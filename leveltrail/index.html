@@ -187,7 +187,7 @@ function stats(c) {
   const onLevel = since && c.online != null && since.online != null ? c.online - since.online : null;
   // estimate: later levels take longer, so scale the recent average by the level ratio
   let eta = null;
-  if (avg5 && c.level < MAX_LEVEL) {
+  if (avg5 && last5.length >= 3 && c.level < MAX_LEVEL) {
     const ref = last5.reduce((a, s) => a + s.level, 0) / last5.length;
     let total = 0;
     for (let L = c.level; L < MAX_LEVEL; L++) total += avg5 * Math.pow((L + 1) / ref, 1.15);
@@ -196,7 +196,7 @@ function stats(c) {
   }
   const xs = c.xpSources || null;
   const deaths = arr(c.deaths);
-  return { splits, full, recorded, avg5, fastest, slowest, onLevel, eta, xs, deaths, deathCount: c.deathCount ?? deaths.length };
+  return { n5: last5.length, splits, full, recorded, avg5, fastest, slowest, onLevel, eta, xs, deaths, deathCount: c.deathCount ?? deaths.length };
 }
 
 /* ---------- rendering ---------- */
@@ -215,7 +215,7 @@ function barChart(splits) {
   if (!data.length) return `<div class="empty">No completed level yet. Splits start with your next level-up.</div>`;
   const W = 1000, H = 220, P = {l: 46, r: 8, t: 10, b: 24};
   const max = Math.max(...data.map(s => +s.dur));
-  const bw = (W - P.l - P.r) / data.length;
+  const bw = Math.min(70, (W - P.l - P.r) / data.length);
   const y = v => H - P.b - (v / max) * (H - P.t - P.b);
   const ticks = [0, .25, .5, .75, 1].map(f => f * max);
   let g = ticks.map(t => `<line x1="${P.l}" x2="${W - P.r}" y1="${y(t)}" y2="${y(t)}" stroke="#222a33"/><text x="${P.l - 6}" y="${y(t) + 4}" text-anchor="end">${dur(t, true)}</text>`).join("");
@@ -280,8 +280,8 @@ function render() {
   <div class="small" style="margin-top:4px">${c.level >= MAX_LEVEL ? "Max level" : `${xpPct.toFixed(0)} % into level ${c.level}${c.rested ? `, ${num(c.rested)} rested XP` : ""}`}</div>
 
   <div class="kpis">
-    <div class="kpi"><div class="l">Played</div><div class="v">${dur(c.online, true)}</div></div>
-    <div class="kpi"><div class="l">Avg. last 5 levels</div><div class="v">${S.avg5 ? dur(S.avg5, true) : "–"}</div></div>
+    <div class="kpi" title="Online time since LevelTrail was installed"><div class="l">Tracked time</div><div class="v">${dur(c.online, true)}</div></div>
+    <div class="kpi"><div class="l">Avg. last ${S.n5 > 1 ? S.n5 + " levels" : "level"}</div><div class="v">${S.avg5 ? dur(S.avg5, true) : "–"}</div></div>
     <div class="kpi"><div class="l">${c.level >= MAX_LEVEL ? "Levels recorded" : "Est. to level 60"}</div><div class="v">${c.level >= MAX_LEVEL ? S.full.length : S.eta != null ? dur(S.eta, true) : "–"}</div></div>
     <div class="kpi"><div class="l">Deaths</div><div class="v">${num(S.deathCount)}</div></div>
     <div class="kpi"><div class="l">Gold</div><div class="v">${gold(c.copper, true)}</div></div>
@@ -339,7 +339,7 @@ function render() {
     </section>
   </div>
 
-  ${others.length > 1 ? `<section class="card"><h2>Your characters</h2><div class="tblwrap"><table><thead><tr><th>Character</th><th class="num">Level</th><th class="num">Played</th><th class="num">Avg. last 5 levels</th><th class="num">Deaths</th><th class="num">Gold</th></tr></thead><tbody>
+  ${others.length > 1 ? `<section class="card"><h2>Your characters</h2><div class="tblwrap"><table><thead><tr><th>Character</th><th class="num">Level</th><th class="num">Tracked</th><th class="num">Avg. recent levels</th><th class="num">Deaths</th><th class="num">Gold</th></tr></thead><tbody>
     ${others.map(o => { const s = stats(o); return `<tr><td><a href="#" data-open="${esc(charId(o))}" style="color:${CLASS_COLOR[o.class] || "inherit"}">${esc(o.name)}</a> <span class="small">${esc(className(o.class))}</span></td><td class="num">${esc(o.level)}</td><td class="num">${dur(o.online, true)}</td><td class="num">${s.avg5 ? dur(s.avg5, true) : "–"}</td><td class="num">${num(s.deathCount)}</td><td class="num">${gold(o.copper, true)}</td></tr>`; }).join("")}
   </tbody></table></div></section>` : ""}
 
@@ -374,8 +374,8 @@ function drawCard(c, S) {
   ctx.fillStyle = "#c9ced6"; ctx.font = `400 28px ${F}`;
   ctx.fillText(hide ? raceName(c.race) : `Level ${c.level} ${raceName(c.race)} ${className(c.class)}`, 60, 190);
   const tiles = [
-    ["PLAYED", dur(c.online, true)],
-    ["AVG. LAST 5 LEVELS", S.avg5 ? dur(S.avg5, true) : "–"],
+    ["TRACKED TIME", dur(c.online, true)],
+    [S.n5 > 1 ? `AVG. LAST ${S.n5} LEVELS` : "LAST LEVEL", S.avg5 ? dur(S.avg5, true) : "–"],
     ["DEATHS", num(S.deathCount)],
     [c.level >= MAX_LEVEL ? "LIBRARY BOOKS" : "EST. TO 60", c.level >= MAX_LEVEL ? (c.libraryBooks ? `${c.libraryBooks.count}/${c.libraryBooks.total}` : "–") : S.eta != null ? dur(S.eta, true) : "–"]
   ];
@@ -389,7 +389,7 @@ function drawCard(c, S) {
   const data = S.splits.filter(s => s.dur != null).slice(-30);
   const cx = 60, cy = 395, cw = 1080, ch = 150;
   if (data.length) {
-    const max = Math.max(...data.map(s => +s.dur)), bw = cw / data.length;
+    const max = Math.max(...data.map(s => +s.dur)), bw = Math.min(60, cw / data.length);
     data.forEach((s, i) => { const h = Math.max(3, (+s.dur / max) * ch); ctx.fillStyle = s.partial ? "#5b4a26" : "#e0a83a"; roundRect(0, ctx, cx + i * bw + bw * .15, cy + ch - h, bw * .7, h, 3); ctx.fill(); });
     ctx.fillStyle = "#8d97a5"; ctx.font = `400 18px ${F}`;
     ctx.fillText(`Time per level, levels ${data[0].level}–${data[data.length - 1].level}`, cx, cy + ch + 32);
@@ -401,8 +401,8 @@ function drawCard(c, S) {
 }
 function shareText(c, S) {
   const name = $("hideName") && $("hideName").checked ? `Level ${c.level} ${className(c.class)}` : `${c.name}, level ${c.level} ${raceName(c.race)} ${className(c.class)}`;
-  const lines = [`${name} (WoW Forever)`, `Played: ${dur(c.online)}`];
-  if (S.avg5) lines.push(`Last 5 levels: ${dur(S.avg5)} each on average`);
+  const lines = [`${name} (WoW Forever)`, `Tracked time: ${dur(c.online)}`];
+  if (S.avg5) lines.push(`Last ${S.n5} level${S.n5 > 1 ? "s" : ""}: ${dur(S.avg5)} each on average`);
   if (S.fastest) lines.push(`Fastest level: ${S.fastest.level} in ${dur(S.fastest.dur)}`);
   lines.push(`Deaths: ${num(S.deathCount)}`);
   if (c.libraryBooks) lines.push(`Library books: ${c.libraryBooks.count}/${c.libraryBooks.total}`);
