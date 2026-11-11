@@ -198,13 +198,10 @@ function render() {
     <div class="kpi"><div class="l">Still to sell</div><div class="v">${gold(t.unsoldValue, true)}</div></div>
     <div class="kpi"><div class="l">Avg. time to sale</div><div class="v">${heldUnits ? dur(held / heldUnits) : "–"}</div></div>
   </div>
-  ${d.market || d.disenchant ? `<section class="card"><h2>Market and disenchant tabs</h2><div class="kpis" style="margin:0">
-    ${d.market ? `<div class="kpi"><div class="l">Market buys</div><div class="v">${num(d.market.buys)}</div></div>
-    <div class="kpi"><div class="l">Market spent</div><div class="v">${gold(d.market.spent, true)}</div></div>
-    <div class="kpi"><div class="l">Market sold</div><div class="v">${gold(d.market.sold, true)}</div></div>
-    <div class="kpi"><div class="l">Market profit</div><div class="v" style="color:${(d.market.sold || 0) - (d.market.soldCost || 0) < 0 ? "#ef7d6b" : "var(--explore)"}">${gold((d.market.sold || 0) - (d.market.soldCost || 0), true)}</div></div>` : ""}
-    ${d.disenchant ? `<div class="kpi"><div class="l">Bought to disenchant</div><div class="v">${num(d.disenchant.buys)} · ${gold(d.disenchant.spent, true)}</div></div>` : ""}
-  </div><p class="small" style="margin:10px 0 0">Market profit counts items sold on the auction house (from the seller mails): sale minus the 5% cut minus what they cost. The vendor figures above are separate.</p></section>` : ""}
+  ${d.disenchant ? `<section class="card"><h2>Disenchant tab</h2><div class="kpis" style="margin:0">
+    <div class="kpi"><div class="l">Bought to disenchant</div><div class="v">${num(d.disenchant.buys)}</div></div>
+    <div class="kpi"><div class="l">Spent</div><div class="v">${gold(d.disenchant.spent, true)}</div></div>
+  </div></section>` : ""}
   <section class="card"><h2>Profit per day <span class="small">${best ? `best day ${esc(best.d)}: ${gold((+best.sold || 0) - (+best.soldCost || 0))}` : ""}</span></h2>${dayChart(days)}
     <div class="legend"><span>Spent ${gold(t.spent)}</span><span>Sold ${gold(t.sold)}</span><span>Profit counts sold goods only: sale price minus what they cost.</span></div></section>
   <section class="card"><h2>Best items <span class="small">by profit</span></h2>
