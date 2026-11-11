@@ -49,7 +49,7 @@ section.card h2{font-size:16px;margin:0 0 14px;display:flex;align-items:baseline
 section.card h2 .small{font-weight:400}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .grid2>section.card{margin:0}
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px 0}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:18px 0}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
 .kpi .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
 .kpi .l{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
@@ -172,7 +172,7 @@ function charId(c) { return `${c.name || "Unknown"}-${c.realm || ""}`; }
 function slim(d) {
   // keep what the viewer needs; drop quests, recipes, spells, bags and bank
   const c = d.char, o = {};
-  ["name","realm","class","race","date","ts","addonVersion","level","xp","xpMax","rested","online","splits","levelSince","xpSources","deaths","deathCount","goldDays","repairs","sessionMonths","sessions","libraryBooks","vendorFloor","copper","zone","subzone","professions"].forEach(k => { if (c[k] !== undefined) o[k] = c[k]; });
+  ["name","realm","class","race","date","ts","addonVersion","level","xp","xpMax","rested","online","splits","levelSince","xpSources","deaths","deathCount","goldDays","repairs","sessionMonths","sessions","libraryBooks","zones","pace","vendorFloor","copper","zone","subzone","professions"].forEach(k => { if (c[k] !== undefined) o[k] = c[k]; });
   return o;
 }
 
@@ -196,9 +196,12 @@ function stats(c) {
     const frac = c.xpMax ? Math.min(1, (+c.xp || 0) / c.xpMax) : 0;
     eta = Math.max(0, total - avg5 * Math.pow((c.level + 1) / ref, 1.15) * frac);
   }
+  // the addon's own estimate (from XP per hour and the XP table) wins when present
+  const p = c.pace || null;
+  if (p && p.secToCap != null && c.level < MAX_LEVEL) eta = +p.secToCap;
   const xs = c.xpSources || null;
   const deaths = arr(c.deaths);
-  return { n5: last5.length, splits, full, recorded, avg5, fastest, slowest, onLevel, eta, xs, deaths, deathCount: c.deathCount ?? deaths.length };
+  return { p, n5: last5.length, splits, full, recorded, avg5, fastest, slowest, onLevel, eta, xs, deaths, deathCount: c.deathCount ?? deaths.length };
 }
 
 /* ---------- rendering ---------- */
@@ -264,6 +267,7 @@ function render() {
   const zones = {};
   S.deaths.forEach(d => { if (d.zone) zones[d.zone] = (zones[d.zone] || 0) + 1; });
   const topZone = Object.entries(zones).sort((a, b) => b[1] - a[1])[0];
+  const zoneRows = arr(c.zones).filter(z => z && z.zone && (+z.time || +z.xp)).sort((a, b) => (+b.time || 0) - (+a.time || 0));
   const lb = c.libraryBooks;
   const months = arr(c.sessionMonths);
   const sessions = arr(c.sessions);
@@ -285,7 +289,8 @@ function render() {
   <div class="kpis">
     <div class="kpi" title="Online time since LevelTrail was installed"><div class="l">Tracked time</div><div class="v">${dur(c.online, true)}</div></div>
     <div class="kpi"><div class="l">Avg. last ${S.n5 > 1 ? S.n5 + " levels" : "level"}</div><div class="v">${S.avg5 ? dur(S.avg5, true) : "–"}</div></div>
-    <div class="kpi"><div class="l">${c.level >= MAX_LEVEL ? "Levels recorded" : "Est. to level 60"}</div><div class="v">${c.level >= MAX_LEVEL ? S.full.length : S.eta != null ? dur(S.eta, true) : "–"}</div></div>
+    <div class="kpi" title="${S.p && S.p.secToNext != null ? `Next level in ${dur(S.p.secToNext)}` : ""}"><div class="l">${c.level >= MAX_LEVEL ? "Levels recorded" : "Est. to level 60"}</div><div class="v">${c.level >= MAX_LEVEL ? S.full.length : S.eta != null ? dur(S.eta, true) : "–"}</div></div>
+    <div class="kpi" title="${S.p && S.p.xpPerHour ? `From the last ${esc(S.p.levelsUsed || 0)} full levels${S.p.sessionXpPerHour ? `; this session ${num(S.p.sessionXpPerHour)} XP/h` : ""}` : "Shown once a full level is recorded"}"><div class="l">XP per hour</div><div class="v">${S.p && (S.p.xpPerHour || S.p.sessionXpPerHour) ? num(S.p.xpPerHour || S.p.sessionXpPerHour) : "–"}</div></div>
     <div class="kpi"><div class="l">Deaths</div><div class="v">${num(S.deathCount)}</div></div>
     <div class="kpi"><div class="l">Gold</div><div class="v">${gold(c.copper, true)}</div></div>
   </div>
@@ -317,6 +322,14 @@ function render() {
       : `<div class="empty">No deaths recorded. Keep it that way.</div>`}
     </section>
   </div>
+
+
+  <section class="card">
+    <h2>Zones <span class="small">online time, XP and deaths per zone</span></h2>
+    ${zoneRows.length ? `<div class="tblwrap" style="max-height:300px"><table><thead><tr><th>Zone</th><th class="num">Time</th><th class="num">XP</th><th class="num">XP per hour</th><th class="num">Deaths</th></tr></thead><tbody>
+      ${zoneRows.map(z => `<tr><td>${esc(z.zone)}</td><td class="num">${dur(z.time)}</td><td class="num">${num(z.xp)}</td><td class="num">${z.time >= 600 && z.xp ? num(Math.round(z.xp / z.time * 3600)) : "–"}</td><td class="num">${num(z.deaths)}</td></tr>`).join("")}
+    </tbody></table></div>` : `<div class="empty">No zone data yet. Update LevelTrail, play a bit and export again.</div>`}
+  </section>
 
   <section class="card">
     <h2>Gold <span class="small">${c.repairs ? `repairs: ${gold(c.repairs.total)} in ${num(c.repairs.count)} visits` : ""}</span></h2>
@@ -452,6 +465,8 @@ const DEMO = (() => {
     goldDays, copper: c, repairs: { total: 23450, count: 14 }, zone: "Dustwallow Marsh",
     sessions: [{ date: "2026-11-09", minutes: 214, levelStart: 30, levelEnd: 32, copperDelta: 18400, flipProfit: 6200 }, { date: "2026-11-10", minutes: 168, levelStart: 32, levelEnd: 33, copperDelta: 9600, flipProfit: 3100 }, { date: "2026-11-11", minutes: 121, levelStart: 33, levelEnd: 34, copperDelta: 7300, flipProfit: 2500 }],
     vendorFloor: { buys: 212, spent: 61200, sold: 118900, profit: 57700, unsoldUnits: 31, unsoldValue: 8400, days: [3,4,5,6,7,8,9,10,11].map(n => ({ d: `2026-11-${String(n).padStart(2, "0")}`, profit: 2000 + ((n * 2711) % 9000) })) },
+    pace: { level: 34, maxLevel: 60, xpPerHour: 21400, sessionXpPerHour: 23800, levelsUsed: 5, secToNext: 2770, secToCap: 1218000 },
+    zones: [["The Barrens", 52000, 98000, 2], ["Stonetalon Mountains", 31000, 64000, 1], ["Ashenvale", 29000, 61000, 1], ["Durotar", 14000, 12000, 0], ["Thousand Needles", 12500, 30000, 1], ["Dustwallow Marsh", 6100, 14000, 0]].map(([zone, time, xp, deaths]) => ({ zone, time, xp, deaths })),
     libraryBooks: { count: 12, total: 40, missing: [{ title: "Nar'thalas Almanac, Vol. 74" }, { title: "Arcanic Systems Manual" }] } };
 })();
 
