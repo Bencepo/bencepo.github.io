@@ -23,6 +23,7 @@ header.top .wrap{display:flex;align-items:center;gap:14px;height:58px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.3px;font-size:17px}
 .brand svg{width:26px;height:26px}
 .spacer{flex:1}
+.nav{display:flex;gap:4px;margin-left:18px}.nav a{color:var(--muted);text-decoration:none;font-size:14px;padding:6px 10px;border-radius:6px}.nav a.on,.nav a:hover{color:var(--text);background:var(--panel)}
 .chars{display:flex;gap:6px;flex-wrap:wrap}
 .chip{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer}
 .chip.on{border-color:var(--gold);color:var(--gold)}
@@ -84,6 +85,7 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:22px 0 40px;colo
 <body>
 <header class="top"><div class="wrap">
   <div class="brand"><svg viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#151a21"/><path d="M5 25 L12 17 L17 21 L27 8" stroke="#e0a83a" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>LevelTrail</div>
+  <nav class="nav"><a class="on" href="../leveltrail/">LevelTrail</a><a href="../vendorfloor/">VendorFloor</a></nav>
   <div class="spacer"></div>
   <div class="chars" id="chars"></div>
   <button id="addBtn" class="hidden">Import</button>
@@ -170,7 +172,7 @@ function charId(c) { return `${c.name || "Unknown"}-${c.realm || ""}`; }
 function slim(d) {
   // keep what the viewer needs; drop quests, recipes, spells, bags and bank
   const c = d.char, o = {};
-  ["name","realm","class","race","date","ts","addonVersion","level","xp","xpMax","rested","online","splits","levelSince","xpSources","deaths","deathCount","goldDays","repairs","sessionMonths","sessions","libraryBooks","copper","zone","subzone","professions"].forEach(k => { if (c[k] !== undefined) o[k] = c[k]; });
+  ["name","realm","class","race","date","ts","addonVersion","level","xp","xpMax","rested","online","splits","levelSince","xpSources","deaths","deathCount","goldDays","repairs","sessionMonths","sessions","libraryBooks","vendorFloor","copper","zone","subzone","professions"].forEach(k => { if (c[k] !== undefined) o[k] = c[k]; });
   return o;
 }
 
@@ -265,6 +267,7 @@ function render() {
   const lb = c.libraryBooks;
   const months = arr(c.sessionMonths);
   const sessions = arr(c.sessions);
+  const hasFlips = !!c.vendorFloor || sessions.some(s => s.flipProfit != null);
   const others = Object.keys(chars).map(id => chars[id]).sort((a, b) => (b.level || 0) - (a.level || 0));
 
   $("view").innerHTML = `
@@ -318,6 +321,7 @@ function render() {
   <section class="card">
     <h2>Gold <span class="small">${c.repairs ? `repairs: ${gold(c.repairs.total)} in ${num(c.repairs.count)} visits` : ""}</span></h2>
     ${goldChart(c.goldDays)}
+    ${vfBlock(c.vendorFloor)}
   </section>
 
   <div class="grid2">
@@ -332,9 +336,9 @@ function render() {
 
     <section class="card">
       <h2>Play sessions</h2>
-      ${sessions.length || months.length ? `<div class="tblwrap" style="max-height:240px"><table><thead><tr><th>Day</th><th class="num">Time</th><th class="num">Levels</th><th class="num">Gold</th></tr></thead><tbody>
-        ${[...sessions].reverse().slice(0, 14).map(s => `<tr><td>${esc(s.date)}</td><td class="num">${dur((+s.minutes || 0) * 60)}</td><td class="num">${esc(s.levelStart)}→${esc(s.levelEnd)}</td><td class="num">${gold(s.copperDelta, true)}</td></tr>`).join("")}
-        ${[...months].reverse().map(m => `<tr><td>${esc(m.month)} (${esc(m.sessions)} days)</td><td class="num">${dur((+m.minutes || 0) * 60)}</td><td class="num">–</td><td class="num">${gold(m.copper, true)}</td></tr>`).join("")}
+      ${sessions.length || months.length ? `<div class="tblwrap" style="max-height:240px"><table><thead><tr><th>Day</th><th class="num">Time</th><th class="num">Levels</th><th class="num">Gold</th><th class="num">Gold/h</th>${hasFlips ? `<th class="num" title="VendorFloor profit in this session">Flips</th>` : ""}</tr></thead><tbody>
+        ${[...sessions].reverse().slice(0, 14).map(s => `<tr><td>${esc(s.date)}</td><td class="num">${dur((+s.minutes || 0) * 60)}</td><td class="num">${esc(s.levelStart)}→${esc(s.levelEnd)}</td><td class="num">${gold(s.copperDelta, true)}</td><td class="num">${perHour(s.copperDelta, s.minutes)}</td>${hasFlips ? `<td class="num">${s.flipProfit != null ? gold(s.flipProfit, true) : "–"}</td>` : ""}</tr>`).join("")}
+        ${[...months].reverse().map(m => `<tr><td>${esc(m.month)} (${esc(m.sessions)} days)</td><td class="num">${dur((+m.minutes || 0) * 60)}</td><td class="num">–</td><td class="num">${gold(m.copper, true)}</td><td class="num">${perHour(m.copper, m.minutes)}</td>${hasFlips ? `<td class="num">–</td>` : ""}</tr>`).join("")}
       </tbody></table></div>` : `<div class="empty">No sessions recorded yet.</div>`}
     </section>
   </div>
@@ -355,6 +359,21 @@ function render() {
     </div>
   </section>`;
   drawCard(c, S);
+}
+
+function perHour(copper, minutes) { minutes = +minutes || 0; return minutes >= 10 ? gold((+copper || 0) / (minutes / 60), true) : "–"; }
+function vfBlock(v) {
+  if (!v) return `<p class="small" style="margin:12px 0 0">Flipping auctions below vendor price? With <a href="../vendorfloor/">VendorFloor</a> installed, its profit shows up here.</p>`;
+  const days = arr(v.days).slice(-30);
+  const max = Math.max(1, ...days.map(d => Math.abs(+d.profit || 0)));
+  const W = 1000, H = 70;
+  const bw = Math.min(30, W / Math.max(1, days.length));
+  const bars = days.map((d, i) => { const h = Math.max(2, Math.abs(+d.profit || 0) / max * (H - 6)); return `<rect x="${i * bw + bw * .15}" y="${H - h}" width="${bw * .7}" height="${h}" rx="2" fill="${(+d.profit || 0) < 0 ? "#d0634f" : "#5aa77a"}"><title>${esc(d.d)}: ${gold(d.profit)}</title></rect>`; }).join("");
+  return `<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">
+    <div class="row" style="justify-content:space-between"><b>VendorFloor flips <span class="small" style="font-weight:400">all characters</span></b>
+    <span class="small">profit ${gold(v.profit)} · ${num(v.buys)} buys · still to sell ${gold(v.unsoldValue, true)}</span></div>
+    ${days.length ? `<svg viewBox="0 0 ${W} ${H}" width="100%" style="margin-top:8px" role="img" aria-label="Profit per day">${bars}</svg><div class="small">Profit per day, last ${days.length} day${days.length === 1 ? "" : "s"}. <a href="../vendorfloor/">Details on the VendorFloor page</a></div>` : ""}
+  </div>`;
 }
 
 /* ---------- share card ---------- */
@@ -431,7 +450,8 @@ const DEMO = (() => {
     online: online + 2400, splits, levelSince: { level: 34, online, date: splits[splits.length - 1].date },
     xpSources: { quest: q, kill: k, explore: e, total: Math.round(total * 1.03), byLevel }, deaths, deathCount: deaths.length,
     goldDays, copper: c, repairs: { total: 23450, count: 14 }, zone: "Dustwallow Marsh",
-    sessions: [{ date: "2026-11-09", minutes: 214, levelStart: 30, levelEnd: 32, copperDelta: 18400 }, { date: "2026-11-10", minutes: 168, levelStart: 32, levelEnd: 33, copperDelta: 9600 }, { date: "2026-11-11", minutes: 121, levelStart: 33, levelEnd: 34, copperDelta: 7300 }],
+    sessions: [{ date: "2026-11-09", minutes: 214, levelStart: 30, levelEnd: 32, copperDelta: 18400, flipProfit: 6200 }, { date: "2026-11-10", minutes: 168, levelStart: 32, levelEnd: 33, copperDelta: 9600, flipProfit: 3100 }, { date: "2026-11-11", minutes: 121, levelStart: 33, levelEnd: 34, copperDelta: 7300, flipProfit: 2500 }],
+    vendorFloor: { buys: 212, spent: 61200, sold: 118900, profit: 57700, unsoldUnits: 31, unsoldValue: 8400, days: [3,4,5,6,7,8,9,10,11].map(n => ({ d: `2026-11-${String(n).padStart(2, "0")}`, profit: 2000 + ((n * 2711) % 9000) })) },
     libraryBooks: { count: 12, total: 40, missing: [{ title: "Nar'thalas Almanac, Vol. 74" }, { title: "Arcanic Systems Manual" }] } };
 })();
 

@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VendorFloor – your auction flips below vendor price, analysed</title>
+<meta name="description" content="Paste your VendorFloor ledger and see profit per day, your best items and how long goods wait until sale. WoW Forever. Runs in your browser.">
+<meta property="og:title" content="VendorFloor – your flips, analysed">
+<meta property="og:description" content="Profit per day, best items and time to sale for WoW Forever auction flips below vendor price.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23151a21'/%3E%3Cpath d='M9 10 L15 18 L23 8' stroke='%23e0a83a' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M6 22 H26' stroke='%235aa77a' stroke-width='2.4'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0f1318;--panel:#161b22;--panel2:#1c232c;--line:#28313c;--text:#e6e9ee;--muted:#8d97a5;
+  --gold:#e0a83a;--quest:#e0a83a;--kill:#d0634f;--explore:#5aa77a;--other:#6b7685;--accent:#e0a83a;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--gold)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header.top{border-bottom:1px solid var(--line);background:#0c1014}
+header.top .wrap{display:flex;align-items:center;gap:14px;height:58px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.3px;font-size:17px}
+.brand svg{width:26px;height:26px}
+.spacer{flex:1}
+.nav{display:flex;gap:4px;margin-left:18px}.nav a{color:var(--muted);text-decoration:none;font-size:14px;padding:6px 10px;border-radius:6px}.nav a.on,.nav a:hover{color:var(--text);background:var(--panel)}
+.chars{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer}
+.chip.on{border-color:var(--gold);color:var(--gold)}
+button,.btn{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:8px 14px}
+button.primary{background:var(--gold);border-color:var(--gold);color:#1a1205;font-weight:600}
+button:disabled{opacity:.5;cursor:default}
+.hero{padding:56px 0 28px}
+.hero h1{font-size:40px;line-height:1.1;margin:0 0 14px;max-width:760px;letter-spacing:-.5px}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p.lead{color:var(--muted);font-size:18px;max-width:640px;margin:0 0 26px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 26px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.step b{display:block;margin-bottom:4px}
+.step span{color:var(--muted);font-size:14px}
+.step code{font-family:var(--mono);color:var(--gold)}
+textarea{width:100%;min-height:120px;background:#0b0e12;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;font:13px var(--mono);resize:vertical}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.msg{font-size:14px;margin-top:10px}
+.msg.err{color:#ef7d6b}
+.small{font-size:13px;color:var(--muted)}
+section.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin:16px 0}
+section.card h2{font-size:16px;margin:0 0 14px;display:flex;align-items:baseline;gap:10px}
+section.card h2 .small{font-weight:400}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid2>section.card{margin:0}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px 0}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .l{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+.charhead{display:flex;align-items:center;gap:16px;margin-top:26px;flex-wrap:wrap}
+.charhead h1{margin:0;font-size:30px}
+.charhead .sub{color:var(--muted)}
+.xpbar{height:10px;border-radius:5px;background:#0b0e12;border:1px solid var(--line);overflow:hidden;position:relative;margin-top:6px}
+.xpbar i{position:absolute;top:0;bottom:0;left:0;background:var(--gold)}
+.xpbar u{position:absolute;top:0;bottom:0;background:#3c6fb0;opacity:.7}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--muted);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.5px;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid #1f262f;font-variant-numeric:tabular-nums}
+td.num,th.num{text-align:right}
+.tblwrap{max-height:420px;overflow:auto}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.stack{display:flex;height:16px;border-radius:4px;overflow:hidden;background:#0b0e12}
+.empty{color:var(--muted);font-size:14px;padding:8px 0}
+svg text{fill:var(--muted);font-size:11px;font-family:system-ui,sans-serif}
+.books{display:flex;align-items:center;gap:16px}
+.books .big{font-size:34px;font-weight:700}
+.tiers{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.tier{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
+.tier.ok{border-color:var(--explore);color:var(--explore)}
+details summary{cursor:pointer;color:var(--muted);font-size:14px;margin-top:10px}
+.share canvas{width:100%;max-width:600px;border-radius:10px;border:1px solid var(--line);display:block}
+.share .row{margin-top:12px}
+footer{border-top:1px solid var(--line);margin-top:40px;padding:22px 0 40px;color:var(--muted);font-size:13px}
+.hidden{display:none!important}
+@media (max-width:820px){.steps,.grid2{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:30px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="brand"><svg viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#151a21"/><path d="M6 22 H26" stroke="#5aa77a" stroke-width="2.4" stroke-linecap="round"/><path d="M9 10 L15 18 L23 8" stroke="#e0a83a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>VendorFloor</div>
+  <nav class="nav"><a href="../leveltrail/">LevelTrail</a><a class="on" href="../vendorfloor/">VendorFloor</a></nav>
+  <div class="spacer"></div>
+  <button id="addBtn" class="hidden">Import</button>
+</div></header>
+
+<main class="wrap">
+  <div id="intro" class="hero">
+    <h1>Buy below vendor price. <em>See what it really made.</em></h1>
+    <p class="lead">VendorFloor finds auctions listed below what a merchant pays and buys them on one click. This page shows your ledger: profit per day, your best items, and how long goods wait in your bags. Nothing is uploaded.</p>
+    <div class="steps">
+      <div class="step"><b>1. Install the addon</b><span>Get <a href="https://www.curseforge.com/projects/1797826" target="_blank" rel="noopener">VendorFloor</a> for WoW Forever. It runs next to Auctionator.</span></div>
+      <div class="step"><b>2. Copy your ledger</b><span>In game type <code>/vfloor export</code>, then press Ctrl+C in the window.</span></div>
+      <div class="step"><b>3. Paste it here</b><span>Ctrl+V below. The page keeps the latest export in this browser.</span></div>
+    </div>
+  </div>
+
+  <section class="card" id="importBox">
+    <h2>Paste your ledger <span class="small">from /vfloor export</span></h2>
+    <textarea id="paste" placeholder='{"vendorFloor":1,"total":{...}}' spellcheck="false"></textarea>
+    <div class="row" style="margin-top:12px">
+      <button class="primary" id="importBtn">Show my ledger</button>
+      <button id="demoBtn">Try a demo ledger</button>
+      <span class="small">Stored only in this browser (localStorage).</span>
+    </div>
+    <div class="msg" id="msg"></div>
+  </section>
+
+  <div id="view"></div>
+</main>
+
+<footer><div class="wrap">
+  VendorFloor by Bencepo. Not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment, Inc.
+  <span id="clearWrap"> · <a href="#" id="clearAll">Delete the ledger stored on this site</a></span>
+</div></footer>
+
+<script>
+"use strict";
+const KEY = "vendorfloor.ledger.v1";
+const $ = id => document.getElementById(id);
+const arr = v => Array.isArray(v) ? v : (v && typeof v === "object" ? Object.values(v) : []);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num = n => (+n || 0).toLocaleString("en-US");
+function gold(c, short) {
+  c = Math.round(+c || 0); const neg = c < 0; c = Math.abs(c);
+  const g = Math.floor(c / 10000), s = Math.floor(c % 10000 / 100), k = Math.floor(c % 100);
+  const t = short ? (g ? `${num(g)}g` : s ? `${s}s` : `${k}c`) : (g ? `${num(g)}g ${s}s` : s ? `${s}s ${k}c` : `${k}c`);
+  return (neg ? "−" : "") + t;
+}
+function dur(sec) {
+  if (sec == null || !isFinite(+sec)) return "–";
+  sec = Math.round(+sec); const d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600), m = Math.round(sec % 3600 / 60);
+  return d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : `${m}m`;
+}
+let data = null, demo = false;
+function load() { try { return JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { return null; } }
+function save(d) { try { d ? localStorage.setItem(KEY, JSON.stringify(d)) : localStorage.removeItem(KEY); } catch (e) {} }
+
+function parse(text) {
+  text = String(text || "").trim();
+  if (!text) throw new Error("Paste the text from /vfloor export first.");
+  const a = text.indexOf("{"), b = text.lastIndexOf("}");
+  if (a < 0 || b < a) throw new Error("That does not look like a VendorFloor export. In game type /vfloor export and press Ctrl+C in the window.");
+  let d; try { d = JSON.parse(text.slice(a, b + 1)); } catch (e) { throw new Error("The text is incomplete or changed. Copy it again with Ctrl+C."); }
+  if (d && d.levelTrail) throw new Error("This is a LevelTrail export. Paste it on the LevelTrail page instead.");
+  if (!d || !d.vendorFloor || !d.total) throw new Error("That is not a VendorFloor export.");
+  return d;
+}
+
+function dayChart(days) {
+  days = arr(days).slice(-45);
+  if (!days.length) return `<div class="empty">Profit per day starts with this version of VendorFloor.</div>`;
+  const W = 1000, H = 220, P = {l: 56, r: 8, t: 10, b: 24};
+  const prof = days.map(d => (+d.sold || 0) - (+d.soldCost || 0));
+  const max = Math.max(1, ...prof), min = Math.min(0, ...prof);
+  const bw = Math.min(60, (W - P.l - P.r) / days.length);
+  const y = v => H - P.b - (v - min) / (max - min) * (H - P.t - P.b);
+  let g = [min, 0, max].filter((v, i, a) => a.indexOf(v) === i).map(v => `<line x1="${P.l}" x2="${W - P.r}" y1="${y(v)}" y2="${y(v)}" stroke="#222a33"/><text x="${P.l - 6}" y="${y(v) + 4}" text-anchor="end">${gold(v, true)}</text>`).join("");
+  days.forEach((d, i) => {
+    const v = prof[i], x = P.l + i * bw + bw * .15, top = Math.min(y(v), y(0)), h = Math.max(2, Math.abs(y(v) - y(0)));
+    g += `<rect x="${x}" y="${top}" width="${bw * .7}" height="${h}" rx="2" fill="${v < 0 ? "#d0634f" : "#5aa77a"}"><title>${esc(d.d)}: profit ${gold(v)}, spent ${gold(d.spent)}, sold ${gold(d.sold)}</title></rect>`;
+  });
+  g += `<text x="${P.l}" y="${H - 6}">${esc(days[0].d)}</text><text x="${P.l + days.length * bw}" y="${H - 6}" text-anchor="end">${esc(days[days.length - 1].d)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Profit per day">${g}</svg>`;
+}
+
+function render() {
+  const d = demo ? DEMO : data;
+  $("intro").classList.toggle("hidden", !!d);
+  $("importBox").classList.toggle("hidden", !!d);
+  $("addBtn").classList.toggle("hidden", !d);
+  $("clearWrap").classList.toggle("hidden", !data);
+  if (!d) { $("view").innerHTML = ""; return; }
+  const t = d.total || {};
+  const profit = (+t.sold || 0) - (+t.soldCost || 0);
+  const roi = t.soldCost ? profit / t.soldCost * 100 : null;
+  const items = arr(d.items).map(it => ({ ...it, profit: (+it.sold || 0) - (+it.soldCost || 0) }));
+  const sold = items.filter(it => it.soldUnits > 0).sort((a, b) => b.profit - a.profit);
+  const held = sold.reduce((a, it) => a + (+it.heldSec || 0), 0), heldUnits = sold.reduce((a, it) => a + (+it.heldUnits || 0), 0);
+  const days = arr(d.days);
+  const best = days.length ? days.reduce((a, x) => ((+x.sold || 0) - (+x.soldCost || 0) > (+a.sold || 0) - (+a.soldCost || 0) ? x : a)) : null;
+  const slow = [...sold].filter(it => it.heldUnits).sort((a, b) => b.heldSec / b.heldUnits - a.heldSec / a.heldUnits).slice(0, 5);
+  $("view").innerHTML = `
+  <div class="charhead"><div><h1 style="color:var(--gold)">${demo ? "Demo ledger" : esc((d.char && d.char.name) || "Your ledger")}</h1>
+    <div class="sub">VendorFloor ${esc(d.version || "")} · export from ${esc(d.date || "")} · counts all characters on the account</div></div>
+    <div class="spacer"></div>${demo ? `<button class="primary" id="demoOut">Use my own export</button>` : `<button id="newBtn">Paste a newer export</button>`}</div>
+  <div class="kpis">
+    <div class="kpi"><div class="l">Profit from sales</div><div class="v" style="color:${profit < 0 ? "#ef7d6b" : "var(--explore)"}">${gold(profit, true)}</div></div>
+    <div class="kpi"><div class="l">Return on cost</div><div class="v">${roi != null ? Math.round(roi) + " %" : "–"}</div></div>
+    <div class="kpi"><div class="l">Buys</div><div class="v">${num(t.buys)}</div></div>
+    <div class="kpi"><div class="l">Still to sell</div><div class="v">${gold(t.unsoldValue, true)}</div></div>
+    <div class="kpi"><div class="l">Avg. time to sale</div><div class="v">${heldUnits ? dur(held / heldUnits) : "–"}</div></div>
+  </div>
+  <section class="card"><h2>Profit per day <span class="small">${best ? `best day ${esc(best.d)}: ${gold((+best.sold || 0) - (+best.soldCost || 0))}` : ""}</span></h2>${dayChart(days)}
+    <div class="legend"><span>Spent ${gold(t.spent)}</span><span>Sold ${gold(t.sold)}</span><span>Profit counts sold goods only: sale price minus what they cost.</span></div></section>
+  <section class="card"><h2>Best items <span class="small">by profit</span></h2>
+    ${sold.length ? `<div class="tblwrap"><table><thead><tr><th>Item</th><th class="num">Bought</th><th class="num">Sold</th><th class="num">Spent</th><th class="num">Profit</th><th class="num">Per unit</th><th class="num">Time to sale</th></tr></thead><tbody>
+    ${sold.slice(0, 40).map(it => `<tr><td>${esc(it.name || ("Item " + it.id))}</td><td class="num">${num(it.units)}</td><td class="num">${num(it.soldUnits)}</td><td class="num">${gold(it.spent, true)}</td><td class="num" style="color:${it.profit < 0 ? "#ef7d6b" : "inherit"}">${gold(it.profit, true)}</td><td class="num">${gold(it.profit / it.soldUnits)}</td><td class="num">${it.heldUnits ? dur(it.heldSec / it.heldUnits) : "–"}</td></tr>`).join("")}
+    </tbody></table></div>` : `<div class="empty">No sales recorded yet. Sell your finds at a merchant with VendorFloor's button.</div>`}</section>
+  ${slow.length ? `<section class="card"><h2>Waiting longest in your bags</h2><table><tbody>${slow.map(it => `<tr><td>${esc(it.name || it.id)}</td><td class="num">${dur(it.heldSec / it.heldUnits)} on average</td></tr>`).join("")}</tbody></table>
+    <p class="small">Cheap but slow goods block bag space. Raise the minimum profit (/vfloor profit) if these are not worth it.</p></section>` : ""}
+  <section class="card"><h2>Leveling at the same time?</h2><p class="small" style="margin:0">With <a href="../leveltrail/">LevelTrail</a> installed, your VendorFloor profit shows up next to your gold curve and per play session, with gold per hour.</p></section>`;
+}
+
+const DEMO = (() => {
+  const names = ["Coarse Stone","Light Leather","Linen Cloth","Copper Bar","Silk Cloth","Wool Cloth","Small Lustrous Pearl","Heavy Hide","Iron Ore","Mageweave Cloth"];
+  const items = names.map((n, i) => { const u = 20 + (i * 37) % 90, sc = 400 + i * 950, s = Math.round(sc * (1.25 + (i % 4) * .2)); return { id: 2836 + i, name: n, units: u, buys: 3 + i, spent: sc + 300 * i, soldUnits: u - (i % 3) * 4, sold: s, soldCost: sc, heldSec: (u - (i % 3) * 4) * (1800 + i * 2400), heldUnits: u - (i % 3) * 4 }; });
+  const days = []; for (let n = 1; n <= 11; n++) { const sc = 3000 + n * 900; days.push({ d: `2026-11-${String(n).padStart(2, "0")}`, buys: 10 + n, spent: sc + 1200, sold: Math.round(sc * (1.2 + (n % 4) * .15)), soldCost: sc }); }
+  const tot = k => days.reduce((a, d) => a + d[k], 0);
+  return { vendorFloor: 1, version: "0.4.0-beta", date: "2026-11-11 17:50", total: { buys: tot("buys"), spent: tot("spent"), sold: tot("sold"), soldCost: tot("soldCost"), unsoldUnits: 42, unsoldValue: 6300 }, days, items };
+})();
+
+function doImport(text) {
+  try { data = parse(text); save(data); demo = false; $("paste").value = ""; $("msg").textContent = ""; render(); window.scrollTo(0, 0); }
+  catch (e) { $("msg").textContent = e.message; $("msg").className = "msg err"; }
+}
+$("importBtn").onclick = () => doImport($("paste").value);
+$("paste").addEventListener("paste", ev => { const t = (ev.clipboardData || window.clipboardData).getData("text"); if (t && t.includes("vendorFloor")) { ev.preventDefault(); doImport(t); } });
+$("demoBtn").onclick = () => { demo = true; render(); window.scrollTo(0, 0); };
+const reopen = () => { demo = false; const d = data; data = null; render(); data = d; $("addBtn").classList.add("hidden"); $("paste").focus(); };
+$("addBtn").onclick = reopen;
+$("view").addEventListener("click", ev => { if (ev.target.id === "demoOut" || ev.target.id === "newBtn") reopen(); });
+$("clearAll").onclick = ev => { ev.preventDefault(); data = null; save(null); render(); };
+data = load();
+render();
+</script>
+</body>
+</html>
