@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LevelTrail – your WoW Forever leveling run, analysed</title>
+<meta name="description" content="Paste your LevelTrail export and see your WoW Forever leveling run: time per level, XP sources, deaths, gold, library books and alts. Runs in your browser, nothing is uploaded.">
+<meta property="og:title" content="LevelTrail – your leveling run, analysed">
+<meta property="og:description" content="Time per level, XP sources, deaths, gold and alts for WoW Forever. Free, private, no account.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23151a21'/%3E%3Cpath d='M5 25 L12 17 L17 21 L27 8' stroke='%23e0a83a' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0f1318;--panel:#161b22;--panel2:#1c232c;--line:#28313c;--text:#e6e9ee;--muted:#8d97a5;
+  --gold:#e0a83a;--quest:#e0a83a;--kill:#d0634f;--explore:#5aa77a;--other:#6b7685;--accent:#e0a83a;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--gold)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header.top{border-bottom:1px solid var(--line);background:#0c1014}
+header.top .wrap{display:flex;align-items:center;gap:14px;height:58px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.3px;font-size:17px}
+.brand svg{width:26px;height:26px}
+.spacer{flex:1}
+.chars{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer}
+.chip.on{border-color:var(--gold);color:var(--gold)}
+button,.btn{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:8px 14px}
+button.primary{background:var(--gold);border-color:var(--gold);color:#1a1205;font-weight:600}
+button:disabled{opacity:.5;cursor:default}
+.hero{padding:56px 0 28px}
+.hero h1{font-size:40px;line-height:1.1;margin:0 0 14px;max-width:760px;letter-spacing:-.5px}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p.lead{color:var(--muted);font-size:18px;max-width:640px;margin:0 0 26px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 26px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.step b{display:block;margin-bottom:4px}
+.step span{color:var(--muted);font-size:14px}
+.step code{font-family:var(--mono);color:var(--gold)}
+textarea{width:100%;min-height:120px;background:#0b0e12;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;font:13px var(--mono);resize:vertical}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.msg{font-size:14px;margin-top:10px}
+.msg.err{color:#ef7d6b}
+.small{font-size:13px;color:var(--muted)}
+section.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin:16px 0}
+section.card h2{font-size:16px;margin:0 0 14px;display:flex;align-items:baseline;gap:10px}
+section.card h2 .small{font-weight:400}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid2>section.card{margin:0}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px 0}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .l{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+.charhead{display:flex;align-items:center;gap:16px;margin-top:26px;flex-wrap:wrap}
+.charhead h1{margin:0;font-size:30px}
+.charhead .sub{color:var(--muted)}
+.xpbar{height:10px;border-radius:5px;background:#0b0e12;border:1px solid var(--line);overflow:hidden;position:relative;margin-top:6px}
+.xpbar i{position:absolute;top:0;bottom:0;left:0;background:var(--gold)}
+.xpbar u{position:absolute;top:0;bottom:0;background:#3c6fb0;opacity:.7}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--muted);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.5px;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid #1f262f;font-variant-numeric:tabular-nums}
+td.num,th.num{text-align:right}
+.tblwrap{max-height:420px;overflow:auto}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.stack{display:flex;height:16px;border-radius:4px;overflow:hidden;background:#0b0e12}
+.empty{color:var(--muted);font-size:14px;padding:8px 0}
+svg text{fill:var(--muted);font-size:11px;font-family:system-ui,sans-serif}
+.books{display:flex;align-items:center;gap:16px}
+.books .big{font-size:34px;font-weight:700}
+.tiers{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.tier{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
+.tier.ok{border-color:var(--explore);color:var(--explore)}
+details summary{cursor:pointer;color:var(--muted);font-size:14px;margin-top:10px}
+.share canvas{width:100%;max-width:600px;border-radius:10px;border:1px solid var(--line);display:block}
+.share .row{margin-top:12px}
+footer{border-top:1px solid var(--line);margin-top:40px;padding:22px 0 40px;color:var(--muted);font-size:13px}
+.hidden{display:none!important}
+@media (max-width:820px){.steps,.grid2{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:30px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="brand"><svg viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#151a21"/><path d="M5 25 L12 17 L17 21 L27 8" stroke="#e0a83a" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>LevelTrail</div>
+  <div class="spacer"></div>
+  <div class="chars" id="chars"></div>
+  <button id="addBtn" class="hidden">Import</button>
+</div></header>
+
+<main class="wrap">
+  <div id="intro" class="hero">
+    <h1>Your WoW Forever leveling run, <em>split by split</em>.</h1>
+    <p class="lead">Time on every level, where your XP came from, every death, your gold curve, library books and all your alts. Paste one export and see it. Nothing is uploaded: your data stays in this browser.</p>
+    <div class="steps">
+      <div class="step"><b>1. Install the addon</b><span>Get <a href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">LevelTrail</a> for WoW Forever. It records from the moment you log in.</span></div>
+      <div class="step"><b>2. Copy your export</b><span>In game type <code>/trail</code>, then press Ctrl+C in the window.</span></div>
+      <div class="step"><b>3. Paste it here</b><span>Ctrl+V below. Each character is kept separately, so alts can be compared.</span></div>
+    </div>
+  </div>
+
+  <section class="card" id="importBox">
+    <h2>Paste your export <span class="small">from /trail</span></h2>
+    <textarea id="paste" placeholder='{"levelTrail":2,"char":{...}}' spellcheck="false"></textarea>
+    <div class="row" style="margin-top:12px">
+      <button class="primary" id="importBtn">Show my run</button>
+      <button id="demoBtn">Try a demo character</button>
+      <span class="small">Stored only in this browser (localStorage).</span>
+    </div>
+    <div class="msg" id="msg"></div>
+  </section>
+
+  <div id="view"></div>
+</main>
+
+<footer><div class="wrap">
+  LevelTrail by Bencepo. Not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment, Inc.
+  <span id="clearWrap"> · <a href="#" id="clearAll">Delete all data stored on this site</a></span>
+</div></footer>
+
+<script>
+"use strict";
+const KEY = "leveltrail.chars.v1";
+const CLASS_COLOR = {WARRIOR:"#C69B6D",PALADIN:"#F48CBA",HUNTER:"#AAD372",ROGUE:"#FFF468",PRIEST:"#FFFFFF",SHAMAN:"#0070DD",MAGE:"#3FC7EB",WARLOCK:"#8788EE",DRUID:"#FF7C0A",DEATHKNIGHT:"#C41E3A",MONK:"#00FF98",DEMONHUNTER:"#A330C9",EVOKER:"#33937F"};
+const MAX_LEVEL = 60;
+const $ = id => document.getElementById(id);
+const arr = v => Array.isArray(v) ? v : (v && typeof v === "object" ? Object.values(v) : []);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num = n => (+n || 0).toLocaleString("en-US");
+const cap = s => { s = String(s || "").toLowerCase(); return s ? s[0].toUpperCase() + s.slice(1) : ""; };
+const className = c => ({DEATHKNIGHT:"Death Knight",DEMONHUNTER:"Demon Hunter"}[c] || cap(c));
+const raceName = r => ({Scourge:"Undead"}[r] || String(r || "").replace(/([a-z])([A-Z])/g, "$1 $2"));
+function dur(sec, short) {
+  if (sec == null || !isFinite(+sec)) return "–";
+  sec = Math.max(0, Math.round(+sec));
+  const d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600), m = Math.round(sec % 3600 / 60);
+  if (d) return short ? `${d}d ${h}h` : `${d} d ${h} h`;
+  if (h) return short ? `${h}h ${m}m` : `${h} h ${m} min`;
+  return short ? `${m}m` : `${m} min`;
+}
+function gold(c, short) {
+  c = +c || 0; const neg = c < 0; c = Math.abs(c);
+  const g = Math.floor(c / 10000), s = Math.floor(c % 10000 / 100), k = Math.floor(c % 100);
+  const t = short ? (g ? `${num(g)}g` : s ? `${s}s` : `${k}c`) : (g ? `${num(g)}g ${s}s` : `${s}s ${k}c`);
+  return (neg ? "−" : "") + t;
+}
+const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+
+/* ---------- storage (per browser, may be unavailable) ---------- */
+function load() { try { return JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { return memStore; } }
+let memStore = {};
+function save(all) { memStore = all; try { localStorage.setItem(KEY, JSON.stringify(all)); } catch (e) {} }
+let chars = load();
+let current = null;
+let demoMode = false;
+
+/* ---------- parsing ---------- */
+function parseExport(text) {
+  text = String(text || "").trim();
+  if (!text) throw new Error("Paste the text from /trail first.");
+  const start = text.indexOf("{"), end = text.lastIndexOf("}");
+  if (start < 0 || end < start) throw new Error("That does not look like a LevelTrail export. In game type /trail and press Ctrl+C in the window.");
+  let d;
+  try { d = JSON.parse(text.slice(start, end + 1)); } catch (e) { throw new Error("The text is incomplete or changed. Copy it again with Ctrl+C in the /trail window."); }
+  if (!d || !(d.levelTrail || d.bencepoExport) || !d.char || d.char.level == null) throw new Error("That is not a LevelTrail export.");
+  return d;
+}
+function charId(c) { return `${c.name || "Unknown"}-${c.realm || ""}`; }
+function slim(d) {
+  // keep what the viewer needs; drop quests, recipes, spells, bags and bank
+  const c = d.char, o = {};
+  ["name","realm","class","race","date","ts","addonVersion","level","xp","xpMax","rested","online","splits","levelSince","xpSources","deaths","deathCount","goldDays","repairs","sessionMonths","sessions","libraryBooks","copper","zone","subzone","professions"].forEach(k => { if (c[k] !== undefined) o[k] = c[k]; });
+  return o;
+}
+
+/* ---------- derived numbers ---------- */
+function stats(c) {
+  const splits = arr(c.splits).filter(s => s && s.level != null).sort((a, b) => a.level - b.level);
+  const full = splits.filter(s => s.dur != null && !s.partial);
+  const recorded = full.reduce((a, s) => a + (+s.dur || 0), 0);
+  const last5 = full.slice(-5);
+  const avg5 = last5.length ? last5.reduce((a, s) => a + (+s.dur || 0), 0) / last5.length : null;
+  const fastest = full.length ? full.reduce((a, s) => (+s.dur < +a.dur ? s : a)) : null;
+  const slowest = full.length ? full.reduce((a, s) => (+s.dur > +a.dur ? s : a)) : null;
+  const since = c.levelSince;
+  const onLevel = since && c.online != null && since.online != null ? c.online - since.online : null;
+  // estimate: later levels take longer, so scale the recent average by the level ratio
+  let eta = null;
+  if (avg5 && c.level < MAX_LEVEL) {
+    const ref = last5.reduce((a, s) => a + s.level, 0) / last5.length;
+    let total = 0;
+    for (let L = c.level; L < MAX_LEVEL; L++) total += avg5 * Math.pow((L + 1) / ref, 1.15);
+    const frac = c.xpMax ? Math.min(1, (+c.xp || 0) / c.xpMax) : 0;
+    eta = Math.max(0, total - avg5 * Math.pow((c.level + 1) / ref, 1.15) * frac);
+  }
+  const xs = c.xpSources || null;
+  const deaths = arr(c.deaths);
+  return { splits, full, recorded, avg5, fastest, slowest, onLevel, eta, xs, deaths, deathCount: c.deathCount ?? deaths.length };
+}
+
+/* ---------- rendering ---------- */
+function renderChips() {
+  const ids = Object.keys(chars).sort((a, b) => (chars[b].level || 0) - (chars[a].level || 0));
+  $("chars").innerHTML = ids.map(id => {
+    const c = chars[id];
+    return `<button class="chip ${id === current ? "on" : ""}" data-id="${esc(id)}" style="${id === current ? "" : `color:${CLASS_COLOR[c.class] || "inherit"}`}">${esc(c.name)} ${esc(c.level)}</button>`;
+  }).join("") + (demoMode ? `<span class="chip on">Demo</span>` : "");
+  $("addBtn").classList.toggle("hidden", !(ids.length || demoMode));
+  $("clearWrap").classList.toggle("hidden", !ids.length);
+}
+
+function barChart(splits) {
+  const data = splits.filter(s => s.dur != null);
+  if (!data.length) return `<div class="empty">No completed level yet. Splits start with your next level-up.</div>`;
+  const W = 1000, H = 220, P = {l: 46, r: 8, t: 10, b: 24};
+  const max = Math.max(...data.map(s => +s.dur));
+  const bw = (W - P.l - P.r) / data.length;
+  const y = v => H - P.b - (v / max) * (H - P.t - P.b);
+  const ticks = [0, .25, .5, .75, 1].map(f => f * max);
+  let g = ticks.map(t => `<line x1="${P.l}" x2="${W - P.r}" y1="${y(t)}" y2="${y(t)}" stroke="#222a33"/><text x="${P.l - 6}" y="${y(t) + 4}" text-anchor="end">${dur(t, true)}</text>`).join("");
+  data.forEach((s, i) => {
+    const x = P.l + i * bw + bw * .12, w = bw * .76, top = y(+s.dur);
+    g += `<rect x="${x}" y="${top}" width="${w}" height="${H - P.b - top}" rx="2" fill="${s.partial ? "#5b4a26" : "#e0a83a"}"><title>Level ${s.level - 1} → ${s.level}: ${s.partial ? "at least " : ""}${dur(s.dur)}</title></rect>`;
+    if (data.length <= 30 || i % 2 === 0) g += `<text x="${x + w / 2}" y="${H - 8}" text-anchor="middle">${s.level}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Time per level">${g}</svg>`;
+}
+
+function goldChart(days) {
+  days = arr(days).filter(d => d && d.d);
+  if (days.length < 2) return `<div class="empty">Gold is recorded once a day. Come back after a few play days.</div>`;
+  const W = 1000, H = 180, P = {l: 56, r: 8, t: 10, b: 22};
+  const vals = days.map(d => +d.c || 0), max = Math.max(1, ...vals), min = Math.min(0, ...vals);
+  const x = i => P.l + i * (W - P.l - P.r) / (days.length - 1);
+  const y = v => H - P.b - (v - min) / (max - min) * (H - P.t - P.b);
+  const pts = vals.map((v, i) => `${x(i)},${y(v)}`).join(" ");
+  let g = [0, .5, 1].map(f => { const v = min + f * (max - min); return `<line x1="${P.l}" x2="${W - P.r}" y1="${y(v)}" y2="${y(v)}" stroke="#222a33"/><text x="${P.l - 6}" y="${y(v) + 4}" text-anchor="end">${gold(v, true)}</text>`; }).join("");
+  g += `<polygon points="${P.l},${y(min)} ${pts} ${x(days.length - 1)},${y(min)}" fill="#e0a83a" opacity=".12"/><polyline points="${pts}" fill="none" stroke="#e0a83a" stroke-width="2.4"/>`;
+  g += `<text x="${P.l}" y="${H - 5}">${esc(days[0].d)}</text><text x="${W - P.r}" y="${H - 5}" text-anchor="end">${esc(days[days.length - 1].d)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Gold over time">${g}</svg>`;
+}
+
+function render() {
+  renderChips();
+  const c = current && (demoMode && current === "demo" ? DEMO : chars[current]);
+  $("intro").classList.toggle("hidden", !!c);
+  $("importBox").classList.toggle("hidden", !!c);
+  if (!c) { $("view").innerHTML = ""; return; }
+  const S = stats(c);
+  const col = CLASS_COLOR[c.class] || "var(--text)";
+  const xpPct = c.xpMax ? Math.min(100, (+c.xp || 0) / c.xpMax * 100) : 0;
+  const restPct = c.xpMax ? Math.min(100 - xpPct, (+c.rested || 0) / c.xpMax * 100) : 0;
+  const xs = S.xs;
+  const src = xs ? [["Quests", +xs.quest || 0, "var(--quest)"], ["Kills", +xs.kill || 0, "var(--kill)"], ["Exploration", +xs.explore || 0, "var(--explore)"]] : [];
+  if (xs) src.push(["Other", Math.max(0, (+xs.total || 0) - src.reduce((a, s) => a + s[1], 0)), "var(--other)"]);
+  const srcSum = src.reduce((a, s) => a + s[1], 0);
+  const byLevel = xs && xs.byLevel ? Object.keys(xs.byLevel).map(Number).filter(isFinite).sort((a, b) => b - a) : [];
+  const deathsByLevel = {};
+  S.deaths.forEach(d => { deathsByLevel[d.level] = (deathsByLevel[d.level] || 0) + 1; });
+  const deadliest = Object.entries(deathsByLevel).sort((a, b) => b[1] - a[1])[0];
+  const zones = {};
+  S.deaths.forEach(d => { if (d.zone) zones[d.zone] = (zones[d.zone] || 0) + 1; });
+  const topZone = Object.entries(zones).sort((a, b) => b[1] - a[1])[0];
+  const lb = c.libraryBooks;
+  const months = arr(c.sessionMonths);
+  const sessions = arr(c.sessions);
+  const others = Object.keys(chars).map(id => chars[id]).sort((a, b) => (b.level || 0) - (a.level || 0));
+
+  $("view").innerHTML = `
+  <div class="charhead">
+    <div>
+      <h1 style="color:${col}">${esc(c.name)}</h1>
+      <div class="sub">Level ${esc(c.level)} ${esc(raceName(c.race))} ${esc(className(c.class))}${c.zone ? ` · ${esc(c.zone)}` : ""}${c.date ? ` · export from ${esc(c.date)}` : ""}</div>
+    </div>
+    <div class="spacer"></div>
+    ${demoMode && current === "demo" ? `<button class="primary" id="demoOut">Use my own export</button>` : `<button id="delChar">Remove ${esc(c.name)}</button>`}
+  </div>
+  <div class="xpbar" title="${num(c.xp)} / ${num(c.xpMax)} XP"><i style="width:${xpPct}%"></i><u style="left:${xpPct}%;width:${restPct}%"></u></div>
+  <div class="small" style="margin-top:4px">${c.level >= MAX_LEVEL ? "Max level" : `${xpPct.toFixed(0)} % into level ${c.level}${c.rested ? `, ${num(c.rested)} rested XP` : ""}`}</div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="l">Played</div><div class="v">${dur(c.online, true)}</div></div>
+    <div class="kpi"><div class="l">Avg. last 5 levels</div><div class="v">${S.avg5 ? dur(S.avg5, true) : "–"}</div></div>
+    <div class="kpi"><div class="l">${c.level >= MAX_LEVEL ? "Levels recorded" : "Est. to level 60"}</div><div class="v">${c.level >= MAX_LEVEL ? S.full.length : S.eta != null ? dur(S.eta, true) : "–"}</div></div>
+    <div class="kpi"><div class="l">Deaths</div><div class="v">${num(S.deathCount)}</div></div>
+    <div class="kpi"><div class="l">Gold</div><div class="v">${gold(c.copper, true)}</div></div>
+  </div>
+
+  <section class="card">
+    <h2>Time per level <span class="small">online time from one ding to the next${S.splits.some(s => s.partial) ? " · dark bars started before the addon was installed" : ""}</span></h2>
+    ${barChart(S.splits)}
+    ${S.full.length ? `<div class="legend"><span>Fastest: level ${S.fastest.level} in ${dur(S.fastest.dur)}</span><span>Slowest: level ${S.slowest.level} in ${dur(S.slowest.dur)}</span>${S.onLevel != null ? `<span>On level ${c.level} for ${dur(S.onLevel)}</span>` : ""}</div>` : ""}
+    ${S.splits.length ? `<details><summary>All splits</summary><div class="tblwrap"><table><thead><tr><th>Level</th><th>Reached</th><th class="num">Time on previous level</th><th class="num">Played at ding</th></tr></thead><tbody>
+      ${[...S.splits].reverse().map(s => `<tr><td>${esc(s.level)}</td><td>${esc(s.date)}</td><td class="num">${s.dur != null ? (s.partial ? "≥ " : "") + dur(s.dur) : "–"}</td><td class="num">${dur(s.online)}</td></tr>`).join("")}
+    </tbody></table></div></details>` : ""}
+  </section>
+
+  <div class="grid2">
+    <section class="card">
+      <h2>Where your XP came from</h2>
+      ${srcSum ? `<div class="stack">${src.filter(s => s[1] > 0).map(s => `<span title="${s[0]} ${pct(s[1], srcSum)} %" style="width:${s[1] / srcSum * 100}%;background:${s[2]}"></span>`).join("")}</div>
+      <div class="legend">${src.map(s => `<span><i style="background:${s[2]}"></i>${s[0]} ${pct(s[1], srcSum)} %</span>`).join("")}</div>
+      ${byLevel.length ? `<details><summary>By level</summary><div class="tblwrap"><table><thead><tr><th>Level</th><th class="num">Quests</th><th class="num">Kills</th><th class="num">Explore</th><th class="num">XP</th></tr></thead><tbody>
+        ${byLevel.map(l => { const b = xs.byLevel[l] || xs.byLevel[String(l)] || {}; return `<tr><td>${l}</td><td class="num">${pct(+b.quest || 0, +b.total || 0)} %</td><td class="num">${pct(+b.kill || 0, +b.total || 0)} %</td><td class="num">${pct(+b.explore || 0, +b.total || 0)} %</td><td class="num">${num(b.total)}</td></tr>`; }).join("")}
+      </tbody></table></div></details>` : ""}`
+      : `<div class="empty">No XP recorded yet.</div>`}
+    </section>
+
+    <section class="card">
+      <h2>Deaths <span class="small">${num(S.deathCount)} total</span></h2>
+      ${S.deaths.length ? `<div class="legend" style="margin:0 0 10px">${deadliest && deadliest[1] > 1 ? `<span>Most deaths on level ${deadliest[0]} (${deadliest[1]})</span>` : ""}${topZone && topZone[1] > 1 ? `<span>Deadliest zone: ${esc(topZone[0])} (${topZone[1]})</span>` : ""}</div>
+      <div class="tblwrap" style="max-height:220px"><table><tbody>${[...S.deaths].reverse().slice(0, 20).map(d => `<tr><td>${esc(d.date)}</td><td>${esc(d.zone || "")}${d.subzone ? `, ${esc(d.subzone)}` : ""}</td><td class="num">Lvl ${esc(d.level)}</td></tr>`).join("")}</tbody></table></div>`
+      : `<div class="empty">No deaths recorded. Keep it that way.</div>`}
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Gold <span class="small">${c.repairs ? `repairs: ${gold(c.repairs.total)} in ${num(c.repairs.count)} visits` : ""}</span></h2>
+    ${goldChart(c.goldDays)}
+  </section>
+
+  <div class="grid2">
+    <section class="card">
+      <h2>Library books</h2>
+      ${lb && lb.total ? `<div class="books"><div class="big">${esc(lb.count)}<span class="small"> / ${esc(lb.total)}</span></div>
+        <div style="flex:1"><div class="xpbar"><i style="width:${pct(lb.count, lb.total)}%"></i></div>
+        <div class="tiers"><span class="tier ${lb.count >= 10 ? "ok" : ""}">10 · necklace</span><span class="tier ${lb.count >= 20 ? "ok" : ""}">20 · ring</span><span class="tier ${lb.count >= 25 ? "ok" : ""}">25</span></div></div></div>
+        ${arr(lb.missing).length ? `<details><summary>${arr(lb.missing).length} still missing</summary><ul style="columns:2;font-size:13px;color:var(--muted);padding-left:18px">${arr(lb.missing).map(b => `<li>${esc(b.title)}</li>`).join("")}</ul></details>` : ""}`
+      : `<div class="empty">Update the addon to see library books.</div>`}
+    </section>
+
+    <section class="card">
+      <h2>Play sessions</h2>
+      ${sessions.length || months.length ? `<div class="tblwrap" style="max-height:240px"><table><thead><tr><th>Day</th><th class="num">Time</th><th class="num">Levels</th><th class="num">Gold</th></tr></thead><tbody>
+        ${[...sessions].reverse().slice(0, 14).map(s => `<tr><td>${esc(s.date)}</td><td class="num">${dur((+s.minutes || 0) * 60)}</td><td class="num">${esc(s.levelStart)}→${esc(s.levelEnd)}</td><td class="num">${gold(s.copperDelta, true)}</td></tr>`).join("")}
+        ${[...months].reverse().map(m => `<tr><td>${esc(m.month)} (${esc(m.sessions)} days)</td><td class="num">${dur((+m.minutes || 0) * 60)}</td><td class="num">–</td><td class="num">${gold(m.copper, true)}</td></tr>`).join("")}
+      </tbody></table></div>` : `<div class="empty">No sessions recorded yet.</div>`}
+    </section>
+  </div>
+
+  ${others.length > 1 ? `<section class="card"><h2>Your characters</h2><div class="tblwrap"><table><thead><tr><th>Character</th><th class="num">Level</th><th class="num">Played</th><th class="num">Avg. last 5 levels</th><th class="num">Deaths</th><th class="num">Gold</th></tr></thead><tbody>
+    ${others.map(o => { const s = stats(o); return `<tr><td><a href="#" data-open="${esc(charId(o))}" style="color:${CLASS_COLOR[o.class] || "inherit"}">${esc(o.name)}</a> <span class="small">${esc(className(o.class))}</span></td><td class="num">${esc(o.level)}</td><td class="num">${dur(o.online, true)}</td><td class="num">${s.avg5 ? dur(s.avg5, true) : "–"}</td><td class="num">${num(s.deathCount)}</td><td class="num">${gold(o.copper, true)}</td></tr>`; }).join("")}
+  </tbody></table></div></section>` : ""}
+
+  <section class="card share">
+    <h2>Share your run <span class="small">an image for Discord or Reddit</span></h2>
+    <canvas id="card" width="1200" height="630"></canvas>
+    <div class="row">
+      <label class="small"><input type="checkbox" id="hideName"> Hide character name</label>
+      <button class="primary" id="dlCard">Download image</button>
+      <button id="copyCard">Copy image</button>
+      <button id="copyText">Copy as text</button>
+      <span class="small" id="shareMsg"></span>
+    </div>
+  </section>`;
+  drawCard(c, S);
+}
+
+/* ---------- share card ---------- */
+function roundRect(x, ctx, X, Y, W, H, r) { ctx.beginPath(); ctx.moveTo(X + r, Y); ctx.arcTo(X + W, Y, X + W, Y + H, r); ctx.arcTo(X + W, Y + H, X, Y + H, r); ctx.arcTo(X, Y + H, X, Y, r); ctx.arcTo(X, Y, X + W, Y, r); ctx.closePath(); }
+function drawCard(c, S) {
+  const cv = $("card"); if (!cv) return;
+  const ctx = cv.getContext("2d"), W = 1200, H = 630;
+  const hide = $("hideName") && $("hideName").checked;
+  const col = CLASS_COLOR[c.class] || "#e6e9ee";
+  const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#151b23"); g.addColorStop(1, "#0b0e12");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = col; ctx.fillRect(0, 0, 10, H);
+  const F = "system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+  ctx.fillStyle = "#8d97a5"; ctx.font = `600 22px ${F}`; ctx.fillText("WOW FOREVER · LEVELING RUN", 60, 70);
+  ctx.fillStyle = col; ctx.font = `800 64px ${F}`;
+  ctx.fillText(hide ? `Level ${c.level} ${className(c.class)}` : String(c.name || ""), 60, 145);
+  ctx.fillStyle = "#c9ced6"; ctx.font = `400 28px ${F}`;
+  ctx.fillText(hide ? raceName(c.race) : `Level ${c.level} ${raceName(c.race)} ${className(c.class)}`, 60, 190);
+  const tiles = [
+    ["PLAYED", dur(c.online, true)],
+    ["AVG. LAST 5 LEVELS", S.avg5 ? dur(S.avg5, true) : "–"],
+    ["DEATHS", num(S.deathCount)],
+    [c.level >= MAX_LEVEL ? "LIBRARY BOOKS" : "EST. TO 60", c.level >= MAX_LEVEL ? (c.libraryBooks ? `${c.libraryBooks.count}/${c.libraryBooks.total}` : "–") : S.eta != null ? dur(S.eta, true) : "–"]
+  ];
+  tiles.forEach((t, i) => {
+    const x = 60 + i * 275, y = 235;
+    ctx.fillStyle = "#1c232c"; roundRect(0, ctx, x, y, 255, 120, 14); ctx.fill();
+    ctx.fillStyle = "#8d97a5"; ctx.font = `600 17px ${F}`; ctx.fillText(t[0], x + 22, y + 40);
+    ctx.fillStyle = "#e6e9ee"; ctx.font = `800 42px ${F}`; ctx.fillText(t[1], x + 22, y + 94);
+  });
+  // mini split chart
+  const data = S.splits.filter(s => s.dur != null).slice(-30);
+  const cx = 60, cy = 395, cw = 1080, ch = 150;
+  if (data.length) {
+    const max = Math.max(...data.map(s => +s.dur)), bw = cw / data.length;
+    data.forEach((s, i) => { const h = Math.max(3, (+s.dur / max) * ch); ctx.fillStyle = s.partial ? "#5b4a26" : "#e0a83a"; roundRect(0, ctx, cx + i * bw + bw * .15, cy + ch - h, bw * .7, h, 3); ctx.fill(); });
+    ctx.fillStyle = "#8d97a5"; ctx.font = `400 18px ${F}`;
+    ctx.fillText(`Time per level, levels ${data[0].level}–${data[data.length - 1].level}`, cx, cy + ch + 32);
+  } else {
+    ctx.fillStyle = "#8d97a5"; ctx.font = `400 22px ${F}`; ctx.fillText("Splits appear after the next level-up.", cx, cy + 80);
+  }
+  ctx.fillStyle = "#e0a83a"; ctx.font = `700 22px ${F}`; ctx.textAlign = "right";
+  ctx.fillText("LevelTrail", W - 60, H - 40); ctx.textAlign = "left";
+}
+function shareText(c, S) {
+  const name = $("hideName") && $("hideName").checked ? `Level ${c.level} ${className(c.class)}` : `${c.name}, level ${c.level} ${raceName(c.race)} ${className(c.class)}`;
+  const lines = [`${name} (WoW Forever)`, `Played: ${dur(c.online)}`];
+  if (S.avg5) lines.push(`Last 5 levels: ${dur(S.avg5)} each on average`);
+  if (S.fastest) lines.push(`Fastest level: ${S.fastest.level} in ${dur(S.fastest.dur)}`);
+  lines.push(`Deaths: ${num(S.deathCount)}`);
+  if (c.libraryBooks) lines.push(`Library books: ${c.libraryBooks.count}/${c.libraryBooks.total}`);
+  lines.push(`Tracked with LevelTrail: ${location.origin + location.pathname}`);
+  return lines.join("\n");
+}
+
+/* ---------- demo data ---------- */
+const DEMO = (() => {
+  const splits = [], deaths = [], goldDays = [], byLevel = {};
+  let online = 0, t = Date.UTC(2026, 10, 5, 17) / 1000, q = 0, k = 0, e = 0;
+  const zones = ["Durotar","The Barrens","Stonetalon Mountains","Ashenvale","Thousand Needles","Desolace","Dustwallow Marsh"];
+  for (let L = 2; L <= 34; L++) {
+    const d = Math.round((600 + L * L * 9.5) * (0.8 + ((L * 37) % 11) / 25));
+    online += d; t += d + 3600 * (L % 4 === 0 ? 10 : 0.5);
+    const day = new Date(t * 1000).toISOString().slice(0, 16).replace("T", " ");
+    splits.push({ level: L, dur: d, online, date: day });
+    const tot = Math.round(L * L * 52 + 400), bq = Math.round(tot * .61), bk = Math.round(tot * .31), be = Math.round(tot * .05);
+    byLevel[L - 1] = { quest: bq, kill: bk, explore: be, total: tot }; q += bq; k += bk; e += be;
+    if (L % 7 === 3 || L === 29) deaths.push({ level: L, date: day, zone: zones[Math.min(zones.length - 1, Math.floor(L / 5))], subzone: "" });
+  }
+  let c = 0;
+  for (let i = 0; i < 7; i++) { c += 9000 + i * i * 2500; goldDays.push({ d: `2026-11-${String(5 + i).padStart(2, "0")}`, c }); }
+  const total = Object.values(byLevel).reduce((a, b) => a + b.total, 0);
+  return { name: "Thornhoof", realm: "", class: "DRUID", race: "Tauren", date: "2026-11-11 16:40", level: 34, xp: 14200, xpMax: 30700, rested: 9100,
+    online: online + 2400, splits, levelSince: { level: 34, online, date: splits[splits.length - 1].date },
+    xpSources: { quest: q, kill: k, explore: e, total: Math.round(total * 1.03), byLevel }, deaths, deathCount: deaths.length,
+    goldDays, copper: c, repairs: { total: 23450, count: 14 }, zone: "Dustwallow Marsh",
+    sessions: [{ date: "2026-11-09", minutes: 214, levelStart: 30, levelEnd: 32, copperDelta: 18400 }, { date: "2026-11-10", minutes: 168, levelStart: 32, levelEnd: 33, copperDelta: 9600 }, { date: "2026-11-11", minutes: 121, levelStart: 33, levelEnd: 34, copperDelta: 7300 }],
+    libraryBooks: { count: 12, total: 40, missing: [{ title: "Nar'thalas Almanac, Vol. 74" }, { title: "Arcanic Systems Manual" }] } };
+})();
+
+/* ---------- events ---------- */
+function importText(text) {
+  const msg = $("msg");
+  try {
+    const d = parseExport(text);
+    const c = slim(d), id = charId(c);
+    chars[id] = c; save(chars);
+    current = id; demoMode = false;
+    $("paste").value = ""; msg.textContent = ""; msg.className = "msg";
+    render(); window.scrollTo(0, 0);
+  } catch (e) { msg.textContent = e.message; msg.className = "msg err"; }
+}
+$("importBtn").onclick = () => importText($("paste").value);
+$("paste").addEventListener("paste", ev => { const t = (ev.clipboardData || window.clipboardData).getData("text"); if (t && t.includes("levelTrail")) { ev.preventDefault(); importText(t); } });
+$("demoBtn").onclick = () => { demoMode = true; current = "demo"; render(); window.scrollTo(0, 0); };
+$("addBtn").onclick = () => { current = null; demoMode = false; render(); $("paste").focus(); };
+$("chars").onclick = ev => { const b = ev.target.closest("[data-id]"); if (b) { current = b.dataset.id; demoMode = false; render(); } };
+$("clearAll").onclick = ev => { ev.preventDefault(); chars = {}; save(chars); try { localStorage.removeItem(KEY); } catch (e) {} current = null; render(); };
+$("view").addEventListener("click", async ev => {
+  const t = ev.target;
+  const c = current === "demo" ? DEMO : chars[current];
+  if (t.dataset.open) { ev.preventDefault(); current = t.dataset.open; render(); window.scrollTo(0, 0); return; }
+  if (t.id === "demoOut") { current = null; demoMode = false; render(); $("paste").focus(); return; }
+  if (t.id === "delChar") { delete chars[current]; save(chars); current = Object.keys(chars)[0] || null; render(); return; }
+  if (!c) return;
+  const S = stats(c), out = $("shareMsg");
+  if (t.id === "dlCard") {
+    const a = document.createElement("a"); a.download = `leveltrail-${($("hideName").checked ? "run" : c.name || "run").toLowerCase()}-${c.level}.png`;
+    a.href = $("card").toDataURL("image/png"); a.click(); out.textContent = "Saved.";
+  }
+  if (t.id === "copyCard") {
+    try { const blob = await new Promise(r => $("card").toBlob(r, "image/png")); await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); out.textContent = "Image copied. Paste it into Discord."; }
+    catch (e) { out.textContent = "Your browser cannot copy images. Use Download instead."; }
+  }
+  if (t.id === "copyText") {
+    try { await navigator.clipboard.writeText(shareText(c, S)); out.textContent = "Text copied."; }
+    catch (e) { out.textContent = "Copy failed."; }
+  }
+});
+$("view").addEventListener("change", ev => { if (ev.target.id === "hideName") { const c = current === "demo" ? DEMO : chars[current]; drawCard(c, stats(c)); } });
+
+const first = Object.keys(chars).sort((a, b) => (chars[b].level || 0) - (chars[a].level || 0))[0];
+current = first || null;
+render();
+</script>
+</body>
+</html>
