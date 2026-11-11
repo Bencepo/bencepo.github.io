@@ -166,7 +166,8 @@ function dayChart(days) {
     const v = prof[i], x = P.l + i * bw + bw * .15, top = Math.min(y(v), y(0)), h = Math.max(2, Math.abs(y(v) - y(0)));
     g += `<rect x="${x}" y="${top}" width="${bw * .7}" height="${h}" rx="2" fill="${v < 0 ? "#d0634f" : "#5aa77a"}"><title>${esc(d.d)}: profit ${gold(v)}, spent ${gold(d.spent)}, sold ${gold(d.sold)}</title></rect>`;
   });
-  g += `<text x="${P.l}" y="${H - 6}">${esc(days[0].d)}</text><text x="${P.l + days.length * bw}" y="${H - 6}" text-anchor="end">${esc(days[days.length - 1].d)}</text>`;
+  g += days.length === 1 ? `<text x="${P.l + bw / 2}" y="${H - 6}" text-anchor="middle">${esc(days[0].d)}</text>`
+    : `<text x="${P.l}" y="${H - 6}">${esc(days[0].d)}</text><text x="${P.l + days.length * bw}" y="${H - 6}" text-anchor="end">${esc(days[days.length - 1].d)}</text>`;
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Profit per day">${g}</svg>`;
 }
 
