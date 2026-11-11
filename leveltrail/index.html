@@ -49,6 +49,13 @@ section.card h2{font-size:16px;margin:0 0 14px;display:flex;align-items:baseline
 section.card h2 .small{font-weight:400}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .grid2>section.card{margin:0}
+.bars{display:flex;flex-direction:column;gap:7px}.bar{display:grid;grid-template-columns:150px 1fr 90px;gap:10px;align-items:center;font-size:13px}
+.bar .t{height:8px;background:var(--line);border-radius:4px;overflow:hidden}.bar .t i{display:block;height:100%;background:var(--accent,#e0a83a);border-radius:4px}
+.bar .n{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}.bar .k{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gear{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 16px;font-size:13px}.gear div{display:flex;gap:8px;justify-content:space-between;border-bottom:1px solid var(--line);padding:4px 0}
+.gear .s{color:var(--muted);width:72px;flex:none}.gear .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gear .il{color:var(--muted);font-variant-numeric:tabular-nums}
+.warn{color:#e0a83a}.good{color:#5aa77a}.bad{color:#d0634f}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 12px}.mini div{background:var(--panel2,rgba(255,255,255,.03));border:1px solid var(--line);border-radius:8px;padding:8px 10px}.mini .l{font-size:12px;color:var(--muted)}.mini .v{font-size:18px;font-weight:600}
 .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:18px 0}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
 .kpi .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
@@ -172,7 +179,13 @@ function charId(c) { return `${c.name || "Unknown"}-${c.realm || ""}`; }
 function slim(d) {
   // keep what the viewer needs; drop quests, recipes, spells, bags and bank
   const c = d.char, o = {};
-  ["name","realm","class","race","date","ts","addonVersion","level","xp","xpMax","rested","online","splits","levelSince","xpSources","deaths","deathCount","goldDays","repairs","sessionMonths","sessions","libraryBooks","vendorFloor","zones","pace","copper","zone","subzone","professions"].forEach(k => { if (c[k] !== undefined) o[k] = c[k]; });
+  ["name","realm","class","race","date","ts","addonVersion","level","xp","xpMax","rested","online","splits","levelSince","xpSources","deaths","deathCount","goldDays","repairs","sessionMonths","sessions","libraryBooks","vendorFloor","zones","pace","copper","zone","subzone","professions","zoneLevels","dungeons","dungeonRun","travel","questStats","talentTrees","talents","unspent","reputation"].forEach(k => { if (c[k] !== undefined) o[k] = c[k]; });
+  // gear: name, item level and quality per slot
+  if (d.equipped && typeof d.equipped === "object") {
+    o.gear = {};
+    Object.keys(d.equipped).forEach(k => { const g = d.equipped[k] || {}; o.gear[k] = { name: g.name, ilvl: g.ilvl, q: g.q }; });
+  }
+  if (!o.questStats && d.quests) o.questStats = { completed: arr(d.quests.completed).length, log: arr(d.quests.log).length, logComplete: arr(d.quests.log).filter(q => q.complete).length };
   return o;
 }
 
@@ -306,6 +319,28 @@ function render() {
 
   <div class="grid2">
     <section class="card">
+      <h2>Level times compared <span class="small">against your other characters</span></h2>
+      ${levelCompare(c, S)}
+    </section>
+    <section class="card">
+      <h2>Best zone for your level <span class="small">XP per hour, from your own play</span></h2>
+      ${bestZones(c)}
+    </section>
+  </div>
+
+  <div class="grid2">
+    <section class="card">
+      <h2>Rested XP</h2>
+      ${restedBlock(c)}
+    </section>
+    <section class="card">
+      <h2>Travel time <span class="small">flights and corpse runs</span></h2>
+      ${travelBlock(c)}
+    </section>
+  </div>
+
+  <div class="grid2">
+    <section class="card">
       <h2>Where your XP came from</h2>
       ${srcSum ? `<div class="stack">${src.filter(s => s[1] > 0).map(s => `<span title="${s[0]} ${pct(s[1], srcSum)} %" style="width:${s[1] / srcSum * 100}%;background:${s[2]}"></span>`).join("")}</div>
       <div class="legend">${src.map(s => `<span><i style="background:${s[2]}"></i>${s[0]} ${pct(s[1], srcSum)} %</span>`).join("")}</div>
@@ -320,8 +355,41 @@ function render() {
       ${S.deaths.length ? `<div class="legend" style="margin:0 0 10px">${deadliest && deadliest[1] > 1 ? `<span>Most deaths on level ${deadliest[0]} (${deadliest[1]})</span>` : ""}${topZone && topZone[1] > 1 ? `<span>Deadliest zone: ${esc(topZone[0])} (${topZone[1]})</span>` : ""}</div>
       <div class="tblwrap" style="max-height:220px"><table><tbody>${[...S.deaths].reverse().slice(0, 20).map(d => `<tr><td>${esc(d.date)}</td><td>${esc(d.zone || "")}${d.subzone ? `, ${esc(d.subzone)}` : ""}</td><td class="num">Lvl ${esc(d.level)}</td></tr>`).join("")}</tbody></table></div>`
       : `<div class="empty">No deaths recorded. Keep it that way.</div>`}
+      ${deathBlock(c, S)}
     </section>
   </div>
+
+  <div class="grid2">
+    <section class="card">
+      <h2>Quests</h2>
+      ${questBlock(c, S)}
+    </section>
+    <section class="card">
+      <h2>Talents</h2>
+      ${talentBlock(c)}
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Gear <span class="small">item level per slot</span></h2>
+    ${gearBlock(c)}
+  </section>
+
+  <div class="grid2">
+    <section class="card">
+      <h2>Professions</h2>
+      ${profBlock(c)}
+    </section>
+    <section class="card">
+      <h2>Reputation</h2>
+      ${repBlock(c)}
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Dungeons <span class="small">time, XP and gold per visit</span></h2>
+    ${dungeonBlock(c)}
+  </section>
 
 
   <section class="card">
@@ -349,9 +417,10 @@ function render() {
 
     <section class="card">
       <h2>Play sessions</h2>
-      ${sessions.length || months.length ? `<div class="tblwrap" style="max-height:240px"><table><thead><tr><th>Day</th><th class="num">Time</th><th class="num">Levels</th><th class="num">Gold</th><th class="num">Gold/h</th>${hasFlips ? `<th class="num" title="VendorFloor profit in this session">Flips</th>` : ""}</tr></thead><tbody>
-        ${[...sessions].reverse().slice(0, 14).map(s => `<tr><td>${esc(s.date)}</td><td class="num">${dur((+s.minutes || 0) * 60)}</td><td class="num">${esc(s.levelStart)}→${esc(s.levelEnd)}</td><td class="num">${gold(s.copperDelta, true)}</td><td class="num">${perHour(s.copperDelta, s.minutes)}</td>${hasFlips ? `<td class="num">${s.flipProfit != null ? gold(s.flipProfit, true) : "–"}</td>` : ""}</tr>`).join("")}
-        ${[...months].reverse().map(m => `<tr><td>${esc(m.month)} (${esc(m.sessions)} days)</td><td class="num">${dur((+m.minutes || 0) * 60)}</td><td class="num">–</td><td class="num">${gold(m.copper, true)}</td><td class="num">${perHour(m.copper, m.minutes)}</td>${hasFlips ? `<td class="num">–</td>` : ""}</tr>`).join("")}
+      ${sessionRecap(c)}
+      ${sessions.length || months.length ? `<div class="tblwrap" style="max-height:240px"><table><thead><tr><th>Day</th><th class="num">Time</th><th class="num">Levels</th><th class="num">XP</th><th class="num">Kills</th><th class="num">Quests</th><th class="num">Gold</th><th class="num">Gold/h</th>${hasFlips ? `<th class="num" title="VendorFloor profit in this session">Flips</th>` : ""}</tr></thead><tbody>
+        ${[...sessions].reverse().slice(0, 14).map(s => `<tr><td>${esc(s.date)}</td><td class="num">${dur((+s.minutes || 0) * 60)}</td><td class="num">${esc(s.levelStart)}→${esc(s.levelEnd)}</td><td class="num">${num(s.xpGained)}</td><td class="num">${s.kills != null ? num(s.kills) : "–"}</td><td class="num">${s.quests != null ? num(s.quests) : "–"}</td><td class="num">${gold(s.copperDelta, true)}</td><td class="num">${perHour(s.copperDelta, s.minutes)}</td>${hasFlips ? `<td class="num">${s.flipProfit != null ? gold(s.flipProfit, true) : "–"}</td>` : ""}</tr>`).join("")}
+        ${[...months].reverse().map(m => `<tr><td>${esc(m.month)} (${esc(m.sessions)} days)</td><td class="num">${dur((+m.minutes || 0) * 60)}</td><td class="num">–</td><td class="num">${num(m.xp)}</td><td class="num">–</td><td class="num">–</td><td class="num">${gold(m.copper, true)}</td><td class="num">${perHour(m.copper, m.minutes)}</td>${hasFlips ? `<td class="num">–</td>` : ""}</tr>`).join("")}
       </tbody></table></div>` : `<div class="empty">No sessions recorded yet.</div>`}
     </section>
   </div>
@@ -372,6 +441,180 @@ function render() {
     </div>
   </section>`;
   drawCard(c, S);
+}
+
+/* ---------- insights ---------- */
+const STANDING = ["", "Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"];
+const QCOL = ["#9d9d9d", "#ffffff", "#1eff00", "#3a8eff", "#b35ef2", "#ff8000", "#e6cc80"];
+const SLOT_ORDER = [["head","Head"],["neck","Neck"],["shoulder","Shoulder"],["back","Back"],["chest","Chest"],["wrist","Wrist"],["hands","Hands"],["waist","Waist"],["legs","Legs"],["feet","Feet"],["finger1","Ring"],["finger2","Ring"],["trinket1","Trinket"],["trinket2","Trinket"],["mainhand","Main hand"],["offhand","Off hand"],["relic","Ranged"]];
+const xph = (xp, sec) => sec >= 600 && xp ? Math.round(xp / sec * 3600) : null;
+function barRow(label, value, max, right, color, title) {
+  const w = max ? Math.max(0, Math.min(100, value / max * 100)) : 0;
+  return `<div class="bar"${title ? ` title="${esc(title)}"` : ""}><span class="k">${label}</span><span class="t"><i style="width:${w}%${color ? `;background:${color}` : ""}"></i></span><span class="n">${right}</span></div>`;
+}
+
+// Level times of this character against your other characters at the same level.
+function levelCompare(c, S) {
+  const others = (demoMode && current === "demo" ? [DEMO_ALT] : Object.keys(chars).filter(id => id !== current).map(id => chars[id]))
+    .map(o => ({ o, splits: arr(o.splits).filter(s => s && s.dur != null && !s.partial) }))
+    .filter(x => x.splits.length);
+  if (!others.length) return `<div class="empty">Import a second character to compare level times. Every character you import is kept in this browser.</div>`;
+  const rows = S.full.slice(-12).reverse().map(s => {
+    const same = others.map(x => ({ name: x.o.name, dur: (x.splits.find(t => t.level === s.level) || {}).dur })).filter(x => x.dur != null);
+    if (!same.length) return null;
+    const avg = same.reduce((a, x) => a + +x.dur, 0) / same.length;
+    const best = same.reduce((a, x) => (+x.dur < +a.dur ? x : a));
+    const diff = +s.dur - avg;
+    return `<tr><td>${esc(s.level)}</td><td class="num">${dur(s.dur)}</td><td class="num">${dur(avg)}</td><td class="num">${dur(best.dur)} <span class="small">${esc(best.name)}</span></td><td class="num ${diff <= 0 ? "good" : "bad"}">${diff <= 0 ? "−" : "+"}${dur(Math.abs(diff))}</td></tr>`;
+  }).filter(Boolean);
+  let now = "";
+  if (S.onLevel != null && c.level < MAX_LEVEL) {
+    const same = others.map(x => (x.splits.find(t => t.level === c.level + 1) || {}).dur).filter(v => v != null);
+    if (same.length) { const best = Math.min(...same.map(Number)); now = `<div class="legend" style="margin:0 0 10px"><span>On level ${esc(c.level)} for ${dur(S.onLevel)}. Your best character needed ${dur(best)} for it${S.onLevel > best ? `: ${dur(S.onLevel - best)} behind` : `: still ${dur(best - S.onLevel)} to beat it`}.</span></div>`; }
+  }
+  return rows.length ? `${now}<div class="tblwrap" style="max-height:300px"><table><thead><tr><th>Level</th><th class="num">This character</th><th class="num">Your average</th><th class="num">Your best</th><th class="num">Difference</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>`
+    : `${now}<div class="empty">Your other characters have no levels in this range yet.</div>`;
+}
+
+// Best zone per 5-level bracket from XP per hour (at least 15 minutes in the zone).
+function bestZones(c) {
+  const rows = arr(c.zoneLevels).filter(r => r && r.zone && r.level);
+  if (!rows.length) return `<div class="empty">Recorded by LevelTrail 1.3 (coming soon): play a bit with it and export again.</div>`;
+  const brackets = {};
+  rows.forEach(r => {
+    const b = Math.floor((r.level - 1) / 5) * 5 + 1;
+    const z = (brackets[b] = brackets[b] || {})[r.zone] = (brackets[b] || {})[r.zone] || { time: 0, xp: 0 };
+    z.time += +r.time || 0; z.xp += +r.xp || 0;
+  });
+  const cur = Math.floor((c.level - 1) / 5) * 5 + 1;
+  const list = Object.keys(brackets).map(Number).sort((a, b) => b - a).map(b => {
+    const zs = Object.entries(brackets[b]).map(([zone, v]) => ({ zone, ...v, rate: v.time >= 900 ? v.xp / v.time * 3600 : null })).filter(z => z.rate).sort((x, y) => y.rate - x.rate);
+    return { b, zs };
+  }).filter(x => x.zs.length);
+  if (!list.length) return `<div class="empty">Spend at least 15 minutes in a zone to rate it.</div>`;
+  const here = list.find(x => x.b === cur);
+  const hint = here && here.zs.length > 1 ? `<div class="legend" style="margin:0 0 10px"><span>Levels ${cur}–${cur + 4}: <b>${esc(here.zs[0].zone)}</b> gave you ${num(Math.round(here.zs[0].rate))} XP/h, ${pct(here.zs[0].rate - here.zs[1].rate, here.zs[1].rate)} % more than ${esc(here.zs[1].zone)}.</span></div>` : "";
+  return hint + `<div class="tblwrap" style="max-height:300px"><table><thead><tr><th>Levels</th><th>Best zone</th><th class="num">XP per hour</th><th>Runner-up</th></tr></thead><tbody>${list.map(x => `<tr${x.b === cur ? ` style="background:rgba(224,168,58,.08)"` : ""}><td>${x.b}–${x.b + 4}</td><td>${esc(x.zs[0].zone)}</td><td class="num">${num(Math.round(x.zs[0].rate))}</td><td>${x.zs[1] ? `${esc(x.zs[1].zone)} <span class="small">${num(Math.round(x.zs[1].rate))}</span>` : "–"}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+function restedBlock(c) {
+  if (c.level >= MAX_LEVEL) return `<div class="empty">Max level: rested XP no longer matters.</div>`;
+  const rested = +c.rested || 0, left = Math.max(0, (+c.xpMax || 0) - (+c.xp || 0));
+  // rested XP doubles kill XP; it is used up 1:1 by the bonus
+  const full = (+c.xpMax || 0) * 1.5;
+  return `<div class="mini"><div><div class="l">Rested XP</div><div class="v">${num(rested)}</div></div><div><div class="l">Of this level</div><div class="v">${pct(rested, +c.xpMax || 0)} %</div></div><div><div class="l">Pool full</div><div class="v">${pct(rested, full)} %</div></div></div>
+    <div class="xpbar"><i style="width:${Math.min(100, pct(rested, full))}%;background:#4f8fd9"></i></div>
+    <p class="small" style="margin:8px 0 0">${rested ? `Covers ${pct(Math.min(rested, left), left)} % of what is left of level ${esc(c.level)}: kills give double XP until ${num(rested)} bonus XP are used up.` : "No rested XP. Log out in an inn or a city to build it up (full after about 10 days, 1.5 levels)."}</p>`;
+}
+
+function travelBlock(c) {
+  const t = c.travel;
+  if (!t) return `<div class="empty">Recorded by LevelTrail 1.3 (coming soon).</div>`;
+  const total = (+t.flight || 0) + (+t.ghost || 0);
+  const share = c.online ? pct(total, c.online) : 0;
+  const byL = t.byLevel ? Object.keys(t.byLevel).map(Number).filter(isFinite).sort((a, b) => b - a).slice(0, 8) : [];
+  return `<div class="mini"><div><div class="l">Flights</div><div class="v">${dur(t.flight, true)}</div><div class="small">${num(t.flights)} flights</div></div><div><div class="l">Corpse runs</div><div class="v">${dur(t.ghost, true)}</div><div class="small">${num(t.ghostRuns)} runs</div></div><div><div class="l">Of tracked time</div><div class="v">${share} %</div></div></div>
+    ${byL.length ? `<details><summary>By level</summary><div class="tblwrap"><table><thead><tr><th>Level</th><th class="num">Flights</th><th class="num">Corpse runs</th></tr></thead><tbody>${byL.map(l => { const b = t.byLevel[l] || t.byLevel[String(l)] || {}; return `<tr><td>${l}</td><td class="num">${dur(b.flight)}</td><td class="num">${dur(b.ghost)}</td></tr>`; }).join("")}</tbody></table></div></details>` : ""}`;
+}
+
+function questBlock(c, S) {
+  const q = c.questStats;
+  if (!q) return `<div class="empty">Import your export again to see quest numbers.</div>`;
+  const by = q.byLevel ? Object.keys(q.byLevel).map(Number).filter(isFinite).sort((a, b) => a - b) : [];
+  const max = Math.max(1, ...by.map(l => +q.byLevel[l] || +q.byLevel[String(l)] || 0));
+  const qxp = S.xs ? +S.xs.quest || 0 : 0;
+  return `<div class="mini"><div><div class="l">Quests completed</div><div class="v">${num(q.completed)}</div></div><div><div class="l">Quest log</div><div class="v">${num(q.log)}<span class="small"> / 20</span></div><div class="small">${num(q.logComplete)} ready to turn in</div></div><div><div class="l">XP per quest</div><div class="v">${by.length && qxp ? num(Math.round(qxp / by.reduce((a, l) => a + (+q.byLevel[l] || +q.byLevel[String(l)] || 0), 0))) : "–"}</div></div></div>
+    ${by.length ? `<div class="bars">${by.slice(-10).reverse().map(l => { const n = +q.byLevel[l] || +q.byLevel[String(l)] || 0; return barRow(`Level ${l}`, n, max, `${n} quests`); }).join("")}</div>` : `<p class="small">Quests per level are counted by LevelTrail 1.3 (coming soon).</p>`}`;
+}
+
+function profBlock(c) {
+  const p = c.professions && typeof c.professions === "object" ? Object.entries(c.professions) : [];
+  if (!p.length) return `<div class="empty">No professions learned.</div>`;
+  // skill caps: Apprentice 75, Journeyman 150, Expert 225, Artisan 300
+  return `<div class="bars">${p.sort((a, b) => (+b[1].rank || 0) - (+a[1].rank || 0)).map(([name, v]) => {
+    const rank = +v.rank || 0, max = +v.max || 0;
+    const atCap = max && rank >= max && max < 300;
+    return barRow(esc(name), rank, max || 300, `${rank} / ${max || "?"}`, atCap ? "#d0634f" : "", atCap ? "At the cap: train the next rank" : "");
+  }).join("")}</div>${p.some(([, v]) => +v.max && +v.rank >= +v.max && +v.max < 300) ? `<p class="small warn" style="margin:8px 0 0">At least one profession is at its cap: visit the trainer for the next rank.</p>` : ""}`;
+}
+
+function gearBlock(c) {
+  const g = c.gear;
+  if (!g || !Object.keys(g).length) return `<div class="empty">Import your export again to see your gear.</div>`;
+  const filled = SLOT_ORDER.filter(([k]) => g[k] && g[k].ilvl);
+  const avg = filled.length ? filled.reduce((a, [k]) => a + (+g[k].ilvl || 0), 0) / filled.length : 0;
+  const weakest = [...filled].sort((a, b) => (+g[a[0]].ilvl || 0) - (+g[b[0]].ilvl || 0)).slice(0, 3).map(([k]) => k);
+  const old = +c.level - 10;
+  const empty = SLOT_ORDER.filter(([k]) => !g[k] && !["relic", "offhand"].includes(k));
+  return `<div class="mini"><div><div class="l">Avg. item level</div><div class="v">${avg ? avg.toFixed(1) : "–"}</div></div><div><div class="l">Below level ${Math.max(1, old)}</div><div class="v">${filled.filter(([k]) => +g[k].ilvl < old).length}</div></div><div><div class="l">Empty slots</div><div class="v">${empty.length}</div></div></div>
+    <div class="gear">${SLOT_ORDER.filter(([k]) => g[k] || !["relic", "offhand"].includes(k)).map(([k, label]) => { const it = g[k]; return `<div><span class="s">${label}</span>${it ? `<span class="nm" style="color:${QCOL[+it.q] || "inherit"}">${esc(it.name || "?")}</span><span class="il ${weakest.includes(k) || +it.ilvl < old ? "warn" : ""}">${esc(it.ilvl ?? "")}</span>` : `<span class="nm small bad">empty</span>`}</div>`; }).join("")}</div>
+    <p class="small" style="margin:8px 0 0">Orange: your three weakest slots and anything more than 10 levels below you. Upgrade those first.</p>`;
+}
+
+function talentBlock(c) {
+  const trees = arr(c.talentTrees).filter(t => t && (t.name || t.points));
+  const list = arr(c.talents);
+  const spent = trees.reduce((a, t) => a + (+t.points || 0), 0) || list.reduce((a, t) => a + (+t.rank || 0), 0);
+  const expected = Math.max(0, (+c.level || 0) - 9);
+  const unspent = c.unspent != null ? +c.unspent : Math.max(0, expected - spent);
+  if (!trees.length && !list.length) return `<div class="empty">${c.level < 10 ? "Talents start at level 10." : "Update LevelTrail to see your talents."}</div>`;
+  const max = Math.max(1, ...trees.map(t => +t.points || 0));
+  return `${unspent > 0 ? `<p class="warn" style="margin:0 0 10px"><b>${unspent} talent point${unspent === 1 ? "" : "s"} not spent.</b> Press N in game.</p>` : `<p class="small good" style="margin:0 0 10px">All ${spent} talent points spent.</p>`}
+    ${trees.length ? `<div class="bars">${trees.map(t => barRow(esc(t.name || "Tree"), +t.points || 0, max, `${num(t.points)} points`)).join("")}</div>` : ""}
+    ${!trees.length && list.length ? `<div class="small">${list.map(t => `${esc(t.name)} ${esc(t.rank)}/${esc(t.max)}`).join(" · ")}</div>` : ""}`;
+}
+
+function repBlock(c) {
+  const r = arr(c.reputation).filter(f => f && f.name && f.max != null);
+  if (!r.length) return `<div class="empty">Import your export again to see your reputation.</div>`;
+  const rows = r.sort((a, b) => (+b.standing || 0) - (+a.standing || 0) || ((+b.value || 0) - (+b.min || 0)) - ((+a.value || 0) - (+a.min || 0)));
+  return `<div class="bars" style="max-height:300px;overflow:auto">${rows.map(f => {
+    const into = (+f.value || 0) - (+f.min || 0), span = Math.max(1, (+f.max || 0) - (+f.min || 0));
+    const st = STANDING[+f.standing] || "";
+    const col = +f.standing <= 3 ? "#d0634f" : +f.standing === 4 ? "#c9b458" : "#5aa77a";
+    return barRow(esc(f.name), into, span, `${esc(st)}${+f.standing >= 8 ? "" : ` ${pct(into, span)} %`}`, col, `${num(into)} / ${num(span)} to the next standing`);
+  }).join("")}</div>`;
+}
+
+function deathBlock(c, S) {
+  const zr = arr(c.zones).filter(z => z && +z.deaths > 0).map(z => ({ zone: z.zone, deaths: +z.deaths, perHour: z.time >= 1800 ? +z.deaths / (z.time / 3600) : null }))
+    .sort((a, b) => (b.perHour ?? -1) - (a.perHour ?? -1) || b.deaths - a.deaths);
+  const byB = {};
+  S.deaths.forEach(d => { const b = Math.floor(((+d.level || 1) - 1) / 5) * 5 + 1; byB[b] = (byB[b] || 0) + 1; });
+  const bk = Object.keys(byB).map(Number).sort((a, b) => a - b);
+  const max = Math.max(1, ...bk.map(b => byB[b]));
+  if (!zr.length && !bk.length) return "";
+  return `<details open><summary>Analysis</summary>
+    ${zr.length ? `<div class="small" style="margin:6px 0">Deadliest zones (deaths per hour played there):</div><div class="bars">${zr.slice(0, 5).map(z => barRow(esc(z.zone), z.perHour ?? 0, zr[0].perHour || 1, z.perHour != null ? `${z.perHour.toFixed(2)}/h · ${z.deaths}` : `${z.deaths}`)).join("")}</div>` : ""}
+    ${bk.length ? `<div class="small" style="margin:10px 0 6px">Deaths by level range (last ${S.deaths.length}):</div><div class="bars">${bk.map(b => barRow(`Levels ${b}–${b + 4}`, byB[b], max, `${byB[b]}`, "#d0634f")).join("")}</div>` : ""}
+  </details>`;
+}
+
+function sessionRecap(c) {
+  const s = arr(c.sessions).slice(-1)[0];
+  if (!s) return "";
+  const has = s.kills != null || s.quests != null || s.loot != null;
+  const h = (+s.minutes || 0) / 60;
+  return `<div class="mini"><div><div class="l">Last session · ${esc(s.date)}</div><div class="v">${dur((+s.minutes || 0) * 60, true)}</div><div class="small">Level ${esc(s.levelStart)}${s.levelEnd !== s.levelStart ? ` → ${esc(s.levelEnd)}` : ""}</div></div>
+    <div><div class="l">XP</div><div class="v">${num(s.xpGained)}</div><div class="small">${h >= .2 && s.xpGained ? `${num(Math.round(s.xpGained / h))} XP/h` : "&nbsp;"}</div></div>
+    <div><div class="l">Gold</div><div class="v">${gold(s.copperDelta, true)}</div><div class="small">${has ? `loot worth ${gold(s.loot, true)}` : "&nbsp;"}</div></div></div>
+    ${has ? `<div class="legend" style="margin:0 0 10px"><span>${num(s.kills)} kills</span><span>${num(s.quests)} quests</span><span>${num(s.deaths)} deaths</span></div>` : ""}`;
+}
+
+function dungeonBlock(c) {
+  const d = arr(c.dungeons);
+  const run = c.dungeonRun;
+  if (!d.length) return `<div class="empty">${run ? `Running: ${esc(run.name)} since ${esc(run.date)}. ` : ""}No finished dungeon visit yet. Visits are recorded by LevelTrail 1.3 (coming soon).</div>`;
+  const qRate = (c.pace && +c.pace.xpPerHour) || (arr(c.zones).length ? (() => { const t = arr(c.zones).reduce((a, z) => a + (+z.time || 0), 0), x = arr(c.zones).reduce((a, z) => a + (+z.xp || 0), 0); return xph(x, t); })() : null);
+  const by = {};
+  d.forEach(r => { const b = by[r.name] = by[r.name] || { n: 0, min: 0, xp: 0, copper: 0, loot: 0, deaths: 0 }; b.n++; b.min += +r.minutes || 0; b.xp += +r.xp || 0; b.copper += +r.copper || 0; b.loot += +r.loot || 0; b.deaths += +r.deaths || 0; });
+  return `${qRate ? `<div class="legend" style="margin:0 0 10px"><span>Your usual pace: ${num(qRate)} XP/h.</span>${run ? `<span>Running: ${esc(run.name)}</span>` : ""}</div>` : ""}
+    <div class="tblwrap" style="max-height:300px"><table><thead><tr><th>Dungeon</th><th class="num">Visits</th><th class="num">Avg. time</th><th class="num">XP per hour</th><th class="num">Gold + loot per hour</th><th class="num">Deaths</th></tr></thead><tbody>
+    ${Object.entries(by).sort((a, b) => b[1].n - a[1].n).map(([name, b]) => { const r = xph(b.xp, b.min * 60); return `<tr><td>${esc(name)}</td><td class="num">${b.n}</td><td class="num">${dur(b.min / b.n * 60)}</td><td class="num ${qRate && r ? (r >= qRate ? "good" : "bad") : ""}">${r ? num(r) : "–"}</td><td class="num">${perHour(b.copper + b.loot, b.min)}</td><td class="num">${b.deaths}</td></tr>`; }).join("")}
+    </tbody></table></div>
+    <details><summary>All visits</summary><div class="tblwrap"><table><thead><tr><th>Date</th><th>Dungeon</th><th class="num">Level</th><th class="num">Time</th><th class="num">XP</th><th class="num">Kills</th><th class="num">Gold</th><th class="num">Loot</th></tr></thead><tbody>
+    ${[...d].reverse().map(r => `<tr><td>${esc(r.date)}</td><td>${esc(r.name)}</td><td class="num">${esc(r.level)}</td><td class="num">${dur((+r.minutes || 0) * 60)}</td><td class="num">${num(r.xp)}</td><td class="num">${num(r.kills)}</td><td class="num">${gold(r.copper, true)}</td><td class="num">${gold(r.loot, true)}</td></tr>`).join("")}
+    </tbody></table></div></details>`;
 }
 
 function perHour(copper, minutes) { minutes = +minutes || 0; return minutes >= 10 ? gold((+copper || 0) / (minutes / 60), true) : "–"; }
@@ -463,12 +706,23 @@ const DEMO = (() => {
     online: online + 2400, splits, levelSince: { level: 34, online, date: splits[splits.length - 1].date },
     xpSources: { quest: q, kill: k, explore: e, total: Math.round(total * 1.03), byLevel }, deaths, deathCount: deaths.length,
     goldDays, copper: c, repairs: { total: 23450, count: 14 }, zone: "Dustwallow Marsh",
-    sessions: [{ date: "2026-11-09", minutes: 214, levelStart: 30, levelEnd: 32, copperDelta: 18400, flipProfit: 6200 }, { date: "2026-11-10", minutes: 168, levelStart: 32, levelEnd: 33, copperDelta: 9600, flipProfit: 3100 }, { date: "2026-11-11", minutes: 121, levelStart: 33, levelEnd: 34, copperDelta: 7300, flipProfit: 2500 }],
+    sessions: [{ date: "2026-11-09", minutes: 214, levelStart: 30, levelEnd: 32, xpGained: 74100, copperDelta: 18400, flipProfit: 6200, kills: 188, quests: 21, deaths: 1, loot: 9200 }, { date: "2026-11-10", minutes: 168, levelStart: 32, levelEnd: 33, xpGained: 59800, copperDelta: 9600, flipProfit: 3100, kills: 141, quests: 17, deaths: 0, loot: 6100 }, { date: "2026-11-11", minutes: 121, levelStart: 33, levelEnd: 34, xpGained: 47900, copperDelta: 7300, flipProfit: 2500, kills: 97, quests: 14, deaths: 0, loot: 4400 }],
     vendorFloor: { buys: 212, spent: 61200, sold: 118900, profit: 57700, unsoldUnits: 31, unsoldValue: 8400, days: [3,4,5,6,7,8,9,10,11].map(n => ({ d: `2026-11-${String(n).padStart(2, "0")}`, profit: 2000 + ((n * 2711) % 9000) })) },
     pace: { level: 34, maxLevel: 60, xpPerHour: 21400, sessionXpPerHour: 23800, levelsUsed: 5, secToNext: 2770, secToCap: 1218000 },
     zones: [["The Barrens", 52000, 98000, 2], ["Stonetalon Mountains", 31000, 64000, 1], ["Ashenvale", 29000, 61000, 1], ["Durotar", 14000, 12000, 0], ["Thousand Needles", 12500, 30000, 1], ["Dustwallow Marsh", 6100, 14000, 0]].map(([zone, time, xp, deaths]) => ({ zone, time, xp, deaths })),
+    zoneLevels: [["Durotar",2,1800,4200],["Durotar",5,2400,5100],["Durotar",8,1500,4400],["The Barrens",12,5200,16100],["The Barrens",14,4100,13600],["Durotar",13,1400,2900],["Stonetalon Mountains",17,3900,15800],["The Barrens",18,2600,8700],["Ashenvale",21,4400,21800],["Stonetalon Mountains",22,3100,13600],["Ashenvale",24,3600,19900],["Thousand Needles",27,4100,24100],["Ashenvale",28,2800,14900],["Thousand Needles",31,3300,22800],["Desolace",32,2900,17100],["Dustwallow Marsh",34,1900,13800]].map(([zone, level, time, xp]) => ({ zone, level, time, xp })),
+    dungeons: [{ name: "Ragefire Chasm", type: "party", date: "2026-11-06 20:10", level: 15, minutes: 42, xp: 9800, copper: 1450, kills: 61, deaths: 0, loot: 2100 }, { name: "Wailing Caverns", type: "party", date: "2026-11-07 19:40", level: 19, minutes: 96, xp: 21400, copper: 3800, kills: 112, deaths: 2, loot: 5600 }, { name: "Wailing Caverns", type: "party", date: "2026-11-08 21:05", level: 21, minutes: 78, xp: 20100, copper: 3100, kills: 98, deaths: 0, loot: 4300 }, { name: "Razorfen Kraul", type: "party", date: "2026-11-10 20:30", level: 29, minutes: 88, xp: 38900, copper: 5200, kills: 104, deaths: 1, loot: 7900 }],
+    travel: { flight: 6420, flights: 31, ghost: 1980, ghostRuns: 7, byLevel: { 34: { flight: 380, ghost: 0 }, 33: { flight: 610, ghost: 240 }, 32: { flight: 450, ghost: 0 } } },
+    questStats: { completed: 312, log: 17, logComplete: 4, byLevel: Object.fromEntries(Array.from({ length: 10 }, (_, i) => [25 + i, 8 + ((i * 7) % 6)])) },
+    talentTrees: [{ name: "Balance", points: 0 }, { name: "Feral Combat", points: 24 }, { name: "Restoration", points: 0 }], unspent: 1,
+    professions: { Skinning: { rank: 150, max: 150 }, Leatherworking: { rank: 141, max: 225 }, "First Aid": { rank: 183, max: 225 } },
+    reputation: [{ name: "Orgrimmar", standing: 6, value: 14200, min: 9000, max: 21000 }, { name: "Thunder Bluff", standing: 5, value: 6100, min: 3000, max: 9000 }, { name: "Darkspear Trolls", standing: 5, value: 4200, min: 3000, max: 9000 }, { name: "Undercity", standing: 4, value: 1700, min: 0, max: 3000 }, { name: "Bloodsail Buccaneers", standing: 2, value: -4200, min: -6000, max: -3000 }],
+    gear: { head: { name: "Feral Shoes Hat", ilvl: 33, q: 2 }, neck: { name: "Jade Pendant", ilvl: 30, q: 2 }, shoulder: { name: "Fenrus' Pauldrons", ilvl: 26, q: 3 }, back: { name: "Battle Worn Cloak", ilvl: 19, q: 1 }, chest: { name: "Quillward Harness", ilvl: 33, q: 3 }, wrist: { name: "Thick Bracers", ilvl: 30, q: 2 }, hands: { name: "Slime-encrusted Gloves", ilvl: 21, q: 2 }, waist: { name: "Rawhide Belt", ilvl: 32, q: 2 }, legs: { name: "Raptorbane Legguards", ilvl: 32, q: 2 }, feet: { name: "Wolf Rider's Boots", ilvl: 35, q: 2 }, finger1: { name: "Seal of Wrynn", ilvl: 30, q: 3 }, trinket1: { name: "Venomstrike Orb", ilvl: 22, q: 2 }, mainhand: { name: "Staff of the Blessed Seer", ilvl: 31, q: 3 } },
     libraryBooks: { count: 12, total: 40, missing: [{ title: "Nar'thalas Almanac, Vol. 74" }, { title: "Arcanic Systems Manual" }] } };
 })();
+
+// a second demo character, only for the level comparison in demo mode
+const DEMO_ALT = { name: "Grimtusk", splits: arr(DEMO.splits).map(s => ({ level: s.level, dur: Math.round(s.dur * (0.85 + ((s.level * 13) % 9) / 30)) })) };
 
 /* ---------- events ---------- */
 function importText(text) {
