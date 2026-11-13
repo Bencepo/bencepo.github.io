@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StatTrim · A tidy character window · WoW Forever addon</title>
+<meta name="description" content="Hide, merge and reorder categories and stats right inside the character window. Edit with checkboxes and arrows, works in combat.">
+<meta property="og:title" content="StatTrim · A tidy character window · WoW Forever addon">
+<meta property="og:description" content="Hide, merge and reorder categories and stats right inside the character window. Edit with checkboxes and arrows, works in combat.">
+<meta property="og:image" content="https://bencepo.github.io/assets/icons/stattrim-256.png">
+<meta name="theme-color" content="#0b0a09">
+<link rel="icon" type="image/png" href="../assets/icons/stattrim-64.png">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+.stpanel{background:rgba(0,0,0,.55);border:1px solid #4a3d26;border-radius:6px;padding:6px 8px;font-size:13px}
+.stcat{margin:6px 0 2px}
+.stcat .h{display:flex;align-items:center;gap:6px;color:#ffd100;font-weight:700;padding:2px 0;border-bottom:1px solid rgba(255,209,0,.15)}
+.strow{display:flex;align-items:center;gap:6px;padding:2px 0}
+.strow .n{flex:1;color:#e8e2d0}.strow .v{color:#fff;font-variant-numeric:tabular-nums}
+.stctl{display:none;gap:2px}.edit .stctl{display:inline-flex}
+.stctl button{padding:0 5px;font-size:11px;border-radius:4px;line-height:16px}
+.off{opacity:.35}.gone{display:none}
+.edit .gone{display:flex;opacity:.35}
+.stcat.gone{display:none}.edit .stcat.gone{display:block;opacity:.35}
+.hidenm>.h .t{display:none}.edit .hidenm>.h .t{display:inline;opacity:.4}
+</style>
+</head>
+<body>
+<!--@header--><header class="top"><div class="wrap">
+  <a class="brand" href="../"><img src="../assets/icons/procflare-64.png" alt=""><span class="bt">Bencepo<b>·</b>Addons</span></a>
+  <nav class="nav"><a href="../leveltrail/"><img src="../assets/icons/leveltrail-64.png" alt=""><span>LevelTrail</span></a><a href="../vendorfloor/"><img src="../assets/icons/vendorfloor-64.png" alt=""><span>VendorFloor</span></a><a href="../procflare/"><img src="../assets/icons/procflare-64.png" alt=""><span>ProcFlare</span></a><a href="../swingcast/"><img src="../assets/icons/swingcast-64.png" alt=""><span>SwingCast</span></a><a href="../stattrim/" class=on><img src="../assets/icons/stattrim-64.png" alt=""><span>StatTrim</span></a></nav>
+  <div class="spacer"></div>
+  <a class="btn sm" href="../#import">Import export</a>
+</div></header><!--/@header-->
+<main>
+<div class="wrap">
+  <section class="hero addonhero">
+    <img class="heroicon" src="../assets/icons/stattrim-256.png" alt="StatTrim">
+    <div>
+      <div class="eyebrow">A tidy character window · v1.0.3</div>
+      <h1 class="goldtext">StatTrim</h1>
+      <p class="lead">Hide, merge and reorder categories and stats right inside the character window. Edit with checkboxes and arrows, works in combat.</p>
+      <div class="ctas"><a class="btn primary" href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">Download on CurseForge</a><a class="btn" href="https://addons.wago.io/addons/stattrim" target="_blank" rel="noopener">Wago</a><a class="btn ghost" href="#demo">Try the live demo</a></div>
+      <div class="row" style="margin-top:16px"><img src="https://img.shields.io/curseforge/dt/1801407?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+    </div>
+  </section>
+
+  <section class="section" id="demo">
+    <div class="eyebrow">Live demo</div>
+    <h2 class="goldtext">See it in action</h2>
+    <p class="lead">A recreation in your browser, close to what you see in game.</p>
+    
+<div class="grid2">
+  <div class="panel" style="padding:18px">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px"><b class="display" style="color:var(--gold2)">Character Stats</b>
+      <button class="sm" id="stEdit" title="Edit mode">⚙ Edit</button></div>
+    <div class="stpanel" id="stPanel"></div>
+    <div class="small" style="margin-top:10px" id="stHint">Click the gear to enter edit mode, like in game.</div>
+  </div>
+  <div class="panel" style="padding:18px">
+    <h2>Recorded in game</h2>
+    <img src="../media/stattrim/demo.gif" alt="StatTrim demo in WoW Forever" loading="lazy" style="width:100%;border-radius:10px;border:1px solid var(--line)">
+  </div>
+</div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="eyebrow">Features</div>
+    <h2 class="goldtext">What it does</h2>
+    <div class="features"><div class="feat reveal"><div class="fi">☑</div><b>Hide categories or stats</b><span>A checkbox on every row, right in the character window.</span></div><div class="feat reveal"><div class="fi">≡</div><b>Merge categories</b><span>Hide only a category&#x27;s name: its stats join the category above, for one compact list.</span></div><div class="feat reveal"><div class="fi">⇅</div><b>Reorder</b><span>Move categories and stats up and down with arrows.</span></div><div class="feat reveal"><div class="fi">⚙</div><b>Edit in place</b><span>Gear icon above the stats panel. Rows you turned off stay faded until you leave edit mode.</span></div><div class="feat reveal"><div class="fi">⛨</div><b>Safe in combat</b><span>StatTrim never touches Blizzard&#x27;s stat list, it only moves and fades the finished rows.</span></div><div class="feat reveal"><div class="fi">◈</div><b>Does nothing when idle</b><span>Without hidden or moved stats StatTrim does no work at all.</span></div></div>
+  </section>
+
+  
+
+  <section class="section">
+    <div class="split">
+      <div class="panel reveal"><h2>Settings</h2><ul class="ticks" style="list-style:none;padding:0;margin:0;color:var(--muted)"><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>Gear icon above the stats panel, or <code>/stt</code>.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span><code>/stt list</code>: all categories and stats in one window.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span><code>/stt reset</code> shows everything again, <code>/stt order</code> restores the original order.</li></ul></div>
+      <div class="panel reveal" id="changelog"><h2>Changelog</h2><!--@changelog--><div class="changelog"><div class="cl"><b>1.0.3</b><ul><li>Brighter icon that stays readable on the round minimap button.</li></ul></div><div class="cl"><b>1.0.2</b><ul><li>New icon: gilded stat bars, one cut away, for the minimap button and the addon list.</li></ul></div><div class="cl"><b>1.0.1</b><ul><li>The stats panel is only laid out again when the game changed it, not ten times a second while the character window is open. Without any hidden or moved stats StatTrim does nothing at all.</li><li>An error during the layout no longer stops StatTrim until a /reload.</li></ul></div><div class="cl"><b>1.0.0</b><ul><li>Hide whole categories or single stats in the character window&#x27;s stats panel.</li><li>Hide only a category&#x27;s name: its stats join the category above.</li><li>Reorder categories and stats with arrows.</li><li>Edit mode right in the window: gear icon above the stats panel (or /stt) shows a checkbox and arrows on every row.</li><li>Works in combat without errors: StatTrim never touches Blizzard&#x27;s stat list, it only moves and fades the finished rows.</li><li>/stt list: all categories and stats in one window. /stt reset shows everything again, /stt order restores the original order.</li></ul></div></div><!--/@changelog--></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="eyebrow">Goes well with</div>
+    <h2 class="goldtext">More from Bencepo</h2>
+    <div class="addons"><div class="acard reveal" style="--glow:rgba(90,120,230,.32)">
+  <div class="head"><img src="../assets/icons/swingcast-128.png" alt=""><div><h3>SwingCast</h3><div class="small">Cast bar plus swing timer</div></div></div>
+  
+  <div class="meta"><span class="tag">v0.4.4</span><img src="https://img.shields.io/curseforge/dt/1800255?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="../swingcast/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/swingcast" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(240,190,90,.32)">
+  <div class="head"><img src="../assets/icons/procflare-128.png" alt=""><div><h3>ProcFlare</h3><div class="small">Never miss a proc</div></div></div>
+  
+  <div class="meta"><span class="tag">v0.1.5</span><img src="https://img.shields.io/curseforge/dt/1800929?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="../procflare/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/procflare" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(95,176,122,.30)">
+  <div class="head"><img src="../assets/icons/leveltrail-128.png" alt=""><div><h3>LevelTrail</h3><div class="small">Your leveling run, analysed</div></div></div>
+  
+  <div class="meta"><span class="tag">v1.3.6-beta</span><img src="https://img.shields.io/curseforge/dt/1798692?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="../leveltrail/">Open the page</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/leveltrail" target="_blank" rel="noopener">Wago</a></div>
+</div></div>
+  </section>
+
+  <section class="section" id="community">
+  <div class="eyebrow">Community</div>
+  <h2 class="goldtext">Feedback, bugs and ideas</h2>
+  <p class="lead">Every addon is tested in game before it ships, but Forever changes often. Tell me what breaks and what you miss.</p>
+  <div class="grid3">
+    <div class="panel reveal"><h2>Report a bug</h2><p class="small">Leave a comment on the addon's CurseForge page: what you did, what happened, and the error text from BugSack if there is one.</p>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/wow/addons/leveltrail#comments" target="_blank" rel="noopener">LevelTrail</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/vendorfloor#comments" target="_blank" rel="noopener">VendorFloor</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare#comments" target="_blank" rel="noopener">ProcFlare</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast#comments" target="_blank" rel="noopener">SwingCast</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/stattrim#comments" target="_blank" rel="noopener">StatTrim</a></div></div>
+    <div class="panel reveal"><h2>Share your run</h2><p class="small">LevelTrail turns your export into a share image for Discord or Reddit, VendorFloor does the same for your flips. Names can be hidden.</p>
+      <div class="row"><a class="btn sm gold" href="../leveltrail/#demo">LevelTrail demo</a><a class="btn sm gold" href="../vendorfloor/#demo">VendorFloor demo</a></div></div>
+    <div class="panel reveal"><h2>Suggest a feature</h2><p class="small">Ideas that make leveling faster or the UI calmer have the best chance. Comments on CurseForge reach me directly.</p>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/members/bencepo/projects" target="_blank" rel="noopener">All projects on CurseForge</a></div></div>
+  </div>
+</section>
+</div>
+</main>
+<!--@footer--><footer class="site"><div class="wrap">
+  <div class="cols">
+    <div><h4>Bencepo · Addons</h4><p style="margin:0 0 10px">Small, fast addons for World of Warcraft: Forever. Built by a player who tests every change in game. The pages run in your browser: your exports never leave it.</p>
+      <a href="../#community">Feedback, bugs and ideas</a></div>
+    <div><h4>Addons</h4><a href="../leveltrail/">LevelTrail</a><a href="../vendorfloor/">VendorFloor</a><a href="../procflare/">ProcFlare</a><a href="../swingcast/">SwingCast</a><a href="../stattrim/">StatTrim</a></div>
+    <div><h4>Download</h4><a href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">LevelTrail on CurseForge</a><a href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">VendorFloor on CurseForge</a><a href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">ProcFlare on CurseForge</a><a href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">SwingCast on CurseForge</a><a href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">StatTrim on CurseForge</a></div>
+  </div>
+  <div class="legal">By Bencepo. Not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment, Inc. Headings use Cinzel (SIL Open Font License).</div>
+</div></footer><!--/@footer-->
+<script src="../assets/site.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  let edit = false;
+  const cats = [
+    { n: "Primary Attributes", s: [["Strength","48"],["Agility","112"],["Stamina","97"],["Intellect","61"],["Spirit","66"],["Movement Speed","100%"]] },
+    { n: "Melee", s: [["Damage","81-104"],["Speed","2.40"],["Power","388"],["Hit","3.0%"],["Crit","14.2%"]] },
+    { n: "Spell", s: [["Bonus Damage","12"],["Bonus Healing","24"],["Hit","0.0%"],["Crit","5.1%"],["Mana Regen","22"]] },
+    { n: "Defenses", s: [["Armor","2780"],["Defense","170"],["Dodge","11.4%"],["Parry","0.0%"],["Block","0.0%"]] }
+  ].map(c => ({ ...c, on: true, name: true, s: c.s.map(([n, v]) => ({ n, v, on: true })) }));
+  function render(){
+    const p = $("stPanel"); p.className = "stpanel" + (edit ? " edit" : "");
+    p.innerHTML = cats.map((c, ci) => `<div class="stcat ${c.on ? "" : "gone"} ${c.name ? "" : "hidenm"}">
+      <div class="h"><span class="stctl"><input type="checkbox" data-c="${ci}" ${c.on ? "checked" : ""} title="Show category"><input type="checkbox" data-cn="${ci}" ${c.name ? "checked" : ""} title="Show the name"></span><span class="t">${c.n}</span><span class="spacer"></span><span class="stctl"><button data-cu="${ci}">▲</button><button data-cd="${ci}">▼</button></span></div>
+      ${c.s.map((s, si) => `<div class="strow ${s.on ? "" : "gone"}"><span class="stctl"><input type="checkbox" data-s="${ci}.${si}" ${s.on ? "checked" : ""}></span><span class="n">${s.n}</span><span class="v">${s.v}</span><span class="stctl"><button data-su="${ci}.${si}">▲</button><button data-sd="${ci}.${si}">▼</button></span></div>`).join("")}
+    </div>`).join("");
+  }
+  const mv = (a, i, d) => { const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; };
+  $("stPanel").addEventListener("click", ev => {
+    const t = ev.target, d = t.dataset; if (!Object.keys(d).length) return;
+    if (d.c) cats[d.c].on = t.checked;
+    if (d.cn) cats[d.cn].name = t.checked;
+    if (d.s) { const [c, s] = d.s.split(".").map(Number); cats[c].s[s].on = t.checked; }
+    if (d.cu) mv(cats, +d.cu, -1); if (d.cd) mv(cats, +d.cd, 1);
+    if (d.su) { const [c, s] = d.su.split(".").map(Number); mv(cats[c].s, s, -1); }
+    if (d.sd) { const [c, s] = d.sd.split(".").map(Number); mv(cats[c].s, s, 1); }
+    render();
+  });
+  $("stEdit").onclick = () => { edit = !edit; $("stEdit").classList.toggle("gold", edit);
+    $("stHint").textContent = edit ? "Untick what you do not need, move rows with the arrows. Click the gear again to finish." : "Hidden rows are gone. Your panel, your order."; render(); };
+  render();
+})();
+</script>
+</body>
+</html>

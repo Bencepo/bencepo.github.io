@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ProcFlare · Never miss a proc · WoW Forever addon</title>
+<meta name="description" content="A big pulsing Clearcasting alert with sound and screen flash, and small icons with a countdown for weapon, trinket and talent procs. Nothing to set up.">
+<meta property="og:title" content="ProcFlare · Never miss a proc · WoW Forever addon">
+<meta property="og:description" content="A big pulsing Clearcasting alert with sound and screen flash, and small icons with a countdown for weapon, trinket and talent procs. Nothing to set up.">
+<meta property="og:image" content="https://bencepo.github.io/assets/icons/procflare-256.png">
+<meta name="theme-color" content="#0b0a09">
+<link rel="icon" type="image/png" href="../assets/icons/procflare-64.png">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+.pfstage{position:relative;height:380px;background:radial-gradient(ellipse at 50% 120%,#24361f 0%,#121a10 40%,#07090a 75%),#07090a;overflow:hidden}
+.pfstage::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(120,150,200,.10),transparent 60%)}
+.pfflash{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 0 rgba(80,150,255,0);transition:box-shadow .5s}
+.pfflash.on{box-shadow:inset 0 0 120px 30px rgba(80,150,255,.55);transition:box-shadow .08s}
+.pfchar{position:absolute;left:50%;bottom:34px;width:46px;height:96px;margin-left:-23px;border-radius:23px 23px 8px 8px;background:linear-gradient(#2a2620,#14110d);box-shadow:0 0 0 1px rgba(255,255,255,.04),0 20px 30px rgba(0,0,0,.6)}
+.pfchar::before{content:"";position:absolute;left:9px;top:-26px;width:28px;height:28px;border-radius:50%;background:#2a2620}
+.pfcc{position:absolute;left:50%;top:22px;transform:translateX(-50%) scale(.6);opacity:0;transition:.25s;text-align:center}
+.pfcc.on{opacity:1;transform:translateX(-50%) scale(1)}
+.pfccicon{width:96px;height:96px;border-radius:12px;margin:0 auto;border:2px solid #6aa8ff;background:conic-gradient(from 0deg,#14204a,#3b6fe0,#a6c8ff,#3b6fe0,#14204a,#3b6fe0,#a6c8ff,#14204a);animation:pfspin 6s linear infinite,pfpulse 1s ease-in-out infinite;box-shadow:0 0 30px rgba(90,150,255,.8)}
+.pfccicon::after{content:"";display:block;width:100%;height:100%;border-radius:10px;background:radial-gradient(circle,rgba(255,255,255,.85) 0%,rgba(140,190,255,.4) 30%,transparent 60%)}
+@keyframes pfspin{to{filter:hue-rotate(25deg)}}
+@keyframes pfpulse{0%,100%{box-shadow:0 0 18px rgba(90,150,255,.6);transform:scale(1)}50%{box-shadow:0 0 46px rgba(120,180,255,1);transform:scale(1.07)}}
+.pfcctime{font:800 30px var(--sans);color:#fff;text-shadow:0 2px 6px #000;margin-top:-62px;position:relative}
+.pfcclabel{margin-top:40px;font-family:var(--display);color:#a6c8ff;font-size:14px;letter-spacing:1px;text-shadow:0 1px 4px #000}
+.pfrow{position:absolute;left:50%;top:172px;transform:translateX(-50%);display:flex;gap:8px}
+.pfp{width:42px;height:42px;border-radius:7px;border:1px solid #e0b45a;position:relative;animation:pfin .25s ease-out;box-shadow:0 0 14px var(--c)}
+.pfp b{position:absolute;inset:0;display:grid;place-items:center;font:800 15px var(--sans);color:#fff;text-shadow:0 1px 3px #000}
+.pfp i{position:absolute;left:0;right:0;bottom:-16px;text-align:center;font-style:normal;font-size:10px;color:var(--muted);white-space:nowrap}
+@keyframes pfin{from{transform:scale(1.6);opacity:0}}
+.pfhint{position:absolute;left:0;right:0;bottom:12px;text-align:center;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<!--@header--><header class="top"><div class="wrap">
+  <a class="brand" href="../"><img src="../assets/icons/procflare-64.png" alt=""><span class="bt">Bencepo<b>·</b>Addons</span></a>
+  <nav class="nav"><a href="../leveltrail/"><img src="../assets/icons/leveltrail-64.png" alt=""><span>LevelTrail</span></a><a href="../vendorfloor/"><img src="../assets/icons/vendorfloor-64.png" alt=""><span>VendorFloor</span></a><a href="../procflare/" class=on><img src="../assets/icons/procflare-64.png" alt=""><span>ProcFlare</span></a><a href="../swingcast/"><img src="../assets/icons/swingcast-64.png" alt=""><span>SwingCast</span></a><a href="../stattrim/"><img src="../assets/icons/stattrim-64.png" alt=""><span>StatTrim</span></a></nav>
+  <div class="spacer"></div>
+  <a class="btn sm" href="../#import">Import export</a>
+</div></header><!--/@header-->
+<main>
+<div class="wrap">
+  <section class="hero addonhero">
+    <img class="heroicon" src="../assets/icons/procflare-256.png" alt="ProcFlare">
+    <div>
+      <div class="eyebrow">Never miss a proc · v0.1.5</div>
+      <h1 class="goldtext">ProcFlare</h1>
+      <p class="lead">A big pulsing Clearcasting alert with sound and screen flash, and small icons with a countdown for weapon, trinket and talent procs. Nothing to set up.</p>
+      <div class="ctas"><a class="btn primary" href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">Download on CurseForge</a><a class="btn" href="https://addons.wago.io/addons/procflare" target="_blank" rel="noopener">Wago</a><a class="btn ghost" href="#demo">Try the live demo</a></div>
+      <div class="row" style="margin-top:16px"><img src="https://img.shields.io/curseforge/dt/1800929?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+    </div>
+  </section>
+
+  <section class="section" id="demo">
+    <div class="eyebrow">Live demo</div>
+    <h2 class="goldtext">See it in action</h2>
+    <p class="lead">A recreation in your browser, close to what you see in game.</p>
+    
+<div class="panel" style="padding:0;overflow:hidden">
+  <div class="pfstage" id="pfStage">
+    <div class="pfflash" id="pfFlash"></div>
+    <div class="pfcc" id="pfCC"><div class="pfccicon"></div><div class="pfcctime" id="pfCCt">15</div><div class="pfcclabel">Clearcasting</div></div>
+    <div class="pfrow" id="pfRow"></div>
+    <div class="pfchar"></div>
+    <div class="pfhint" id="pfHint">Press a button below to trigger a proc.</div>
+  </div>
+  <div class="row" style="padding:16px 18px;border-top:1px solid var(--line)">
+    <button class="primary" id="pfCCBtn">Clearcasting</button>
+    <button id="pfW">Weapon proc</button>
+    <button id="pfT">Trinket proc</button>
+    <button id="pfD">Target debuff</button>
+    <div class="spacer"></div>
+    <label class="small"><input type="checkbox" id="pfSound" checked> Sound</label>
+    <label class="small"><input type="checkbox" id="pfFlashOn" checked> Screen flash</label>
+  </div>
+</div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="eyebrow">Features</div>
+    <h2 class="goldtext">What it does</h2>
+    <div class="features"><div class="feat reveal"><div class="fi">✦</div><b>Clearcasting you cannot miss</b><span>Big pulsing icon above your character while the buff is up, with the seconds left, a sound and a short blue flash at the screen edges. Omen of Clarity, Arcane Concentration and Elemental Focus.</span></div><div class="feat reveal"><div class="fi">⚔</div><b>Weapon, trinket and talent procs</b><span>Small icons with a countdown and a softer sound. Crusader, trinkets and talent procs are picked up on their own, nothing to set up.</span></div><div class="feat reveal"><div class="fi">◎</div><b>Procs on your target</b><span>Debuffs your weapon or talents put on your target, such as Icy Chill or Spell Vulnerability.</span></div><div class="feat reveal"><div class="fi">✕</div><b>Mute what you do not need</b><span>In move mode your recent procs are shown: right-click one to mute or unmute it.</span></div><div class="feat reveal"><div class="fi">⚙</div><b>Works in combat</b><span>Forever hides buff details in combat. ProcFlare still finds Clearcasting by spell, by the game&#x27;s own proc glow or by your abilities becoming free.</span></div><div class="feat reveal"><div class="fi">◈</div><b>Light</b><span>Classes without Clearcasting do not rescan their buffs on every resource change; with Clearcasting at most five times a second.</span></div></div>
+  </section>
+
+  <section class="section"><div class="note"><b style="color:var(--gold2)">Limits.</b> Procs that only deal damage (Fiery Weapon, Lifestealing) or grant an extra attack (Hand of Justice, Windfury) cannot be shown: Forever keeps the combat log from addons. In restricted content (some boss encounters, battlegrounds) only Clearcasting is shown.</div></section>
+
+  <section class="section">
+    <div class="split">
+      <div class="panel reveal"><h2>Settings</h2><ul class="ticks" style="list-style:none;padding:0;margin:0;color:var(--muted)"><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span><b>Options &gt; AddOns &gt; ProcFlare</b>, or the <b>minimap button</b>: left-click options, shift-click move mode, right-click preview.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>Clearcasting alert, its sound and the screen flash on or off.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>Other procs and their sound, only your own procs.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>Longest buff that still counts as a proc (30 s by default), size and position.</li></ul></div>
+      <div class="panel reveal" id="changelog"><h2>Changelog</h2><!--@changelog--><div class="changelog"><div class="cl"><b>0.1.5</b><ul><li>Brighter icon that stays readable on the round minimap button.</li></ul></div><div class="cl"><b>0.1.4</b><ul><li>Icon reworked: bigger die with clear pips and less glare, easy to read even at minimap size.</li></ul></div><div class="cl"><b>0.1.3</b><ul><li>New icon: a die mid-roll with a glowing face, for the minimap button and the addon list.</li></ul></div><div class="cl"><b>0.1.2</b><ul><li>Fixed: while your target&#x27;s debuffs were hidden (in combat), a proc on the target could stop the scan halfway, so procs on you were announced again and again.</li><li>Classes without Clearcasting no longer rescan their buffs on every change of mana, rage or energy; with Clearcasting at most five times a second.</li></ul></div><div class="cl"><b>0.1.1</b><ul><li>Clearcasting is now also found in combat, where Forever hides buff details from addons: by spell, by the game&#x27;s own proc glow, or by your abilities becoming free.</li><li>No more &quot;Auras cannot be accessed when secret&quot; errors in combat.</li><li>Spells you cast yourself (e.g. Regrowth) no longer count as procs.</li></ul></div></div><details><summary>1 older versions</summary><div class="changelog" style="margin-top:12px"><div class="cl"><b>0.1.0</b><ul><li>Clearcasting: big pulsing icon above your character as long as the buff is up, with remaining seconds, a sound and a short blue flash at the screen edges. Also alerts again when a new proc refreshes it.</li><li>Other procs (weapon enchants such as Crusader, trinkets, talents): small icons with countdown and a softer sound. Found on their own, no list to maintain.</li><li>Procs on your target: debuffs your weapon or talents put on the target (e.g. Icy Chill, Spell Vulnerability).</li><li>Move mode: drag the icons where you want them; your recent procs are shown and a right-click mutes or unmutes one.</li><li>Options under Options &gt; AddOns &gt; ProcFlare: alerts, sounds, screen flash, only own procs, longest proc duration, size, preview.</li><li>Minimap button and addon menu entry: left-click options, shift-click move mode, right-click preview.</li></ul></div></div></details><!--/@changelog--></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="eyebrow">Goes well with</div>
+    <h2 class="goldtext">More from Bencepo</h2>
+    <div class="addons"><div class="acard reveal" style="--glow:rgba(90,120,230,.32)">
+  <div class="head"><img src="../assets/icons/swingcast-128.png" alt=""><div><h3>SwingCast</h3><div class="small">Cast bar plus swing timer</div></div></div>
+  
+  <div class="meta"><span class="tag">v0.4.4</span><img src="https://img.shields.io/curseforge/dt/1800255?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="../swingcast/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/swingcast" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(110,160,240,.28)">
+  <div class="head"><img src="../assets/icons/stattrim-128.png" alt=""><div><h3>StatTrim</h3><div class="small">A tidy character window</div></div></div>
+  
+  <div class="meta"><span class="tag">v1.0.3</span><img src="https://img.shields.io/curseforge/dt/1801407?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="../stattrim/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/stattrim" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(95,176,122,.30)">
+  <div class="head"><img src="../assets/icons/leveltrail-128.png" alt=""><div><h3>LevelTrail</h3><div class="small">Your leveling run, analysed</div></div></div>
+  
+  <div class="meta"><span class="tag">v1.3.6-beta</span><img src="https://img.shields.io/curseforge/dt/1798692?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="../leveltrail/">Open the page</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/leveltrail" target="_blank" rel="noopener">Wago</a></div>
+</div></div>
+  </section>
+
+  <section class="section" id="community">
+  <div class="eyebrow">Community</div>
+  <h2 class="goldtext">Feedback, bugs and ideas</h2>
+  <p class="lead">Every addon is tested in game before it ships, but Forever changes often. Tell me what breaks and what you miss.</p>
+  <div class="grid3">
+    <div class="panel reveal"><h2>Report a bug</h2><p class="small">Leave a comment on the addon's CurseForge page: what you did, what happened, and the error text from BugSack if there is one.</p>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/wow/addons/leveltrail#comments" target="_blank" rel="noopener">LevelTrail</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/vendorfloor#comments" target="_blank" rel="noopener">VendorFloor</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare#comments" target="_blank" rel="noopener">ProcFlare</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast#comments" target="_blank" rel="noopener">SwingCast</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/stattrim#comments" target="_blank" rel="noopener">StatTrim</a></div></div>
+    <div class="panel reveal"><h2>Share your run</h2><p class="small">LevelTrail turns your export into a share image for Discord or Reddit, VendorFloor does the same for your flips. Names can be hidden.</p>
+      <div class="row"><a class="btn sm gold" href="../leveltrail/#demo">LevelTrail demo</a><a class="btn sm gold" href="../vendorfloor/#demo">VendorFloor demo</a></div></div>
+    <div class="panel reveal"><h2>Suggest a feature</h2><p class="small">Ideas that make leveling faster or the UI calmer have the best chance. Comments on CurseForge reach me directly.</p>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/members/bencepo/projects" target="_blank" rel="noopener">All projects on CurseForge</a></div></div>
+  </div>
+</section>
+</div>
+</main>
+<!--@footer--><footer class="site"><div class="wrap">
+  <div class="cols">
+    <div><h4>Bencepo · Addons</h4><p style="margin:0 0 10px">Small, fast addons for World of Warcraft: Forever. Built by a player who tests every change in game. The pages run in your browser: your exports never leave it.</p>
+      <a href="../#community">Feedback, bugs and ideas</a></div>
+    <div><h4>Addons</h4><a href="../leveltrail/">LevelTrail</a><a href="../vendorfloor/">VendorFloor</a><a href="../procflare/">ProcFlare</a><a href="../swingcast/">SwingCast</a><a href="../stattrim/">StatTrim</a></div>
+    <div><h4>Download</h4><a href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">LevelTrail on CurseForge</a><a href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">VendorFloor on CurseForge</a><a href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">ProcFlare on CurseForge</a><a href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">SwingCast on CurseForge</a><a href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">StatTrim on CurseForge</a></div>
+  </div>
+  <div class="legal">By Bencepo. Not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment, Inc. Headings use Cinzel (SIL Open Font License).</div>
+</div></footer><!--/@footer-->
+<script src="../assets/site.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  let ctx = null;
+  function beep(f, d, v){ if(!$("pfSound").checked) return; try{ ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.value = f; g.gain.value = v;
+    o.connect(g); g.connect(ctx.destination); const t = ctx.currentTime; g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.start(t); o.stop(t + d);}catch(e){} }
+  let ccT = null, ccLeft = 0;
+  $("pfCCBtn").onclick = () => {
+    $("pfHint").textContent = "Clearcasting: your next spell is free.";
+    ccLeft = 15; $("pfCCt").textContent = ccLeft; $("pfCC").classList.add("on");
+    beep(880, .35, .12); setTimeout(() => beep(1320, .4, .09), 110);
+    if ($("pfFlashOn").checked) { $("pfFlash").classList.add("on"); setTimeout(() => $("pfFlash").classList.remove("on"), 180); }
+    clearInterval(ccT); ccT = setInterval(() => { ccLeft--; $("pfCCt").textContent = ccLeft; if (ccLeft <= 0) { clearInterval(ccT); $("pfCC").classList.remove("on"); } }, 1000);
+  };
+  const KINDS = { pfW: ["Crusader", "#e8c46a", "radial-gradient(circle at 40% 35%,#fff3c4,#e0a83a 45%,#6b3d0c)", 15],
+                  pfT: ["Trinket", "#b27ae0", "radial-gradient(circle at 40% 35%,#f0d8ff,#9a5bd6 45%,#3a1660)", 20],
+                  pfD: ["On target", "#5fb0ff", "radial-gradient(circle at 40% 35%,#d8f0ff,#3d8ad9 45%,#0c2a52)", 12] };
+  Object.keys(KINDS).forEach(id => $(id).onclick = () => {
+    const [name, c, bg, sec] = KINDS[id];
+    $("pfHint").textContent = name + " proc: small icon with a countdown and a softer sound.";
+    beep(660, .18, .07);
+    const el = document.createElement("div"); el.className = "pfp"; el.style.setProperty("--c", c); el.style.background = bg;
+    el.innerHTML = `<b>${sec}</b><i>${name}</i>`; $("pfRow").prepend(el);
+    let left = sec; const t = setInterval(() => { left--; el.querySelector("b").textContent = left; if (left <= 0) { clearInterval(t); el.remove(); } }, 1000);
+  });
+})();
+</script>
+</body>
+</html>

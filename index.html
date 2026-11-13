@@ -1,32 +1,166 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bencepo – addons for WoW Forever</title>
-<meta name="description" content="LevelTrail and VendorFloor: free addons for World of Warcraft: Forever, with web pages that show your leveling run and your auction flips.">
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bencepo · Addons for WoW Forever</title>
+<meta name="description" content="LevelTrail, VendorFloor, ProcFlare, SwingCast and StatTrim: small, fast addons for World of Warcraft: Forever, with private web pages for your leveling run and auction flips.">
+<meta property="og:title" content="Bencepo · Addons for WoW Forever">
+<meta property="og:description" content="LevelTrail, VendorFloor, ProcFlare, SwingCast and StatTrim: small, fast addons for World of Warcraft: Forever, with private web pages for your leveling run and auction flips.">
+<meta property="og:image" content="https://bencepo.github.io/assets/icons/procflare-256.png">
+<meta name="theme-color" content="#0b0a09">
+<link rel="icon" type="image/png" href="assets/icons/procflare-64.png">
+<link rel="stylesheet" href="assets/site.css">
 <style>
-:root{--bg:#0f1318;--panel:#161b22;--line:#28313c;--text:#e6e9ee;--muted:#8d97a5;--gold:#e0a83a}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.wrap{max-width:980px;margin:0 auto;padding:64px 20px}
-h1{font-size:38px;margin:0 0 10px;letter-spacing:-.4px}p.lead{color:var(--muted);font-size:18px;margin:0 0 36px;max-width:620px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px;transition:border-color .15s}
-.card:hover{border-color:var(--gold)}
-.card h2{margin:12px 0 6px;font-size:22px}.card p{color:var(--muted);margin:0 0 14px}
-.card .links{display:flex;gap:18px;flex-wrap:wrap}.card .links a{color:var(--gold);font-weight:600;text-decoration:none}.card .links a.dl{color:var(--text)}
-.card .links a:hover{text-decoration:underline}
-.card img{width:44px;height:44px;border-radius:9px}
-footer{color:var(--muted);font-size:13px;margin-top:48px}
-@media(max-width:720px){.grid{grid-template-columns:1fr}h1{font-size:30px}}
-</style></head>
-<body><div class="wrap">
-<h1>Addons for WoW Forever</h1>
-<p class="lead">Two small addons that record what you do, and two pages that show it. Free, private, nothing is uploaded.</p>
-<div class="grid">
-  <div class="card"><img src="media/icons/leveltrail.png" alt="">
-    <h2>LevelTrail</h2><p>Your leveling run split by split: time per level, XP sources, deaths, gold, library books, alts and a share image.</p><div class="links"><a href="leveltrail/">Open LevelTrail →</a><a class="dl" href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">Download on CurseForge</a></div></div>
-  <div class="card"><img src="media/icons/vendorfloor.png" alt="">
-    <h2>VendorFloor</h2><p>Buys auctions listed below vendor price, collects them from the mail and sells them. The page shows profit per day and your best items.</p><div class="links"><a href="vendorfloor/">Open VendorFloor →</a><a class="dl" href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">Download on CurseForge</a></div></div>
-  <div class="card"><img src="media/icons/stattrim.png" alt="">
-    <h2>StatTrim</h2><p>Hide, merge and reorder the stats in your character window, right inside the window.</p><div class="links"><a href="media/stattrim/demo.gif" target="_blank" rel="noopener">Watch the demo →</a><a class="dl" href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">Download on CurseForge</a></div></div>
+.homehero{text-align:center;padding-top:84px}
+.homehero h1{margin-left:auto;margin-right:auto;font-size:46px;max-width:900px}
+.homehero h1 small{display:block;font-size:26px;color:var(--text);margin-top:10px;letter-spacing:1px}
+.homehero .lead{margin-left:auto;margin-right:auto}
+.homehero .ctas{justify-content:center}
+.iconrow{display:flex;justify-content:center;gap:22px;margin-top:46px;flex-wrap:wrap}
+.iconrow a{position:relative;display:block;border-radius:20px;transition:transform .25s}
+.iconrow a::after{content:"";position:absolute;inset:-18px;border-radius:50%;background:radial-gradient(circle,var(--glow),transparent 70%);z-index:-1;opacity:.8}
+.iconrow img{width:92px;height:92px;border-radius:20px;display:block;box-shadow:0 0 0 1px var(--line2),0 14px 30px rgba(0,0,0,.6);animation:float 6s ease-in-out infinite}
+.iconrow a:nth-child(2) img{animation-delay:-1.2s}.iconrow a:nth-child(3) img{animation-delay:-2.4s}.iconrow a:nth-child(4) img{animation-delay:-3.6s}.iconrow a:nth-child(5) img{animation-delay:-4.8s}
+.iconrow a:hover{transform:scale(1.08)}
+.ticks{list-style:none;padding:0;margin:0;color:var(--muted)}
+.ticks li{padding-left:24px;position:relative;margin:8px 0}
+.ticks li::before{content:"◆";position:absolute;left:2px;color:var(--gold);font-size:12px;top:3px}
+@media(max-width:860px){.homehero h1{font-size:36px}.iconrow img{width:64px;height:64px}}
+</style>
+</head>
+<body>
+<!--@header--><header class="top"><div class="wrap">
+  <a class="brand" href=""><img src="assets/icons/procflare-64.png" alt=""><span class="bt">Bencepo<b>·</b>Addons</span></a>
+  <nav class="nav"><a href="leveltrail/"><img src="assets/icons/leveltrail-64.png" alt=""><span>LevelTrail</span></a><a href="vendorfloor/"><img src="assets/icons/vendorfloor-64.png" alt=""><span>VendorFloor</span></a><a href="procflare/"><img src="assets/icons/procflare-64.png" alt=""><span>ProcFlare</span></a><a href="swingcast/"><img src="assets/icons/swingcast-64.png" alt=""><span>SwingCast</span></a><a href="stattrim/"><img src="assets/icons/stattrim-64.png" alt=""><span>StatTrim</span></a></nav>
+  <div class="spacer"></div>
+  <a class="btn sm" href="#import">Import export</a>
+</div></header><!--/@header-->
+<main>
+<div class="wrap">
+  <section class="hero homehero">
+    <div class="eyebrow">World of Warcraft: Forever</div>
+    <h1><span class="goldtext">Addons that stay out of your way</span><small>and show you what you did</small></h1>
+    <p class="lead">Five small addons by Bencepo: proc alerts, a smarter cast bar, a tidy character window, an auction sniper and a leveling recorder. Light on memory, set up with buttons, never with walls of chat commands.</p>
+    <div class="ctas"><a class="btn primary" href="#addons">Browse the addons</a><a class="btn" href="#import">Paste an export</a></div>
+    <div class="iconrow"><a href="leveltrail/" title="LevelTrail" style="--glow:rgba(95,176,122,.30)"><img src="assets/icons/leveltrail-128.png" alt="LevelTrail"></a><a href="vendorfloor/" title="VendorFloor" style="--glow:rgba(224,112,60,.32)"><img src="assets/icons/vendorfloor-128.png" alt="VendorFloor"></a><a href="procflare/" title="ProcFlare" style="--glow:rgba(240,190,90,.32)"><img src="assets/icons/procflare-128.png" alt="ProcFlare"></a><a href="swingcast/" title="SwingCast" style="--glow:rgba(90,120,230,.32)"><img src="assets/icons/swingcast-128.png" alt="SwingCast"></a><a href="stattrim/" title="StatTrim" style="--glow:rgba(110,160,240,.28)"><img src="assets/icons/stattrim-128.png" alt="StatTrim"></a></div>
+  </section>
+
+  <section class="section" id="addons">
+    <div class="eyebrow">The collection</div>
+    <h2 class="goldtext">Five addons, one style</h2>
+    <p class="lead">All of them are free, all of them work together, and none of them needs a configuration marathon.</p>
+    <div class="addons"><div class="acard reveal" style="--glow:rgba(95,176,122,.30)">
+  <div class="head"><img src="assets/icons/leveltrail-128.png" alt=""><div><h3>LevelTrail</h3><div class="small">Your leveling run, analysed</div></div></div>
+  <p>Records every level, death, XP source, gold day and dungeon visit. Paste the export into the page and see your run split by split, with records and a share image.</p>
+  <div class="meta"><span class="tag">v1.3.6-beta</span><img src="https://img.shields.io/curseforge/dt/1798692?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="leveltrail/">Open the page</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/leveltrail" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(224,112,60,.32)">
+  <div class="head"><img src="assets/icons/vendorfloor-128.png" alt=""><div><h3>VendorFloor</h3><div class="small">Auction house sniper</div></div></div>
+  <p>Finds auctions below vendor price, below disenchant value and profitable crafts. One click to buy, collect and sell. The page shows your real profit per day and item.</p>
+  <div class="meta"><span class="tag">v0.8.6</span><img src="https://img.shields.io/curseforge/dt/1797826?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="vendorfloor/">Open the page</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/vendorfloor" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(240,190,90,.32)">
+  <div class="head"><img src="assets/icons/procflare-128.png" alt=""><div><h3>ProcFlare</h3><div class="small">Never miss a proc</div></div></div>
+  <p>A big pulsing Clearcasting alert with sound and screen flash, and small icons with a countdown for weapon, trinket and talent procs. Nothing to set up.</p>
+  <div class="meta"><span class="tag">v0.1.5</span><img src="https://img.shields.io/curseforge/dt/1800929?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="procflare/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/procflare" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(90,120,230,.32)">
+  <div class="head"><img src="assets/icons/swingcast-128.png" alt=""><div><h3>SwingCast</h3><div class="small">Cast bar plus swing timer</div></div></div>
+  <p>Adds spell icon, cast time, latency zone and a swing timer to the standard cast bar. The strip lights up while Maul, Heroic Strike or Cleave is queued.</p>
+  <div class="meta"><span class="tag">v0.4.4</span><img src="https://img.shields.io/curseforge/dt/1800255?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="swingcast/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/swingcast" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(110,160,240,.28)">
+  <div class="head"><img src="assets/icons/stattrim-128.png" alt=""><div><h3>StatTrim</h3><div class="small">A tidy character window</div></div></div>
+  <p>Hide, merge and reorder categories and stats right inside the character window. Edit with checkboxes and arrows, works in combat.</p>
+  <div class="meta"><span class="tag">v1.0.3</span><img src="https://img.shields.io/curseforge/dt/1801407?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="stattrim/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/stattrim" target="_blank" rel="noopener">Wago</a></div>
+</div></div>
+  </section>
+
+  <section class="section" id="import">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Import hub</div>
+        <h2 class="goldtext" style="font-size:30px;margin:6px 0 8px">Paste any export</h2>
+        <p class="lead">LevelTrail (<code>/trail</code>) or VendorFloor (Menu &gt; Export): paste it here and the right page opens with your data. Nothing is uploaded, the page reads it in your browser.</p>
+        <ul class="ticks">
+          <li><b>LevelTrail</b>: time per level, XP sources, deaths, gear, records and a share image.</li>
+          <li><b>VendorFloor</b>: profit per day, best items, time to sale, cumulative profit and a share image.</li>
+        </ul>
+      </div>
+      <div class="panel dropzone" id="hub">
+        <h2>Your export <span class="small">paste or drop a text file</span></h2>
+        <textarea id="hubText" spellcheck="false" placeholder='{"levelTrail":2,...}  or  {"vendorFloor":1,...}'></textarea>
+        <div class="row" style="margin-top:12px">
+          <button class="primary" id="hubGo">Open my data</button>
+          <span class="small" id="hubKind">Detects the addon on its own.</span>
+        </div>
+        <div class="msg" id="hubMsg"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="eyebrow">How they are built</div>
+    <h2 class="goldtext">Small on purpose</h2>
+    <div class="features" style="margin-top:20px">
+      <div class="feat reveal"><div class="fi">✦</div><b>Buttons, not commands</b><span>Every setting lives in the options window or behind the minimap button. Chat commands exist, but you never need them.</span></div>
+      <div class="feat reveal"><div class="fi">◈</div><b>Light and quiet</b><span>No work while nothing happens. Each release gets a performance review and a code check with the WoW API annotations.</span></div>
+      <div class="feat reveal"><div class="fi">⛉</div><b>Private by design</b><span>The web pages read your export in the browser. No accounts, no uploads, no tracking.</span></div>
+      <div class="feat reveal"><div class="fi">⚒</div><b>Made for Forever</b><span>Built around Forever's limits, such as the hidden combat log and secret values, instead of pretending they are not there.</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="community">
+  <div class="eyebrow">Community</div>
+  <h2 class="goldtext">Feedback, bugs and ideas</h2>
+  <p class="lead">Every addon is tested in game before it ships, but Forever changes often. Tell me what breaks and what you miss.</p>
+  <div class="grid3">
+    <div class="panel reveal"><h2>Report a bug</h2><p class="small">Leave a comment on the addon's CurseForge page: what you did, what happened, and the error text from BugSack if there is one.</p>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/wow/addons/leveltrail#comments" target="_blank" rel="noopener">LevelTrail</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/vendorfloor#comments" target="_blank" rel="noopener">VendorFloor</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare#comments" target="_blank" rel="noopener">ProcFlare</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast#comments" target="_blank" rel="noopener">SwingCast</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/stattrim#comments" target="_blank" rel="noopener">StatTrim</a></div></div>
+    <div class="panel reveal"><h2>Share your run</h2><p class="small">LevelTrail turns your export into a share image for Discord or Reddit, VendorFloor does the same for your flips. Names can be hidden.</p>
+      <div class="row"><a class="btn sm gold" href="leveltrail/#demo">LevelTrail demo</a><a class="btn sm gold" href="vendorfloor/#demo">VendorFloor demo</a></div></div>
+    <div class="panel reveal"><h2>Suggest a feature</h2><p class="small">Ideas that make leveling faster or the UI calmer have the best chance. Comments on CurseForge reach me directly.</p>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/members/bencepo/projects" target="_blank" rel="noopener">All projects on CurseForge</a></div></div>
+  </div>
+</section>
 </div>
-<footer>By Bencepo. Not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment, Inc.</footer>
-</div></body></html>
+</main>
+<!--@footer--><footer class="site"><div class="wrap">
+  <div class="cols">
+    <div><h4>Bencepo · Addons</h4><p style="margin:0 0 10px">Small, fast addons for World of Warcraft: Forever. Built by a player who tests every change in game. The pages run in your browser: your exports never leave it.</p>
+      <a href="#community">Feedback, bugs and ideas</a></div>
+    <div><h4>Addons</h4><a href="leveltrail/">LevelTrail</a><a href="vendorfloor/">VendorFloor</a><a href="procflare/">ProcFlare</a><a href="swingcast/">SwingCast</a><a href="stattrim/">StatTrim</a></div>
+    <div><h4>Download</h4><a href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">LevelTrail on CurseForge</a><a href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">VendorFloor on CurseForge</a><a href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">ProcFlare on CurseForge</a><a href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">SwingCast on CurseForge</a><a href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">StatTrim on CurseForge</a></div>
+  </div>
+  <div class="legal">By Bencepo. Not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment, Inc. Headings use Cinzel (SIL Open Font License).</div>
+</div></footer><!--/@footer-->
+<script src="assets/site.js"></script>
+<script>
+(function(){
+  const t = document.getElementById("hubText"), msg = document.getElementById("hubMsg"), kind = document.getElementById("hubKind"), hub = document.getElementById("hub");
+  const NAMES = { leveltrail: "LevelTrail", vendorfloor: "VendorFloor" };
+  function check() {
+    const k = BENCEPO.detect(t.value);
+    kind.textContent = k ? `Recognised: ${NAMES[k]} export.` : t.value.trim() ? "Not recognised yet." : "Detects the addon on its own.";
+    kind.className = "small" + (k ? " good" : "");
+    return k;
+  }
+  function go() {
+    const k = check();
+    if (!t.value.trim()) { msg.textContent = "Paste an export first."; msg.className = "msg err"; return; }
+    if (!k) { msg.textContent = "This is not a LevelTrail or VendorFloor export. Copy it again with Ctrl+C in the addon's export window."; msg.className = "msg err"; return; }
+    BENCEPO.handoff(k, t.value, "");
+  }
+  t.addEventListener("input", check);
+  t.addEventListener("paste", () => setTimeout(() => { if (check()) go(); }, 0));
+  document.getElementById("hubGo").onclick = go;
+  ["dragenter","dragover"].forEach(e => hub.addEventListener(e, ev => { ev.preventDefault(); hub.classList.add("over"); }));
+  ["dragleave","drop"].forEach(e => hub.addEventListener(e, () => hub.classList.remove("over")));
+  hub.addEventListener("drop", ev => { ev.preventDefault(); const f = ev.dataTransfer.files && ev.dataTransfer.files[0];
+    if (f) f.text().then(x => { t.value = x; go(); }); else { t.value = ev.dataTransfer.getData("text"); go(); } });
+})();
+</script>
+</body>
+</html>

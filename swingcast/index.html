@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SwingCast · Cast bar plus swing timer · WoW Forever addon</title>
+<meta name="description" content="Adds spell icon, cast time, latency zone and a swing timer to the standard cast bar. The strip lights up while Maul, Heroic Strike or Cleave is queued.">
+<meta property="og:title" content="SwingCast · Cast bar plus swing timer · WoW Forever addon">
+<meta property="og:description" content="Adds spell icon, cast time, latency zone and a swing timer to the standard cast bar. The strip lights up while Maul, Heroic Strike or Cleave is queued.">
+<meta property="og:image" content="https://bencepo.github.io/assets/icons/swingcast-256.png">
+<meta name="theme-color" content="#0b0a09">
+<link rel="icon" type="image/png" href="../assets/icons/swingcast-64.png">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+.scstage{height:300px;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 120%,#1d2433 0%,#0d1018 55%,#07080b 80%)}
+.scwrap{width:min(560px,88%)}
+.scbar{display:flex;gap:8px;align-items:center}
+.scicon{flex:none;width:40px;height:40px;border-radius:5px;border:1px solid #b89a5a;background:radial-gradient(circle at 40% 35%,#e5ffd4,#5fb07a 45%,#163a20);opacity:.35;transition:opacity .2s}
+.scicon.on{opacity:1;box-shadow:0 0 12px rgba(95,176,122,.6)}
+.sccast{position:relative;flex:1;height:28px;border-radius:4px;background:rgba(0,0,0,.65);border:1px solid #6b5a3a;box-shadow:0 0 0 2px #1a1510,0 6px 16px rgba(0,0,0,.6);overflow:hidden}
+.scfill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(#ffe08a,#e0a83a 55%,#a7731e)}
+.sclat{position:absolute;right:0;top:0;bottom:0;width:10%;background:rgba(220,60,40,.55);opacity:0}
+.scname{position:absolute;left:10px;top:4px;font-size:14px;color:#fff;text-shadow:0 1px 2px #000}
+.sctime{position:absolute;right:10px;top:4px;font-size:14px;color:#fff;text-shadow:0 1px 2px #000;font-variant-numeric:tabular-nums}
+.scswing{position:relative;margin:8px 0 0 48px;height:9px;border-radius:3px;background:rgba(0,0,0,.6);border:1px solid #3a3226;overflow:visible}
+.scsfill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:3px;background:#c9ced6}
+.scswing span{position:absolute;right:0;top:12px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<!--@header--><header class="top"><div class="wrap">
+  <a class="brand" href="../"><img src="../assets/icons/procflare-64.png" alt=""><span class="bt">Bencepo<b>·</b>Addons</span></a>
+  <nav class="nav"><a href="../leveltrail/"><img src="../assets/icons/leveltrail-64.png" alt=""><span>LevelTrail</span></a><a href="../vendorfloor/"><img src="../assets/icons/vendorfloor-64.png" alt=""><span>VendorFloor</span></a><a href="../procflare/"><img src="../assets/icons/procflare-64.png" alt=""><span>ProcFlare</span></a><a href="../swingcast/" class=on><img src="../assets/icons/swingcast-64.png" alt=""><span>SwingCast</span></a><a href="../stattrim/"><img src="../assets/icons/stattrim-64.png" alt=""><span>StatTrim</span></a></nav>
+  <div class="spacer"></div>
+  <a class="btn sm" href="../#import">Import export</a>
+</div></header><!--/@header-->
+<main>
+<div class="wrap">
+  <section class="hero addonhero">
+    <img class="heroicon" src="../assets/icons/swingcast-256.png" alt="SwingCast">
+    <div>
+      <div class="eyebrow">Cast bar plus swing timer · v0.4.4</div>
+      <h1 class="goldtext">SwingCast</h1>
+      <p class="lead">Adds spell icon, cast time, latency zone and a swing timer to the standard cast bar. The strip lights up while Maul, Heroic Strike or Cleave is queued.</p>
+      <div class="ctas"><a class="btn primary" href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">Download on CurseForge</a><a class="btn" href="https://addons.wago.io/addons/swingcast" target="_blank" rel="noopener">Wago</a><a class="btn ghost" href="#demo">Try the live demo</a></div>
+      <div class="row" style="margin-top:16px"><img src="https://img.shields.io/curseforge/dt/1800255?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+    </div>
+  </section>
+
+  <section class="section" id="demo">
+    <div class="eyebrow">Live demo</div>
+    <h2 class="goldtext">See it in action</h2>
+    <p class="lead">A recreation in your browser, close to what you see in game.</p>
+    
+<div class="panel" style="padding:0;overflow:hidden">
+  <div class="scstage">
+    <div class="scwrap">
+      <div class="scbar">
+        <div class="scicon" id="scIcon"></div>
+        <div class="sccast"><div class="scfill" id="scFill"></div><div class="sclat" id="scLat"></div><span class="scname" id="scName">Healing Touch</span><span class="sctime" id="scTime"></span></div>
+      </div>
+      <div class="scswing"><div class="scsfill" id="scSwing"></div><span id="scSwingT">2.4</span></div>
+      <div class="small" style="text-align:center;margin-top:14px" id="scHint">The swing strip runs on its own. Cast a spell or queue Maul.</div>
+    </div>
+  </div>
+  <div class="row" style="padding:16px 18px;border-top:1px solid var(--line)">
+    <button class="primary" id="scCast">Cast Healing Touch</button>
+    <button id="scMaul">Queue Maul</button>
+    <button id="scCleave">Queue Cleave</button>
+    <div class="spacer"></div>
+    <label class="small">Latency <input type="range" id="scPing" min="20" max="400" value="120" style="vertical-align:middle"> <span id="scPingV">120 ms</span></label>
+  </div>
+</div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="eyebrow">Features</div>
+    <h2 class="goldtext">What it does</h2>
+    <div class="features"><div class="feat reveal"><div class="fi">◧</div><b>Spell icon</b><span>Left of the cast bar, so you see what you are casting at a glance.</span></div><div class="feat reveal"><div class="fi">⧗</div><b>Remaining cast time</b><span>Counted down right on the bar.</span></div><div class="feat reveal"><div class="fi">▮</div><b>Latency zone</b><span>Red end of the bar: once the bar reaches it, the next spell can be pressed.</span></div><div class="feat reveal"><div class="fi">⚔</div><b>Swing timer</b><span>A thin strip right under the cast bar, with the seconds to the next swing.</span></div><div class="feat reveal"><div class="fi">◆</div><b>Queued swing</b><span>Orange while Maul, Heroic Strike or Raptor Strike is queued, blue for Cleave.</span></div><div class="feat reveal"><div class="fi">⚙</div><b>Your look</b><span>Height, font, font size and every colour, with the game&#x27;s colour picker.</span></div></div>
+  </section>
+
+  <section class="section"><div class="note"><b style="color:var(--gold2)">How it works.</b> The strip mirrors Forever's built-in swing timer, the only accurate source: Forever keeps the combat log from addons and hands attack speed to addons as secret values. If the strip ever fails, it switches itself off and the built-in bar comes back.</div></section>
+
+  <section class="section">
+    <div class="split">
+      <div class="panel reveal"><h2>Settings</h2><ul class="ticks" style="list-style:none;padding:0;margin:0;color:var(--muted)"><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>Switch on Forever&#x27;s swing timer first: <b>Options &gt; Advanced Options &gt; Swing Timer</b>.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span><b>Options &gt; AddOns &gt; SwingCast</b>, or the <b>minimap button</b>: left-click options, right-click an 8 s preview.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>Show or hide icon, cast time, latency zone, swing strip and its seconds; hide the built-in swing bars.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>Advanced: <code>/swc</code> lists every setting as a command.</li></ul></div>
+      <div class="panel reveal" id="changelog"><h2>Changelog</h2><!--@changelog--><div class="changelog"><div class="cl"><b>0.4.4</b><ul><li>Brighter icon that stays readable on the round minimap button.</li></ul></div><div class="cl"><b>0.4.3</b><ul><li>New icon: a blazing weapon swing above a cast bar, for the minimap button and the addon list.</li></ul></div><div class="cl"><b>0.4.2</b><ul><li>With the swing strip switched off, SwingCast no longer does any work each frame.</li></ul></div><div class="cl"><b>0.4.1</b><ul><li>The cast time label is only redrawn when the shown value changes, not every frame.</li><li>Code check with LuaLS and the WoW API annotations runs with every change; removed fallbacks for old clients.</li></ul></div><div class="cl"><b>0.4.0</b><ul><li>First stable release. No functional changes since 0.3.2.</li><li>README and project description now lead with the options window; chat commands moved to an advanced section.</li></ul></div></div><details><summary>6 older versions</summary><div class="changelog" style="margin-top:12px"><div class="cl"><b>0.3.2-alpha</b><ul><li>Own minimap and addon list icon.</li></ul></div><div class="cl"><b>0.3.1-alpha</b><ul><li>Now also released on Wago.</li></ul></div><div class="cl"><b>0.3.0-alpha</b><ul><li>Font: choose the font of the cast time and the swing seconds (the fonts every client has) and its size, in the options window or with <code>/swc font &lt;7-20&gt;</code>.</li><li>Colours: swing strip, queued swing, Cleave and latency zone each get a &quot;Choose&quot; button in the options window that opens the game&#x27;s colour picker, plus a reset button. Also <code>/swc color swing|queued|cleave|latency|reset</code>.</li></ul></div><div class="cl"><b>0.2.0-alpha</b><ul><li>Minimap button: left-click opens the options, right-click shows the swing strip preview. <code>/swc minimap</code> hides or shows it.</li><li>Entry in the game&#x27;s addon menu next to the minimap, with the same clicks.</li><li>Options window under Options &gt; AddOns &gt; SwingCast with every setting, including the strip height.</li><li><code>/swc options</code> opens the options window.</li><li>Fixed: <code>/swc swingText</code> and <code>/swc hideNative</code> did nothing because the command is read in lower case.</li></ul></div><div class="cl"><b>0.1.1-alpha</b><ul><li>Swing strip copies the built-in timer&#x27;s values and seconds label as they are. Forever hands the attack speed to addons as a secret value that cannot be calculated with.</li><li>If the strip fails, it switches itself off and the built-in swing timer is shown again.</li></ul></div><div class="cl"><b>0.1.0-alpha</b><ul><li>Spell icon, remaining cast time and latency zone on the standard player cast bar.</li><li>Swing strip under the cast bar, mirrored from Forever&#x27;s built-in swing timer (main hand, off hand and ranged where present).</li><li>Strip turns orange while Maul, Heroic Strike or Raptor Strike is queued, blue for Cleave.</li><li><code>/swc</code> settings, <code>/swc test</code> preview.</li><li>Released on CurseForge (project 1800255).</li></ul></div></div></details><!--/@changelog--></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="eyebrow">Goes well with</div>
+    <h2 class="goldtext">More from Bencepo</h2>
+    <div class="addons"><div class="acard reveal" style="--glow:rgba(240,190,90,.32)">
+  <div class="head"><img src="../assets/icons/procflare-128.png" alt=""><div><h3>ProcFlare</h3><div class="small">Never miss a proc</div></div></div>
+  
+  <div class="meta"><span class="tag">v0.1.5</span><img src="https://img.shields.io/curseforge/dt/1800929?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="../procflare/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/procflare" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(110,160,240,.28)">
+  <div class="head"><img src="../assets/icons/stattrim-128.png" alt=""><div><h3>StatTrim</h3><div class="small">A tidy character window</div></div></div>
+  
+  <div class="meta"><span class="tag">v1.0.3</span><img src="https://img.shields.io/curseforge/dt/1801407?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="../stattrim/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/stattrim" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(95,176,122,.30)">
+  <div class="head"><img src="../assets/icons/leveltrail-128.png" alt=""><div><h3>LevelTrail</h3><div class="small">Your leveling run, analysed</div></div></div>
+  
+  <div class="meta"><span class="tag">v1.3.6-beta</span><img src="https://img.shields.io/curseforge/dt/1798692?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="links"><a class="btn gold sm" href="../leveltrail/">Open the page</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/leveltrail" target="_blank" rel="noopener">Wago</a></div>
+</div></div>
+  </section>
+
+  <section class="section" id="community">
+  <div class="eyebrow">Community</div>
+  <h2 class="goldtext">Feedback, bugs and ideas</h2>
+  <p class="lead">Every addon is tested in game before it ships, but Forever changes often. Tell me what breaks and what you miss.</p>
+  <div class="grid3">
+    <div class="panel reveal"><h2>Report a bug</h2><p class="small">Leave a comment on the addon's CurseForge page: what you did, what happened, and the error text from BugSack if there is one.</p>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/wow/addons/leveltrail#comments" target="_blank" rel="noopener">LevelTrail</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/vendorfloor#comments" target="_blank" rel="noopener">VendorFloor</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare#comments" target="_blank" rel="noopener">ProcFlare</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast#comments" target="_blank" rel="noopener">SwingCast</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/stattrim#comments" target="_blank" rel="noopener">StatTrim</a></div></div>
+    <div class="panel reveal"><h2>Share your run</h2><p class="small">LevelTrail turns your export into a share image for Discord or Reddit, VendorFloor does the same for your flips. Names can be hidden.</p>
+      <div class="row"><a class="btn sm gold" href="../leveltrail/#demo">LevelTrail demo</a><a class="btn sm gold" href="../vendorfloor/#demo">VendorFloor demo</a></div></div>
+    <div class="panel reveal"><h2>Suggest a feature</h2><p class="small">Ideas that make leveling faster or the UI calmer have the best chance. Comments on CurseForge reach me directly.</p>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/members/bencepo/projects" target="_blank" rel="noopener">All projects on CurseForge</a></div></div>
+  </div>
+</section>
+</div>
+</main>
+<!--@footer--><footer class="site"><div class="wrap">
+  <div class="cols">
+    <div><h4>Bencepo · Addons</h4><p style="margin:0 0 10px">Small, fast addons for World of Warcraft: Forever. Built by a player who tests every change in game. The pages run in your browser: your exports never leave it.</p>
+      <a href="../#community">Feedback, bugs and ideas</a></div>
+    <div><h4>Addons</h4><a href="../leveltrail/">LevelTrail</a><a href="../vendorfloor/">VendorFloor</a><a href="../procflare/">ProcFlare</a><a href="../swingcast/">SwingCast</a><a href="../stattrim/">StatTrim</a></div>
+    <div><h4>Download</h4><a href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">LevelTrail on CurseForge</a><a href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">VendorFloor on CurseForge</a><a href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">ProcFlare on CurseForge</a><a href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">SwingCast on CurseForge</a><a href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">StatTrim on CurseForge</a></div>
+  </div>
+  <div class="legal">By Bencepo. Not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment, Inc. Headings use Cinzel (SIL Open Font License).</div>
+</div></footer><!--/@footer-->
+<script src="../assets/site.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const SPEED = 2.4; let swingStart = performance.now(), queued = null;
+  let cast = null; const CAST = 2.5;
+  function ping(){ return +$("scPing").value / 1000; }
+  $("scPing").oninput = () => { $("scPingV").textContent = $("scPing").value + " ms"; };
+  $("scCast").onclick = () => { cast = performance.now(); $("scIcon").classList.add("on"); $("scHint").textContent = "Red zone at the end: press your next spell as soon as the bar reaches it."; };
+  $("scMaul").onclick = () => { queued = "#e8873a"; $("scHint").textContent = "Maul queued: the strip turns orange until the swing lands."; };
+  $("scCleave").onclick = () => { queued = "#4f8fd9"; $("scHint").textContent = "Cleave queued: blue until the swing lands."; };
+  function frame(now){
+    let s = (now - swingStart) / 1000;
+    if (s >= SPEED) { swingStart = now; s = 0; if (queued) { queued = null; } }
+    $("scSwing").style.width = (s / SPEED * 100) + "%";
+    $("scSwing").style.background = queued || "#c9ced6";
+    $("scSwing").style.boxShadow = queued ? `0 0 10px ${queued}` : "none";
+    $("scSwingT").textContent = (SPEED - s).toFixed(1);
+    if (cast) {
+      const c = (now - cast) / 1000;
+      const lat = Math.min(.5, ping() / CAST);
+      $("scLat").style.width = (lat * 100) + "%"; $("scLat").style.opacity = 1;
+      if (c >= CAST) { cast = null; $("scFill").style.width = "0"; $("scTime").textContent = ""; $("scIcon").classList.remove("on"); $("scLat").style.opacity = 0; }
+      else { $("scFill").style.width = (c / CAST * 100) + "%"; $("scTime").textContent = (CAST - c).toFixed(1); }
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
