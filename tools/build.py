@@ -95,13 +95,13 @@ def header(active, base):
 </div></header>'''
 
 
-PAYPAL = "https://paypal.me/BenjaminRieckhoff"
+PAYPAL = "https://ko-fi.com/bencepo"
 
 
 def support_panel():
     return f'''<div class="panel support reveal" style="margin-top:18px;display:flex;gap:22px;align-items:center;flex-wrap:wrap">
     <div style="flex:1;min-width:260px"><h2 style="margin-bottom:6px">Support the addons</h2><p class="small" style="margin:0">All addons and pages are free and stay free, without ads or tracking. If they save you time in game, a tip keeps new features and fixes coming.</p></div>
-    <a class="btn primary" href="{PAYPAL}" target="_blank" rel="noopener">Tip via PayPal</a>
+    <a class="btn primary" href="{PAYPAL}" target="_blank" rel="noopener">Support on Ko-fi</a>
   </div>'''
 
 
@@ -111,7 +111,7 @@ def footer(base):
     return f'''<footer class="site"><div class="wrap">
   <div class="cols">
     <div><h4>Bencepo · Addons</h4><p style="margin:0 0 10px">Small, fast addons for World of Warcraft: Forever. Built by a player who tests every change in game. The pages run in your browser: your exports never leave it.</p>
-      <a href="{base}#community">Feedback, bugs and ideas</a><a href="{PAYPAL}" target="_blank" rel="noopener">Support the addons (PayPal)</a></div>
+      <a href="{base}#community">Feedback, bugs and ideas</a><a href="{PAYPAL}" target="_blank" rel="noopener">Support on Ko-fi</a></div>
     <div><h4>Addons</h4>{addons}</div>
     <div><h4>Download</h4>{cf}</div>
   </div>
