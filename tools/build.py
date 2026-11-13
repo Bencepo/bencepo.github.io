@@ -350,7 +350,7 @@ PROC_DEMO = '''
     <label class="small"><input type="checkbox" id="pfFlashOn" checked> Screen flash</label>
   </div>
 </div>
-<p class="small" style="margin-top:10px">In game ProcFlare plays the game's own sounds: Raid Warning for Clearcasting and Map Ping for other procs by default, selectable in the options (Ready Check, Alarm Clock, Toast or none). The demo plays similar tones.</p>'''
+<p class="small" style="margin-top:10px">These are the sounds ProcFlare plays in game: the chime for Clearcasting, the ping for other procs. In the options you can switch to a game sound (Raid Warning, Ready Check, Map Ping and others) or turn them off.</p>'''
 PROC_CSS = '''
 .pfstage{position:relative;height:380px;background:radial-gradient(ellipse at 50% 120%,#24361f 0%,#121a10 40%,#07090a 75%),#07090a;overflow:hidden}
 .pfstage::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(120,150,200,.10),transparent 60%)}

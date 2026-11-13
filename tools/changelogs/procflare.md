@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.7
+
+- Existing installs switch from the old default sounds (Raid warning, Map ping) to ProcFlare's own sounds once. A sound you picked yourself stays.
+
+## 0.1.6
+
+- ProcFlare's own sounds: "ProcFlare chime" for Clearcasting and "ProcFlare ping" for other procs, the same tones as on the web page. They are the new defaults; the game's sounds (Raid warning, Map ping and others) can still be picked in the options.
+
 ## 0.1.5
 
 - Brighter icon that stays readable on the round minimap button.
