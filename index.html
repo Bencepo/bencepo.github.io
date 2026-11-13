@@ -26,6 +26,12 @@
 .ticks{list-style:none;padding:0;margin:0;color:var(--muted)}
 .ticks li{padding-left:24px;position:relative;margin:8px 0}
 .ticks li::before{content:"◆";position:absolute;left:2px;color:var(--gold);font-size:12px;top:3px}
+.vids{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-top:20px}
+.vid{position:relative;display:flex;flex-direction:column;gap:4px;width:220px;text-decoration:none;color:var(--text);text-align:center}
+.vid img{width:220px;height:391px;object-fit:cover;border-radius:16px;box-shadow:0 0 0 1px var(--line2),0 14px 30px rgba(0,0,0,.6);transition:transform .25s}
+.vid:hover img{transform:scale(1.03)}
+.vid .play{position:absolute;left:50%;top:195px;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:rgba(0,0,0,.65);color:var(--gold);font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px var(--gold)}
+.vid b{margin-top:6px;color:var(--gold)}
 @media(max-width:860px){.homehero h1{font-size:36px}.iconrow img{width:64px;height:64px}}
 </style>
 </head>
@@ -59,23 +65,35 @@
   <div class="head"><img src="assets/icons/vendorfloor-128.png" alt=""><div><h3>VendorFloor</h3><div class="small">Auction house sniper</div></div></div>
   <p>Finds auctions below vendor price, below disenchant value and profitable crafts. One click to buy, collect and sell. The page shows your real profit per day and item.</p>
   <div class="meta"><span class="tag">v0.8.6</span></div>
-  <div class="links"><a class="btn gold sm" href="vendorfloor/">Open the page</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/vendorfloor" target="_blank" rel="noopener">Wago</a></div>
+  <div class="links"><a class="btn gold sm" href="vendorfloor/">Open the page</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/vendorfloor" target="_blank" rel="noopener">Wago</a><a class="btn sm ghost" href="https://youtube.com/shorts/1ZLihWGOfK8" target="_blank" rel="noopener">▶ Video</a></div>
 </div><div class="acard reveal" style="--glow:rgba(240,190,90,.32)">
   <div class="head"><img src="assets/icons/procflare-128.png" alt=""><div><h3>ProcFlare</h3><div class="small">Never miss a proc</div></div></div>
   <p>A big pulsing Clearcasting alert with sound and screen flash, and small icons with a countdown for weapon, trinket and talent procs. Nothing to set up.</p>
   <div class="meta"><span class="tag">v0.2.0</span></div>
-  <div class="links"><a class="btn gold sm" href="procflare/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/procflare" target="_blank" rel="noopener">Wago</a></div>
+  <div class="links"><a class="btn gold sm" href="procflare/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/procflare" target="_blank" rel="noopener">Wago</a><a class="btn sm ghost" href="https://youtube.com/shorts/WF2kPiWWzdE" target="_blank" rel="noopener">▶ Video</a></div>
 </div><div class="acard reveal" style="--glow:rgba(90,120,230,.32)">
   <div class="head"><img src="assets/icons/swingcast-128.png" alt=""><div><h3>SwingCast</h3><div class="small">Cast bar plus swing timer</div></div></div>
   <p>Adds spell icon, cast time, latency zone and a swing timer to the standard cast bar. The strip lights up while Maul, Heroic Strike or Cleave is queued.</p>
   <div class="meta"><span class="tag">v0.4.4</span></div>
-  <div class="links"><a class="btn gold sm" href="swingcast/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/swingcast" target="_blank" rel="noopener">Wago</a></div>
+  <div class="links"><a class="btn gold sm" href="swingcast/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/swingcast" target="_blank" rel="noopener">Wago</a><a class="btn sm ghost" href="https://youtube.com/shorts/zE11MGQ7QIY" target="_blank" rel="noopener">▶ Video</a></div>
 </div><div class="acard reveal" style="--glow:rgba(110,160,240,.28)">
   <div class="head"><img src="assets/icons/stattrim-128.png" alt=""><div><h3>StatTrim</h3><div class="small">A tidy character window</div></div></div>
   <p>Hide, merge and reorder categories and stats right inside the character window. Edit with checkboxes and arrows, works in combat.</p>
   <div class="meta"><span class="tag">v1.0.3</span></div>
   <div class="links"><a class="btn gold sm" href="stattrim/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/stattrim" target="_blank" rel="noopener">Wago</a></div>
 </div></div>
+  </section>
+
+  <section class="section" id="videos">
+    <div class="eyebrow">Watch them in action</div>
+    <h2 class="goldtext">25-second demos</h2>
+    <p class="lead">Short clips straight from the game. They open on YouTube; nothing from YouTube loads on this page.</p>
+    <div class="vids">
+      <a class="vid reveal" href="https://youtube.com/shorts/1ZLihWGOfK8" target="_blank" rel="noopener"><img src="assets/video/vendorfloor-short.jpg" alt="VendorFloor demo" loading="lazy"><span class="play">▶</span><b>VendorFloor</b><span class="small">Buying gold for less than gold</span></a>
+      <a class="vid reveal" href="https://youtube.com/shorts/WF2kPiWWzdE" target="_blank" rel="noopener"><img src="assets/video/procflare-short.jpg" alt="ProcFlare demo" loading="lazy"><span class="play">▶</span><b>ProcFlare</b><span class="small">Sound on: proc alerts with sound packs</span></a>
+      <a class="vid reveal" href="https://youtube.com/shorts/zE11MGQ7QIY" target="_blank" rel="noopener"><img src="assets/video/swingcast-short.jpg" alt="SwingCast demo" loading="lazy"><span class="play">▶</span><b>SwingCast</b><span class="small">Bear tanks: stop wasting your Maul</span></a>
+    </div>
+    <div style="text-align:center;margin-top:18px"><a class="btn" href="https://www.youtube.com/@Bencepo" target="_blank" rel="noopener">More videos on YouTube</a></div>
   </section>
 
   <section class="section" id="import">
