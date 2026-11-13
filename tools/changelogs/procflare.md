@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+- Two sound packs, both loud and epic: **Melee** (war drums, war horn, axe clash, beast roar, rage spike, thud) and **Caster** (arcane surge, mana burst, frost shatter, fire burst, power chord, spark). ProcFlare picks the pack once from your class and talents; switch it under Options > AddOns > ProcFlare > Sound pack, and change each sound on its own.
+- **Volume** slider for ProcFlare's own sounds (25 to 100 %).
+- **Sound channel**: ProcFlare plays on the game's Sound Effects channel by default, so the game's volume slider for effects applies too. Master, Ambience or Dialog can be picked instead.
+- Sounds you picked by hand stay.
+
 ## 0.1.7
 
 - Existing installs switch from the old default sounds (Raid warning, Map ping) to ProcFlare's own sounds once. A sound you picked yourself stays.

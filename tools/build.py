@@ -332,6 +332,7 @@ def showcase(key, demo_html, demo_css, demo_js, features, settings, extra_sectio
 
 
 PROC_DEMO = '''
+<div class="pfgrid">
 <div class="panel" style="padding:0;overflow:hidden">
   <div class="pfstage" id="pfStage">
     <div class="pfflash" id="pfFlash"></div>
@@ -345,13 +346,22 @@ PROC_DEMO = '''
     <button id="pfW">Weapon proc</button>
     <button id="pfT">Trinket proc</button>
     <button id="pfD">Target debuff</button>
-    <div class="spacer"></div>
-    <label class="small"><input type="checkbox" id="pfSound" checked> Sound</label>
-    <label class="small"><input type="checkbox" id="pfFlashOn" checked> Screen flash</label>
   </div>
 </div>
-<p class="small" style="margin-top:10px">These are the sounds ProcFlare plays in game: the chime for Clearcasting, the ping for other procs. In the options you can switch to a game sound (Raid Warning, Ready Check, Map Ping and others) or turn them off.</p>'''
+<div class="wowopt">
+  <div class="wowopt-h">ProcFlare <span>Options</span></div>
+  <div class="wo"><label>Sound pack</label><div class="wsel" data-key="pack"></div></div>
+  <div class="wo"><label>Clearcasting sound</label><div class="wsel" data-key="cc"></div></div>
+  <div class="wo"><label>Screen flash</label><span class="wchk on" id="pfFlashOn"></span></div>
+  <div class="wo"><label>Proc sound</label><div class="wsel" data-key="proc"></div></div>
+  <div class="wo"><label>Volume</label><div class="wslide"><input type="range" id="pfVol" min="25" max="100" step="25" value="100"><b id="pfVolV">100</b></div></div>
+  <div class="wo"><label>Sound</label><span class="wchk on" id="pfSound"></span></div>
+  <p class="small" style="margin:12px 2px 0">The same options as in game, under Options &gt; AddOns &gt; ProcFlare. ProcFlare picks the pack from your class on first login.</p>
+</div>
+</div>'''
 PROC_CSS = '''
+.pfgrid{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start}
+@media(max-width:900px){.pfgrid{grid-template-columns:1fr}}
 .pfstage{position:relative;height:380px;background:radial-gradient(ellipse at 50% 120%,#24361f 0%,#121a10 40%,#07090a 75%),#07090a;overflow:hidden}
 .pfstage::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(120,150,200,.10),transparent 60%)}
 .pfflash{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 0 rgba(80,150,255,0);transition:box-shadow .5s}
@@ -360,9 +370,8 @@ PROC_CSS = '''
 .pfchar::before{content:"";position:absolute;left:9px;top:-26px;width:28px;height:28px;border-radius:50%;background:#2a2620}
 .pfcc{position:absolute;left:50%;top:22px;transform:translateX(-50%) scale(.6);opacity:0;transition:.25s;text-align:center}
 .pfcc.on{opacity:1;transform:translateX(-50%) scale(1)}
-.pfccicon{width:96px;height:96px;border-radius:12px;margin:0 auto;border:2px solid #6aa8ff;background:conic-gradient(from 0deg,#14204a,#3b6fe0,#a6c8ff,#3b6fe0,#14204a,#3b6fe0,#a6c8ff,#14204a);animation:pfspin 6s linear infinite,pfpulse 1s ease-in-out infinite;box-shadow:0 0 30px rgba(90,150,255,.8)}
+.pfccicon{width:96px;height:96px;border-radius:12px;margin:0 auto;border:2px solid #6aa8ff;background:conic-gradient(from 0deg,#14204a,#3b6fe0,#a6c8ff,#3b6fe0,#14204a,#3b6fe0,#a6c8ff,#14204a);animation:pfpulse 1s ease-in-out infinite;box-shadow:0 0 30px rgba(90,150,255,.8)}
 .pfccicon::after{content:"";display:block;width:100%;height:100%;border-radius:10px;background:radial-gradient(circle,rgba(255,255,255,.85) 0%,rgba(140,190,255,.4) 30%,transparent 60%)}
-@keyframes pfspin{to{filter:hue-rotate(25deg)}}
 @keyframes pfpulse{0%,100%{box-shadow:0 0 18px rgba(90,150,255,.6);transform:scale(1)}50%{box-shadow:0 0 46px rgba(120,180,255,1);transform:scale(1.07)}}
 .pfcctime{font:800 30px var(--sans);color:#fff;text-shadow:0 2px 6px #000;margin-top:-62px;position:relative}
 .pfcclabel{margin-top:40px;font-family:var(--display);color:#a6c8ff;font-size:14px;letter-spacing:1px;text-shadow:0 1px 4px #000}
@@ -372,20 +381,62 @@ PROC_CSS = '''
 .pfp i{position:absolute;left:0;right:0;bottom:-16px;text-align:center;font-style:normal;font-size:10px;color:var(--muted);white-space:nowrap}
 @keyframes pfin{from{transform:scale(1.6);opacity:0}}
 .pfhint{position:absolute;left:0;right:0;bottom:12px;text-align:center;color:var(--dim);font-size:13px}
+/* in-game options look */
+.wowopt{background:linear-gradient(rgba(20,16,10,.92),rgba(12,10,7,.95)),repeating-linear-gradient(45deg,rgba(255,255,255,.015) 0 2px,transparent 2px 6px);border:2px solid #5a4a2c;border-radius:6px;padding:14px 14px 16px;box-shadow:inset 0 0 0 1px #000,0 10px 30px rgba(0,0,0,.5)}
+.wowopt-h{font-family:var(--display);font-size:20px;color:#fff;padding-bottom:10px;margin-bottom:6px;border-bottom:1px solid rgba(255,209,0,.25)}
+.wowopt-h span{font-size:13px;color:#a89a80;font-family:var(--sans);margin-left:6px}
+.wo{display:grid;grid-template-columns:130px 1fr;align-items:center;gap:10px;padding:7px 2px}
+.wo label{color:#ffd100;font-size:13px;text-shadow:0 1px 1px #000}
+.wsel{display:flex;align-items:center;gap:4px}
+.wsel button{flex:none;width:22px;height:24px;padding:0;border-radius:3px;border:1px solid #6b5a3a;background:linear-gradient(#3a3226,#1c170f);color:#ffd100;font-size:10px;display:grid;place-items:center}
+.wsel button:hover{border-color:#ffd100;box-shadow:none}
+.wsel select{flex:1;min-width:0;appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;height:24px;border-radius:3px;border:1px solid #6b5a3a;background:linear-gradient(#3a3226,#1c170f);color:#fff;font:13px var(--sans);padding:0 6px;cursor:pointer}
+.wsel select:focus{outline:none;border-color:#ffd100}
+.wsel select option{background:#1c170f;color:#fff}
+.wchk{width:22px;height:22px;border-radius:3px;border:1px solid #6b5a3a;background:#0e0b07;cursor:pointer;position:relative}
+.wchk.on::after{content:"";position:absolute;left:6px;top:1px;width:7px;height:13px;border:solid #ffd100;border-width:0 3px 3px 0;transform:rotate(40deg)}
+.wslide{display:flex;align-items:center;gap:10px}
+.wslide input{flex:1;accent-color:#ffd100}
+.wslide b{color:#fff;font-weight:400;font-size:13px;width:28px;text-align:right}
 '''
 PROC_JS = '''
 (function(){
   const $ = id => document.getElementById(id);
-  let ctx = null;
-  function beep(f, d, v){ if(!$("pfSound").checked) return; try{ ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
-    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.value = f; g.gain.value = v;
-    o.connect(g); g.connect(ctx.destination); const t = ctx.currentTime; g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.start(t); o.stop(t + d);}catch(e){} }
+  const SOUNDS = [["none","None"],["war_drums","Melee: War drums"],["war_horn","Melee: War horn"],["axe_clash","Melee: Axe clash"],["beast_roar","Melee: Beast roar"],["rage_spike","Melee: Rage spike"],["thud","Melee: Thud"],
+    ["arcane_surge","Caster: Arcane surge"],["mana_burst","Caster: Mana burst"],["frost_shatter","Caster: Frost shatter"],["fire_burst","Caster: Fire burst"],["power_chord","Caster: Power chord"],["spark","Caster: Spark"],
+    ["chime","ProcFlare chime"],["ping","ProcFlare ping"]];
+  const PACKS = [["melee","Melee"],["caster","Caster"]];
+  const PACKSET = { melee: ["war_drums","axe_clash"], caster: ["arcane_surge","spark"] };
+  const st = { pack: "melee", cc: "war_drums", proc: "axe_clash" };
+  const cache = {};
+  function play(name){ if (!name || name === "none" || !$("pfSound").classList.contains("on")) return;
+    const a = cache[name] = cache[name] || new Audio("../assets/sounds/procflare/" + name + ".mp3");
+    a.volume = +$("pfVol").value / 100; a.currentTime = 0; a.play().catch(() => {}); }
+  function sel(key, items){
+    const box = document.querySelector(`.wsel[data-key=${key}]`);
+    box.innerHTML = `<button aria-label="Previous">◀</button><select>${items.map(([v,l]) => `<option value="${v}">${l}</option>`).join("")}</select><button aria-label="Next">▶</button>`;
+    const s = box.querySelector("select"); s.value = st[key];
+    const set = v => { st[key] = v; s.value = v; changed(key); };
+    s.onchange = () => set(s.value);
+    const [prev, , next] = box.children;
+    prev.onclick = () => { const i = items.findIndex(x => x[0] === st[key]); set(items[(i - 1 + items.length) % items.length][0]); };
+    next.onclick = () => { const i = items.findIndex(x => x[0] === st[key]); set(items[(i + 1) % items.length][0]); };
+    box._set = v => { st[key] = v; s.value = v; };
+  }
+  function changed(key){
+    if (key === "pack") { const [c, p] = PACKSET[st.pack]; document.querySelector(".wsel[data-key=cc]")._set(c); document.querySelector(".wsel[data-key=proc]")._set(p); play(c); }
+    else play(st[key]);
+  }
+  sel("pack", PACKS); sel("cc", SOUNDS); sel("proc", SOUNDS);
+  document.querySelectorAll(".wchk").forEach(c => c.onclick = () => c.classList.toggle("on"));
+  $("pfVol").oninput = () => { $("pfVolV").textContent = $("pfVol").value; };
+  $("pfVol").onchange = () => play(st.cc);
   let ccT = null, ccLeft = 0;
   $("pfCCBtn").onclick = () => {
     $("pfHint").textContent = "Clearcasting: your next spell is free.";
     ccLeft = 15; $("pfCCt").textContent = ccLeft; $("pfCC").classList.add("on");
-    beep(880, .35, .12); setTimeout(() => beep(1320, .4, .09), 110);
-    if ($("pfFlashOn").checked) { $("pfFlash").classList.add("on"); setTimeout(() => $("pfFlash").classList.remove("on"), 180); }
+    play(st.cc);
+    if ($("pfFlashOn").classList.contains("on")) { $("pfFlash").classList.add("on"); setTimeout(() => $("pfFlash").classList.remove("on"), 180); }
     clearInterval(ccT); ccT = setInterval(() => { ccLeft--; $("pfCCt").textContent = ccLeft; if (ccLeft <= 0) { clearInterval(ccT); $("pfCC").classList.remove("on"); } }, 1000);
   };
   const KINDS = { pfW: ["Crusader", "#e8c46a", "radial-gradient(circle at 40% 35%,#fff3c4,#e0a83a 45%,#6b3d0c)", 15],
@@ -393,8 +444,8 @@ PROC_JS = '''
                   pfD: ["On target", "#5fb0ff", "radial-gradient(circle at 40% 35%,#d8f0ff,#3d8ad9 45%,#0c2a52)", 12] };
   Object.keys(KINDS).forEach(id => $(id).onclick = () => {
     const [name, c, bg, sec] = KINDS[id];
-    $("pfHint").textContent = name + " proc: small icon with a countdown and a softer sound.";
-    beep(660, .18, .07);
+    $("pfHint").textContent = name + " proc: small icon with a countdown.";
+    play(st.proc);
     const el = document.createElement("div"); el.className = "pfp"; el.style.setProperty("--c", c); el.style.background = bg;
     el.innerHTML = `<b>${sec}</b><i>${name}</i>`; $("pfRow").prepend(el);
     let left = sec; const t = setInterval(() => { left--; el.querySelector("b").textContent = left; if (left <= 0) { clearInterval(t); el.remove(); } }, 1000);
@@ -537,6 +588,7 @@ def build():
 
     pf = showcase("procflare", PROC_DEMO, PROC_CSS, PROC_JS, [
         ("✦", "Clearcasting you cannot miss", "Big pulsing icon above your character while the buff is up, with the seconds left, a sound and a short blue flash at the screen edges. Omen of Clarity, Arcane Concentration and Elemental Focus."),
+        ("♫", "Sound packs of its own", "**Melee**: war drums, war horn, axe clash, beast roar. **Caster**: arcane surge, mana burst, frost shatter, fire burst. Picked from your class, with volume and sound channel."),
         ("⚔", "Weapon, trinket and talent procs", "Small icons with a countdown and a softer sound. Crusader, trinkets and talent procs are picked up on their own, nothing to set up."),
         ("◎", "Procs on your target", "Debuffs your weapon or talents put on your target, such as Icy Chill or Spell Vulnerability."),
         ("✕", "Mute what you do not need", "In move mode your recent procs are shown: right-click one to mute or unmute it."),
@@ -544,8 +596,9 @@ def build():
         ("◈", "Light", "Classes without Clearcasting do not rescan their buffs on every resource change; with Clearcasting at most five times a second."),
     ], lst([
         "**Options > AddOns > ProcFlare**, or the **minimap button**: left-click options, shift-click move mode, right-click preview.",
-        "Clearcasting alert, its sound and the screen flash on or off.",
-        "Other procs and their sound, only your own procs.",
+        "**Sound pack** (Melee or Caster), Clearcasting sound and proc sound, each from 12 own sounds or the game's.",
+        "**Volume** 25 to 100 % and the **sound channel**: on Sound Effects by default, so the game's effects slider applies.",
+        "Clearcasting alert and screen flash, other procs, only your own procs.",
         "Longest buff that still counts as a proc (30 s by default), size and position.",
     ]), '''<section class="section"><div class="note"><b style="color:var(--gold2)">Limits.</b> Procs that only deal damage (Fiery Weapon, Lifestealing) or grant an extra attack (Hand of Justice, Windfury) cannot be shown: Forever keeps the combat log from addons. In restricted content (some boss encounters, battlegrounds) only Clearcasting is shown.</div></section>''',
         ["swingcast", "stattrim", "leveltrail"])
