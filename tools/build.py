@@ -155,7 +155,7 @@ def card(a, base, compact=False):
     return f'''<div class="acard reveal" style="--glow:{a["glow"]}">
   <div class="head"><img src="{base}assets/icons/{a["key"]}-128.png" alt=""><div><h3>{a["name"]}</h3><div class="small">{esc(a["tag"])}</div></div></div>
   {"" if compact else f'<p>{esc(a["blurb"])}</p>'}
-  <div class="meta"><span class="tag">v{esc(latest(a["key"]))}</span><img src="{badge(a)}" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
+  <div class="meta"><span class="tag">v{esc(latest(a["key"]))}</span></div>
   <div class="links">{open_btn}<a class="btn sm" href="{cf_url(a)}" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="{a["wago"]}" target="_blank" rel="noopener">Wago</a></div>
 </div>'''
 
@@ -292,7 +292,6 @@ def showcase(key, demo_html, demo_css, demo_js, features, settings, extra_sectio
       <h1 class="goldtext">{a["name"]}</h1>
       <p class="lead">{esc(a["blurb"])}</p>
       <div class="ctas">{dl_buttons(a)}<a class="btn ghost" href="#demo">Try the live demo</a></div>
-      <div class="row" style="margin-top:16px"><img src="{badge(a)}" alt="Downloads" loading="lazy" onerror="this.remove()"></div>
     </div>
   </section>
 
