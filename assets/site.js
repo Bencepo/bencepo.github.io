@@ -1,4 +1,4 @@
-/* Bencepo addons – shared helpers. No tracking, no network calls. */
+/* Bencepo addons – shared helpers. Only network call: a cookie-free page view count (GoatCounter). */
 "use strict";
 (function () {
   const B = window.BENCEPO = window.BENCEPO || {};
@@ -65,4 +65,22 @@
   };
 
   document.addEventListener("DOMContentLoaded", reveal);
+
+  /* Page view counter: one image request to GoatCounter, no cookies, no IDs, no third-party script. */
+  const count = () => {
+    const h = location.hostname;
+    if (!/\.github\.io$/.test(h) || navigator.doNotTrack === "1") return;
+    try {
+      const q = new URLSearchParams({
+        p: location.pathname,
+        t: document.title,
+        r: document.referrer,
+        q: location.search,
+        s: [screen.width, screen.height, devicePixelRatio || 1].join(","),
+        rnd: Math.random().toString(36).slice(2)
+      });
+      new Image().src = "https://bencepo.goatcounter.com/count?" + q.toString();
+    } catch (e) { /* counting is optional */ }
+  };
+  document.addEventListener("DOMContentLoaded", count);
 })();

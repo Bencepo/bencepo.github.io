@@ -100,7 +100,7 @@ PAYPAL = "https://ko-fi.com/bencepo"
 
 def support_panel():
     return f'''<div class="panel support reveal" style="margin-top:18px;display:flex;gap:22px;align-items:center;flex-wrap:wrap">
-    <div style="flex:1;min-width:260px"><h2 style="margin-bottom:6px">Support the addons</h2><p class="small" style="margin:0">All addons and pages are free and stay free, without ads or tracking. If they save you time in game, a tip keeps new features and fixes coming.</p></div>
+    <div style="flex:1;min-width:260px"><h2 style="margin-bottom:6px">Support the addons</h2><p class="small" style="margin:0">All addons and pages are free and stay free, without ads or cookies. A privacy-friendly counter only tallies page views. If they save you time in game, a tip keeps new features and fixes coming.</p></div>
     <a class="btn primary" href="{PAYPAL}" target="_blank" rel="noopener">Support on Ko-fi</a>
   </div>'''
 
@@ -237,7 +237,7 @@ def home():
     <div class="features" style="margin-top:20px">
       <div class="feat reveal"><div class="fi">✦</div><b>Buttons, not commands</b><span>Every setting lives in the options window or behind the minimap button. Chat commands exist, but you never need them.</span></div>
       <div class="feat reveal"><div class="fi">◈</div><b>Light and quiet</b><span>No work while nothing happens. Each release gets a performance review and a code check with the WoW API annotations.</span></div>
-      <div class="feat reveal"><div class="fi">⛉</div><b>Private by design</b><span>The web pages read your export in the browser. No accounts, no uploads, no tracking.</span></div>
+      <div class="feat reveal"><div class="fi">⛉</div><b>Private by design</b><span>The web pages read your export in the browser. No accounts, no uploads, no cookies. Your exports never leave your browser.</span></div>
       <div class="feat reveal"><div class="fi">⚒</div><b>Made for Forever</b><span>Built around Forever's limits, such as the hidden combat log and secret values, instead of pretending they are not there.</span></div>
     </div>
   </section>
