@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- Own settings window instead of a page in the game's options: drag it anywhere, it stays open while you play and every change applies at once. `/pfl`, the minimap button or the addon menu open it; Options > AddOns > ProcFlare only points to it.
+- Sound pack, both sounds and the channel are now picked from lists in the window; picking a sound plays it.
+- Warlocks: Shadow Trance (Nightfall) gets the big alert like Clearcasting, in purple. Also found in combat, when the game hides buff details: Shadow Bolt turns instant.
+- Reactive abilities: Overpower and Revenge (warrior), Riposte (rogue), Mongoose Bite and Counterattack (hunter) show as a proc for the few seconds after a dodge, parry or block opens them. Only your class's ones; switch off with "Reactive abilities".
+- Class procs are now also seen in combat, when the game hides buff details: Flurry and Enrage (warrior), Flurry (shaman), Vengeance and Redoubt (paladin), Remorseless Attacks (rogue), Quick Shots (hunter), Spirit Tap and Focused Casting (priest), Nature's Grace (druid), and the Crusader enchant for everyone.
+
 ## 0.2.0
 
 - Two sound packs, both loud and epic: **Melee** (war drums, war horn, axe clash, beast roar, rage spike, thud) and **Caster** (arcane surge, mana burst, frost shatter, fire burst, power chord, spark). ProcFlare picks the pack once from your class and talents; switch it under Options > AddOns > ProcFlare > Sound pack, and change each sound on its own.

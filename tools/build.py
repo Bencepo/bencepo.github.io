@@ -160,13 +160,21 @@ def goes_with(keys, base):
     return '<div class="addons">' + "".join(card(A[k], base, compact=True) for k in keys) + "</div>"
 
 
+VIDEOS = {
+    "vendorfloor": "https://youtube.com/shorts/1ZLihWGOfK8",
+    "procflare": "https://youtube.com/shorts/WF2kPiWWzdE",
+    "swingcast": "https://youtube.com/shorts/zE11MGQ7QIY",
+}
+
+
 def card(a, base, compact=False):
+    video = "" if compact or a["key"] not in VIDEOS else f'<a class="btn sm ghost" href="{VIDEOS[a["key"]]}" target="_blank" rel="noopener">▶ Video</a>'
     open_btn = f'<a class="btn gold sm" href="{base}{a["key"]}/">{"Open the page" if a["tool"] else "Details & demo"}</a>'
     return f'''<div class="acard reveal" style="--glow:{a["glow"]}">
   <div class="head"><img src="{base}assets/icons/{a["key"]}-128.png" alt=""><div><h3>{a["name"]}</h3><div class="small">{esc(a["tag"])}</div></div></div>
   {"" if compact else f'<p>{esc(a["blurb"])}</p>'}
   <div class="meta"><span class="tag">v{esc(latest(a["key"]))}</span></div>
-  <div class="links">{open_btn}<a class="btn sm" href="{cf_url(a)}" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="{a["wago"]}" target="_blank" rel="noopener">Wago</a></div>
+  <div class="links">{open_btn}<a class="btn sm" href="{cf_url(a)}" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="{a["wago"]}" target="_blank" rel="noopener">Wago</a>{video}</div>
 </div>'''
 
 
@@ -206,6 +214,18 @@ def home():
     <h2 class="goldtext">Five addons, one style</h2>
     <p class="lead">All of them are free, all of them work together, and none of them needs a configuration marathon.</p>
     <div class="addons">{"".join(card(a, base) for a in ADDONS)}</div>
+  </section>
+
+  <section class="section" id="videos">
+    <div class="eyebrow">Watch them in action</div>
+    <h2 class="goldtext">25-second demos</h2>
+    <p class="lead">Short clips straight from the game. They open on YouTube; nothing from YouTube loads on this page.</p>
+    <div class="vids">
+      <a class="vid reveal" href="https://youtube.com/shorts/1ZLihWGOfK8" target="_blank" rel="noopener"><img src="assets/video/vendorfloor-short.jpg" alt="VendorFloor demo" loading="lazy"><span class="play">▶</span><b>VendorFloor</b><span class="small">Buying gold for less than gold</span></a>
+      <a class="vid reveal" href="https://youtube.com/shorts/WF2kPiWWzdE" target="_blank" rel="noopener"><img src="assets/video/procflare-short.jpg" alt="ProcFlare demo" loading="lazy"><span class="play">▶</span><b>ProcFlare</b><span class="small">Sound on: proc alerts with sound packs</span></a>
+      <a class="vid reveal" href="https://youtube.com/shorts/zE11MGQ7QIY" target="_blank" rel="noopener"><img src="assets/video/swingcast-short.jpg" alt="SwingCast demo" loading="lazy"><span class="play">▶</span><b>SwingCast</b><span class="small">Bear tanks: stop wasting your Maul</span></a>
+    </div>
+    <div style="text-align:center;margin-top:18px"><a class="btn" href="https://www.youtube.com/@Bencepo" target="_blank" rel="noopener">More videos on YouTube</a></div>
   </section>
 
   <section class="section" id="import">
@@ -260,6 +280,12 @@ def home():
 .ticks{list-style:none;padding:0;margin:0;color:var(--muted)}
 .ticks li{padding-left:24px;position:relative;margin:8px 0}
 .ticks li::before{content:"◆";position:absolute;left:2px;color:var(--gold);font-size:12px;top:3px}
+.vids{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-top:20px}
+.vid{position:relative;display:flex;flex-direction:column;gap:4px;width:220px;text-decoration:none;color:var(--text);text-align:center}
+.vid img{width:220px;height:391px;object-fit:cover;border-radius:16px;box-shadow:0 0 0 1px var(--line2),0 14px 30px rgba(0,0,0,.6);transition:transform .25s}
+.vid:hover img{transform:scale(1.03)}
+.vid .play{position:absolute;left:50%;top:195px;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:rgba(0,0,0,.65);color:var(--gold);font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px var(--gold)}
+.vid b{margin-top:6px;color:var(--gold)}
 @media(max-width:860px){.homehero h1{font-size:36px}.iconrow img{width:64px;height:64px}}
 </style>'''
     js = '''<script>
@@ -366,7 +392,7 @@ PROC_DEMO = '''
   <div class="wo"><label>Proc sound</label><div class="wsel" data-key="proc"></div></div>
   <div class="wo"><label>Volume</label><div class="wslide"><input type="range" id="pfVol" min="25" max="100" step="25" value="100"><b id="pfVolV">100</b></div></div>
   <div class="wo"><label>Sound</label><span class="wchk on" id="pfSound"></span></div>
-  <p class="small" style="margin:12px 2px 0">The same options as in game, under Options &gt; AddOns &gt; ProcFlare. ProcFlare picks the pack from your class on first login.</p>
+  <p class="small" style="margin:12px 2px 0">The same options as in game, in ProcFlare's own window (/pfl). ProcFlare picks the pack from your class on first login.</p>
 </div>
 </div>'''
 PROC_CSS = '''
@@ -597,25 +623,26 @@ def build():
     (ROOT / "index.html").write_text(home(), encoding="utf-8")
 
     pf = showcase("procflare", PROC_DEMO, PROC_CSS, PROC_JS, [
-        ("✦", "Clearcasting you cannot miss", "Big pulsing icon above your character while the buff is up, with the seconds left, a sound and a short blue flash at the screen edges. Omen of Clarity, Arcane Concentration and Elemental Focus."),
+        ("✦", "Clearcasting you cannot miss", "Big pulsing icon above your character while the buff is up, with the seconds left, a sound and a short flash at the screen edges. Omen of Clarity, Arcane Concentration and Elemental Focus, and Shadow Trance from Nightfall for warlocks."),
+        ("⚡", "Reactive abilities", "Overpower and Revenge (warrior), Riposte (rogue), Mongoose Bite and Counterattack (hunter) show for the few seconds after a dodge, parry or block opens them. Only your class's ones."),
         ("♫", "Sound packs of its own", "**Melee**: war drums, war horn, axe clash, beast roar. **Caster**: arcane surge, mana burst, frost shatter, fire burst. Picked from your class, with volume and sound channel."),
         ("⚔", "Weapon, trinket and talent procs", "Small icons with a countdown and a softer sound. Crusader, trinkets and talent procs are picked up on their own, nothing to set up."),
         ("◎", "Procs on your target", "Debuffs your weapon or talents put on your target, such as Icy Chill or Spell Vulnerability."),
         ("✕", "Mute what you do not need", "In move mode your recent procs are shown: right-click one to mute or unmute it."),
-        ("⚙", "Works in combat", "Forever hides buff details in combat. ProcFlare still finds Clearcasting by spell, by the game's own proc glow or by your abilities becoming free."),
+        ("⚙", "Works in combat", "Forever hides buff details in combat. ProcFlare still finds Clearcasting by spell, by the game's own proc glow or by your abilities becoming free or instant, and asks for your class's known procs (Flurry, Enrage, Vengeance, Nature's Grace and more) by spell."),
         ("◈", "Light", "Classes without Clearcasting do not rescan their buffs on every resource change; with Clearcasting at most five times a second."),
     ], lst([
-        "**Options > AddOns > ProcFlare**, or the **minimap button**: left-click options, shift-click move mode, right-click preview.",
+        "Its own **settings window**: drag it anywhere, it stays open while you play and every change applies at once. `/pfl`, or the **minimap button**: left-click the window, shift-click move mode, right-click preview.",
         "**Sound pack** (Melee or Caster), Clearcasting sound and proc sound, each from 12 own sounds or the game's.",
         "**Volume** 25 to 100 % and the **sound channel**: on Sound Effects by default, so the game's effects slider applies.",
-        "Clearcasting alert and screen flash, other procs, only your own procs.",
+        "Clearcasting (or Shadow Trance) alert and screen flash, other procs, reactive abilities, only your own procs.",
         "Longest buff that still counts as a proc (30 s by default), size and position.",
     ]), '''<section class="section"><div class="note"><b style="color:var(--gold2)">Limits.</b> Procs that only deal damage (Fiery Weapon, Lifestealing) or grant an extra attack (Hand of Justice, Windfury) cannot be shown: Forever keeps the combat log from addons. In restricted content (some boss encounters, battlegrounds) only Clearcasting is shown.</div></section>''',
         ["swingcast", "stattrim", "leveltrail"])
     (ROOT / "procflare").mkdir(exist_ok=True); (ROOT / "procflare" / "index.html").write_text(pf, encoding="utf-8")
 
     sc = showcase("swingcast", SWING_DEMO, SWING_CSS, SWING_JS, [
-        ("◧", "Spell icon", "Left of the cast bar, so you see what you are casting at a glance."),
+        ("◧", "Spell icon", "Inside the cast bar at its left end, or left of it, so you see what you are casting at a glance."),
         ("⧗", "Remaining cast time", "Counted down right on the bar."),
         ("▮", "Latency zone", "Red end of the bar: once the bar reaches it, the next spell can be pressed."),
         ("⚔", "Swing timer", "A thin strip right under the cast bar, with the seconds to the next swing."),
@@ -623,9 +650,10 @@ def build():
         ("⚙", "Your look", "Height, font, font size and every colour, with the game's colour picker."),
     ], lst([
         "Switch on Forever's swing timer first: **Options > Advanced Options > Swing Timer**.",
-        "**Options > AddOns > SwingCast**, or the **minimap button**: left-click options, right-click an 8 s preview.",
+        "Its own **settings window**: drag it anywhere, it stays open while you play and every change shows live. `/swc`, or the **minimap button**: left-click the window, right-click an 8 s preview.",
+        "**Move the swing strip** in the game's Edit Mode or with \"Move strip\" in the window, or keep it under the cast bar.",
         "Show or hide icon, cast time, latency zone, swing strip and its seconds; hide the built-in swing bars.",
-        "Advanced: `/swc` lists every setting as a command.",
+        "Advanced: `/swc help` lists every setting as a command.",
     ]), '''<section class="section"><div class="note"><b style="color:var(--gold2)">How it works.</b> The strip mirrors Forever's built-in swing timer, the only accurate source: Forever keeps the combat log from addons and hands attack speed to addons as secret values. If the strip ever fails, it switches itself off and the built-in bar comes back.</div></section>''',
         ["procflare", "stattrim", "leveltrail"])
     (ROOT / "swingcast").mkdir(exist_ok=True); (ROOT / "swingcast" / "index.html").write_text(sc, encoding="utf-8")

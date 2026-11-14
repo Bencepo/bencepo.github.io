@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.0
+
+- Settings in a window of their own instead of a page in the game's options: drag it anywhere, it stays open while you play and every change applies at once. Open it from the menu (Settings) or with `/vfloor options`; Options > AddOns > VendorFloor only points to it.
+
 ## 0.8.6
 
 - Brighter icon that stays readable on the round minimap button.

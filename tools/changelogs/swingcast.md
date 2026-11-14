@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.1
+
+- Spell icon inside the cast bar, at its left end and as high as the bar (new default), so it needs no room next to the bar. "Icon inside the bar" off puts it left of the bar as before.
+- With the icon left of the bar, Edit Mode's box around the cast bar includes the icon's room, and Edit Mode shows a placeholder icon, so you see where it lands while placing the bar.
+
+## 0.5.0
+
+- Own options window instead of a page in the game's options: drag it anywhere, it stays open while you play and every change shows live. `/swc`, the minimap button or the addon menu open it; the game's options only point to it. While it is open the swing strip shows a preview.
+- Move the swing strip: in the game's Edit Mode it shows up as a blue frame you can drag, like the game's own frames. Or "Move strip" in the window (`/swc unlock`), right-click to lock. Width for the free position, "Default position" puts it back under the cast bar.
+- Fix: when another addon hides or replaces the standard cast bar, the swing strip no longer ends up in the top left corner. It switches to its own position and tells you once in chat.
+- New commands: `/swc unlock`, `/swc lock`, `/swc width <60-600>`, `/swc attach`, `/swc position reset`. `/swc help` lists all.
+
 ## 0.4.4
 
 - Brighter icon that stays readable on the round minimap button.
