@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.4.0-beta
+
+- New "Report a bug" button in the export window (and `/trail bug`): shows the link to the bug report page, ready to copy with Ctrl+C.
+- XP: the first XP after a break or a fresh install is no longer lost, and a jump over several levels counts the full XP of the levels in between.
+- Play sessions: online time keeps a session going even without XP (crafting, auction house, travel); a session that ended is saved with its last numbers; kills, quests and loot after a break go to the new session; sessions are recorded at the level cap too. `/trail session` says when no session is running.
+- Logging out after XP-only play now saves the latest XP, level and session.
+- Dungeon visits: kills and deaths count even before the first session of a login; a visit ends when you come back to life outside, and time outside the instance no longer counts.
+- Zone times: the minute before a loading screen goes to the zone you left.
+- Loot value: items the game had not loaded yet are valued as soon as their data arrives.
+- Bank: the first bank bag is read again, and a scan right after closing the bank no longer wipes the saved bank contents.
+- Reputation: factions under collapsed headers and headers with their own standing are listed; your collapsed headers stay collapsed.
+- Spell ranks are read on non-English clients; recipes "in range" are the ones that still give skill; recipes of linked or other players' professions are no longer saved as yours.
+- Deaths are counted per level for the web viewer, so the deathless streak and its badge use every death.
+- Esc closes the export window even without clicking into the text; a clear message when the character is not loaded yet; `/trail minimap` says so when there is no minimap button.
+- Minimap settings moved to their own saved variable (`LevelTrailSettings`).
+- Web viewer: safer import (only numbers where numbers belong), times no longer show "60 min", the level cap comes from the export, "Hide character name" stays on, a notice when the browser does not keep the import, and better screen reader support.
+
 ## 1.3.6-beta
 
 - Brighter icon that stays readable on the round minimap button.
