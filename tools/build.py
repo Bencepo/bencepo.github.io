@@ -207,16 +207,16 @@ def home():
     body = f'''<main>
 <div class="wrap">
   <section class="hero homehero">
-    <div class="eyebrow">World of Warcraft: Forever</div>
-    <h1><span class="goldtext">Addons that stay out of your way</span><small>and show you what you did</small></h1>
-    <p class="lead">Five small addons by Bencepo: proc alerts, a smarter cast bar, a tidy character window, an auction sniper and a leveling recorder. Light on memory, set up with buttons, never with walls of chat commands.</p>
+    <div class="wordmark"><span class="orn"></span><h1 class="goldtext">Bencepo</h1><span class="orn r"></span></div>
+    <div class="tagline">Lightweight addons for WoW Forever</div>
+    <p class="lead">Small addons for proc alerts, the cast bar, the character window, the auction house, transmog collecting and your leveling run. Light on memory, set up with buttons, never with walls of chat commands.</p>
     <div class="ctas"><a class="btn primary" href="#addons">Browse the addons</a><a class="btn" href="#import">Paste an export</a></div>
     <div class="iconrow">{icons}</div>
   </section>
 
   <section class="section" id="addons">
     <div class="eyebrow">The collection</div>
-    <h2 class="goldtext">Five addons, one style</h2>
+    <h2 class="goldtext">Every addon, one style</h2>
     <p class="lead">All of them are free, all of them work together, and none of them needs a configuration marathon.</p>
     <div class="addons">{"".join(card(a, base) for a in ADDONS)}</div>
   </section>
