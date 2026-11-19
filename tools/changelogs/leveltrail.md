@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.0
+
+- Tracker options in their own window (`/trail options`, or shift-click the minimap button): lock the position so clicks go through, hide in combat, size, background opacity and which lines to show. The window can stay open while you play, every change shows at once.
+- LevelTrail leaves beta: 1.5.0 is the first stable release.
+
 ## 1.4.0-beta
 
 - New "Report a bug" button in the export window (and `/trail bug`): shows the link to the bug report page, ready to copy with Ctrl+C.
