@@ -281,7 +281,7 @@ header.top{background:rgba(8,8,14,.82)}
 .homehero .lead{margin-left:auto;margin-right:auto}
 .homehero .ctas,.homehero .iconrow{justify-content:center}
 .wordmark{display:flex;align-items:center;justify-content:center;gap:22px;margin:8px 0 6px}
-.wordmark h1{font-size:clamp(54px,9vw,104px);letter-spacing:5px;margin:0;line-height:1;text-transform:uppercase;filter:drop-shadow(0 4px 0 rgba(0,0,0,.6)) drop-shadow(0 0 30px rgba(232,160,60,.25))}
+.homehero .wordmark h1{font-size:clamp(54px,9vw,104px);max-width:none;letter-spacing:5px;margin:0;line-height:1;text-transform:uppercase;filter:drop-shadow(0 4px 0 rgba(0,0,0,.6)) drop-shadow(0 0 30px rgba(232,160,60,.25))}
 .wordmark .orn{position:relative;flex:0 1 150px;height:2px;background:linear-gradient(90deg,transparent,#966e2d)}
 .wordmark .orn.r{background:linear-gradient(270deg,transparent,#966e2d)}
 .wordmark .orn::after{content:"";position:absolute;left:-7px;top:-6px;width:12px;height:12px;background:#e8be62;transform:rotate(45deg)}
