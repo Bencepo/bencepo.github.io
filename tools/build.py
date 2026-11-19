@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds the static site.
 
-- index.html, procflare/, swingcast/, stattrim/ are generated completely.
+- index.html, procflare/, swingcast/, stattrim/, transmogsweep/ are generated completely.
 - leveltrail/ and vendorfloor/ are hand-written tool pages; only the parts between
   <!--@header-->...<!--/@header-->, <!--@footer-->...<!--/@footer--> and
   <!--@changelog-->...<!--/@changelog--> are replaced.
@@ -36,6 +36,10 @@ ADDONS = [
          tag="A tidy character window",
          blurb="Hide, merge and reorder categories and stats right inside the character window. Edit with checkboxes and arrows, works in combat.",
          wago="https://addons.wago.io/addons/stattrim"),
+    dict(key="transmogsweep", name="TransmogSweep", cf=1816987, glow="rgba(163,53,238,.32)", tool=False,
+         tag="Collect transmogs from the auction house",
+         blurb="Every transmog appearance on the auction house you have not collected yet, cheapest first, as a tab in the auction house window. Buy them top to bottom with one button.",
+         wago="https://addons.wago.io/addons/transmogsweep"),
 ]
 A = {a["key"]: a for a in ADDONS}
 
@@ -314,7 +318,7 @@ def home():
     if (f) f.text().then(x => { t.value = x; go(); }); else { t.value = ev.dataTransfer.getData("text"); go(); } });
 })();
 </script>'''
-    return page("Bencepo · Addons for WoW Forever", "LevelTrail, VendorFloor, ProcFlare, SwingCast and StatTrim: small, fast addons for World of Warcraft: Forever, with private web pages for your leveling run and auction flips.",
+    return page("Bencepo · Addons for WoW Forever", "LevelTrail, VendorFloor, ProcFlare, SwingCast, StatTrim and TransmogSweep: small, fast addons for World of Warcraft: Forever, with private web pages for your leveling run and auction flips.",
                 "", base, body, head, js)
 
 
@@ -615,6 +619,57 @@ STAT_JS = '''
 })();
 '''
 
+TS_DEMO = '''
+<div class="grid2">
+  <div class="panel tsdemo" style="padding:14px">
+    <div class="row" style="gap:8px;margin-bottom:10px">
+      <button class="sm tsbtn" id="tsScan">Scan</button>
+      <button class="sm tson" id="tsUnique">&#10003; Unique appearances</button>
+      <span class="small" id="tsStatus" style="margin-left:auto">5 uncollected looks</span>
+    </div>
+    <div class="tslist" id="tsList"></div>
+    <div class="row" style="margin-top:10px"><span class="small" id="tsInfo">Click "Start buying": each click checks or buys the next item.</span>
+      <button class="sm tsbtn" id="tsBuy" style="margin-left:auto">Start buying</button></div>
+  </div>
+  <div class="panel" style="padding:18px">
+    <h2>Recorded in game</h2>
+    <img src="../media/transmogsweep/demo.gif" alt="TransmogSweep in the auction house of WoW Forever" loading="lazy" style="width:100%;border-radius:10px;border:1px solid var(--line)">
+  </div>
+</div>'''
+TS_CSS = '''
+.tsdemo{background:linear-gradient(180deg,#210d33,#07040b);border-color:#5c3380}
+.tsdemo .tsbtn{background:#a335ee;border-color:#d58cff;color:#fff}
+.tsdemo .tson{background:#28143a;border-color:#a335ee;color:#c98cff}
+.tslist{background:rgba(0,0,0,.5);border:1px solid #5c3380;border-radius:6px;font-size:13px;min-height:150px}
+.tsrow{display:flex;gap:8px;padding:5px 10px;border-bottom:1px solid rgba(163,53,238,.12);transition:background .2s,opacity .3s}
+.tsrow .n{flex:1}.tsrow .s{width:90px;color:#a38fb8}.tsrow .p{width:70px;text-align:right;color:#fff;font-variant-numeric:tabular-nums}
+.tsrow.sel{background:rgba(163,53,238,.25)}.tsrow.gone{opacity:0}
+.q1{color:#fff}.q2{color:#1eff00}
+'''
+TS_JS = '''
+(function(){
+  const $ = id => document.getElementById(id);
+  const all = [["White Woolen Dress","Chest",550,1],["War Paint Shoulder Pads","Shoulder",577,1],["Dirty Blunderbuss","Ranged",590,1],["Fine Leather Tunic","Chest",600,2],["Woolen Boots","Feet",615,2]];
+  let rows = all.slice(), sel = -1, ready = false;
+  const money = c => Math.floor(c / 100) + "s " + (c % 100) + "c";
+  function render(){
+    $("tsList").innerHTML = rows.map((r, i) => `<div class="tsrow ${i === sel ? "sel" : ""}"><span class="n q${r[3]}">${r[0]}</span><span class="s">${r[1]}</span><span class="p">${money(r[2])}</span></div>`).join("") || '<div class="small" style="padding:20px;text-align:center">Nothing left to collect.</div>';
+    $("tsStatus").textContent = rows.length + " uncollected looks";
+    $("tsBuy").textContent = !rows.length ? "Buy" : ready ? "Buy for " + money(rows[sel][2]) : (sel < 0 ? "Start buying" : "Check price");
+  }
+  $("tsBuy").onclick = () => {
+    if (!rows.length) return;
+    if (sel < 0) sel = 0;
+    if (!ready) { ready = true; $("tsInfo").textContent = rows[sel][0] + " found. Click Buy."; render(); return; }
+    $("tsInfo").textContent = "Bought " + rows[sel][0] + ". The next row is checked by itself.";
+    rows.splice(sel, 1); if (sel >= rows.length) sel = rows.length - 1; ready = rows.length > 0; render();
+  };
+  $("tsScan").onclick = () => { rows = all.slice(); sel = -1; ready = false; $("tsInfo").textContent = "Scanned weapons and armor: a few seconds, any time."; render(); };
+  $("tsUnique").onclick = () => { $("tsInfo").textContent = "Unique: one row per look, the cheapest item that has it."; };
+  render();
+})();
+'''
+
 
 def lst(items):
     return '<ul class="ticks" style="list-style:none;padding:0;margin:0;color:var(--muted)">' + "".join(f'<li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>{md_inline(x)}</li>' for x in items) + "</ul>"
@@ -673,6 +728,23 @@ def build():
     ]), "", ["swingcast", "procflare", "leveltrail"])
     (ROOT / "stattrim").mkdir(exist_ok=True); (ROOT / "stattrim" / "index.html").write_text(st, encoding="utf-8")
 
+    ts = showcase("transmogsweep", TS_DEMO, TS_CSS, TS_JS, [
+        ("◩", "A tab of its own", "Right in the auction house window. The tabs of Auctionator, VendorFloor and other addons stay where they are."),
+        ("⚡", "Fast scan", "Asks the auction house for weapons and armor only, grouped by item: a few seconds, no 15-minute wait, repeat it any time."),
+        ("✓", "What the game says", "Collected counts account-wide, exactly as the item tooltip shows it: \"You haven't collected this appearance\"."),
+        ("◈", "Unique appearances", "One row per look, the cheapest item that has it. Off: completionist mode, every source you lack."),
+        ("▶", "Buy top to bottom", "\"Start buying\" checks the first item, the next click buys it, then the next row is checked by itself. One click per item."),
+        ("⚙", "Filters", "Usable by my class, slot, search, maximum price, hide items above your level. Right-click hides a look you never want."),
+    ], lst([
+        "Its own **settings window**: the gear in the tab or the addon menu at the minimap. Drag it anywhere, changes apply live.",
+        "**Unique appearances**, **Usable by my class**, **Hide items above my level**, **Hide what I bought** (until you learn it).",
+        "**Small tab**: follows VendorFloor or Auctionator when unset.",
+        "**Show hidden appearances** and **Forget purchases** to reset.",
+        "**Alt+click** a row shows a diagnosis to copy into a bug report.",
+    ]), '''<section class="section"><div class="note"><b style="color:var(--gold2)">Learning a look.</b> Bought items arrive in the mail. Wear one or sell it to a vendor and the appearance is yours on every character. Until then it stays hidden in the list.</div></section>''',
+        ["vendorfloor", "stattrim", "leveltrail"])
+    (ROOT / "transmogsweep").mkdir(exist_ok=True); (ROOT / "transmogsweep" / "index.html").write_text(ts, encoding="utf-8")
+
     # tool pages: replace marked blocks
     for key in ("leveltrail", "vendorfloor"):
         p = ROOT / key / "index.html"
@@ -681,7 +753,7 @@ def build():
         s = re.sub(r"<!--@footer-->.*?<!--/@footer-->", lambda m: f"<!--@footer-->{footer('../')}<!--/@footer-->", s, flags=re.S)
         s = re.sub(r"<!--@changelog-->.*?<!--/@changelog-->", lambda m: f"<!--@changelog-->{changelog(key)}<!--/@changelog-->", s, flags=re.S)
         s = re.sub(r"<!--@version-->.*?<!--/@version-->", lambda m: f"<!--@version-->v{latest(key)}<!--/@version-->", s, flags=re.S)
-        s = re.sub(r"<!--@goes-->.*?<!--/@goes-->", lambda m: f"<!--@goes-->{goes_with([k for k in ('procflare','swingcast','stattrim','leveltrail','vendorfloor') if k != key][:3], '../')}<!--/@goes-->", s, flags=re.S)
+        s = re.sub(r"<!--@goes-->.*?<!--/@goes-->", lambda m: f"<!--@goes-->{goes_with([k for k in ('procflare','swingcast','stattrim','transmogsweep','leveltrail','vendorfloor') if k != key][:3], '../')}<!--/@goes-->", s, flags=re.S)
         s = re.sub(r"<!--@community-->.*?<!--/@community-->", lambda m: f"<!--@community-->{community('../')}<!--/@community-->", s, flags=re.S)
         p.write_text(s, encoding="utf-8")
     print("built")
