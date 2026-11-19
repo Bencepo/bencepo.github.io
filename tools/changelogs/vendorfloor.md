@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2
+
+- "Your auctions" counts again: sales and expired auctions are now read from the mailbox (the invoice of each sale, the "Auction expired" mail), since the game hides the chat lines about them from addons. Statistics update when you open the mailbox, and sales made while you were offline count too. Each mail is counted once.
+
+## 1.0.1
+
+- Fixed Lua errors "attempt to index local 'msg' (a secret string value)": the game now hides some chat and error lines from addons. VendorFloor skips those instead of reading them. Purchases are still recorded through the auction house events; sales and expired auctions were no longer counted until 1.0.2.
+
 ## 1.0.0
 
 - VendorFloor is now a tab of the auction house window, next to Buy, Sell and Auctions, instead of a separate window beside it. The tab is added with LibAHTab, the library Auctionator uses too: the tabs of all addons stay visible in one row, and Blizzard's tab list is left alone (changing it would taint your bags).
