@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.4
+
+- Fix: Lua error at login ("attempt to call a nil value", line 585) with other addons' frames loaded, for example the damage meter. The swing strip then stayed without its position. The search for swing bars under other names from 0.5.3 is removed again.
+
+## 0.5.3
+
+- Fix: the built-in swing timer showed up again next to SwingCast's strip. The game sets its bars visible again on its own (on a swing, after Edit Mode or a loading screen); SwingCast now keeps them hidden on every frame while "Hide built-in swing bars" is on.
+- Swing bars the game adds under another name are picked up as well.
+
 ## 0.5.2
 
 - "Report a bug" button in the window: shows the link to the bug reports, ready to copy with Ctrl+C.
