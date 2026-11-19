@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.2
+
+- "Report a bug" button in the window: shows the link to the bug reports, ready to copy with Ctrl+C.
+- Fix: the spell icon disappears with the cast instead of staying while the cast bar fades out.
+- Fix: `/swc reset` also puts the window back in its default place.
+- Fix: `/swc lock` says so when the strip is already locked.
+- Fix: extra spaces in commands (`/swc color  swing`) no longer break them.
+
 ## 0.5.1
 
 - Spell icon inside the cast bar, at its left end and as high as the bar (new default), so it needs no room next to the bar. "Icon inside the bar" off puts it left of the bar as before.

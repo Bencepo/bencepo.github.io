@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.4
+
+- "Report a bug" button in the list window (`/stt list`): shows the link to the bug reports, ready to copy with Ctrl+C.
+- Fix: stats with the same name in merged categories can each be moved with the arrows.
+- Fix: when StatTrim gets switched off during combat, the stats panel is put back right after combat.
+- Fix: shifted stat labels are set again when the game resets them while scrolling.
+- Fix: saved positions anchored to the screen are restored completely.
+- Fewer allocations while scrolling in edit mode; commands no longer error before the addon has loaded; `/stt dump` skips protected rows.
+- README lists `/stattrim` and `/stt dump`.
+
 ## 1.0.3
 
 - Brighter icon that stays readable on the round minimap button.

@@ -184,7 +184,8 @@ def community(base):
   <h2 class="goldtext">Feedback, bugs and ideas</h2>
   <p class="lead">Every addon is tested in game before it ships, but Forever changes often. Tell me what breaks and what you miss.</p>
   <div class="grid3">
-    <div class="panel reveal"><h2>Report a bug</h2><p class="small">Leave a comment on the addon's CurseForge page: what you did, what happened, and the error text from BugSack if there is one.</p>
+    <div class="panel reveal"><h2>Report a bug</h2><p class="small">Open an issue on GitHub (the form asks for everything needed) or leave a comment on CurseForge: what you did, what happened, and the error text from BugSack if there is one.</p>
+      <div class="row" style="margin-bottom:8px">{"".join(f'<a class="btn sm gold" href="https://github.com/Bencepo/{a["name"]}/issues/new/choose" target="_blank" rel="noopener">{a["name"]}</a>' for a in ADDONS)}</div>
       <div class="row">{"".join(f'<a class="btn sm" href="{cf_url(a)}#comments" target="_blank" rel="noopener">{a["name"]}</a>' for a in ADDONS)}</div></div>
     <div class="panel reveal"><h2>Share your run</h2><p class="small">LevelTrail turns your export into a share image for Discord or Reddit, VendorFloor does the same for your flips. Names can be hidden.</p>
       <div class="row"><a class="btn sm gold" href="{base}leveltrail/#demo">LevelTrail demo</a><a class="btn sm gold" href="{base}vendorfloor/#demo">VendorFloor demo</a></div></div>

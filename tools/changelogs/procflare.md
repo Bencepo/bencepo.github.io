@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1
+
+- "Report a bug" button at the bottom of the window: shows the link to the bug reports, ready to copy with Ctrl+C.
+- Fix: in move mode, active procs no longer overwrite the "muted" marks on the icons.
+- Fix: a preview started in move mode no longer animates the move-mode icons.
+- README lists `/procflare` and the `test`, `move` and `debug` commands.
+
 ## 0.3.0
 
 - Own settings window instead of a page in the game's options: drag it anywhere, it stays open while you play and every change applies at once. `/pfl`, the minimap button or the addon menu open it; Options > AddOns > ProcFlare only points to it.
