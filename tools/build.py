@@ -161,7 +161,7 @@ def goes_with(keys, base):
 
 
 VIDEOS = {
-    "vendorfloor": "https://youtube.com/shorts/1ZLihWGOfK8",
+    "vendorfloor": "https://youtu.be/_CKO9z5iTYE",
     "procflare": "https://youtube.com/shorts/WF2kPiWWzdE",
     "swingcast": "https://youtube.com/shorts/zE11MGQ7QIY",
 }
@@ -222,7 +222,7 @@ def home():
     <h2 class="goldtext">25-second demos</h2>
     <p class="lead">Short clips straight from the game. They open on YouTube; nothing from YouTube loads on this page.</p>
     <div class="vids">
-      <a class="vid reveal" href="https://youtube.com/shorts/1ZLihWGOfK8" target="_blank" rel="noopener"><img src="assets/video/vendorfloor-short.jpg" alt="VendorFloor demo" loading="lazy"><span class="play">▶</span><b>VendorFloor</b><span class="small">Buying gold for less than gold</span></a>
+      <a class="vid reveal" href="https://youtube.com/shorts/PKxT8-Vhkis" target="_blank" rel="noopener"><img src="assets/video/vendorfloor-short.jpg" alt="VendorFloor demo" loading="lazy"><span class="play">▶</span><b>VendorFloor</b><span class="small">Auctions below vendor price</span></a>
       <a class="vid reveal" href="https://youtube.com/shorts/WF2kPiWWzdE" target="_blank" rel="noopener"><img src="assets/video/procflare-short.jpg" alt="ProcFlare demo" loading="lazy"><span class="play">▶</span><b>ProcFlare</b><span class="small">Sound on: proc alerts with sound packs</span></a>
       <a class="vid reveal" href="https://youtube.com/shorts/zE11MGQ7QIY" target="_blank" rel="noopener"><img src="assets/video/swingcast-short.jpg" alt="SwingCast demo" loading="lazy"><span class="play">▶</span><b>SwingCast</b><span class="small">Bear tanks: stop wasting your Maul</span></a>
     </div>

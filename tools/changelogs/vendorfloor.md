@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.0.0
+
+- VendorFloor is now a tab of the auction house window, next to Buy, Sell and Auctions, instead of a separate window beside it. The tab is added with LibAHTab, the library Auctionator uses too: the tabs of all addons stay visible in one row, and Blizzard's tab list is left alone (changing it would taint your bags).
+- Laid out like the auction house's own tabs: scan buttons on top, the lists (Vendor, Disenchant, Crafting) and the profit filters on the left like Blizzard's categories, the result list with column headers (price, value, profit, quantity) on the right, the buy button bottom right. Blizzard buttons, input field and insets, title in the window's title bar. Your gold stays visible below it.
+- Column headers in Blizzard's style; click one to sort by name, price, value, profit or quantity, click again to reverse. The buy button follows the order shown.
+- The menu opens as Blizzard's context menu and no longer slides under the list.
+- Watchlist: a fourth list for items you want at or below a price of your own, optionally up to a number of units (done, it leaves the list). Add items in Menu > Watchlist or "Edit watchlist" (shift-click an item into the field). "Scan" on this list searches each watched item; normal and full scans fill it too. Watchlist purchases are collected from the mail but never sold to a merchant.
+- Name suggestions while typing (from the third letter) in the watchlist and ignore list: items VendorFloor has seen in the auction house, your purchases and your bags. Up/Down to choose, Tab or Enter to take one. The list is built in small steps so the game does not stutter.
+- Ignore list as a window (Menu > Ignore list): every hidden item with a button to show it again, or all at once; items can be hidden by name there too. No chat command needed any more.
+- Scroll bar on the result list.
+- Spending limit per session and bag slots to keep free (settings, both off by default). Purchases still in the mail count as taken slots until you visit the mailbox.
+- Right-click on a find opens a small menu: hide the item, or add it to the watchlist with its price filled in. Before, a right-click hid the item at once.
+- Settings: minimap button on or off, and "Forget unsold purchases" (with a confirmation).
+- `/vfloor help` only lists the three commands left (`/vfloor`, `buy`, `options`); everything else is in the window. The old commands still work.
+- "Your disenchants" and "Your auctions" show item names instead of bare item IDs: items the game has not loaded yet are requested and the window fills in. Both windows in Blizzard's dialog look.
+- Optional: disenchant value, latest auction price and watchlist limit in item tooltips (settings, off by default).
+- New setting "Small tab": the VendorFloor tab only as wide as its text, so more addon tabs fit in one row. Until you set it, it follows Auctionator's "Small tabs".
+- The auction house opens on the tab you used last: leave it on VendorFloor and it is there right away next time.
+- Away from the auction house (crafting button in a profession window) VendorFloor still opens as a window of its own.
+- No longer tied to Auctionator: works with any or no other auction addon.
+- The "Craft profits" button sits above the profession window now. Below it, it could cover the "Create" button so that only "Create All" worked.
+
 ## 0.9.3
 
 - Full scan works again. The request went out while a search was still under way, and the auction house drops such a request without an answer. VendorFloor now sends it once the auction house is free and sends it again if it is dropped.
