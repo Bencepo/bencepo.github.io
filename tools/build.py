@@ -43,6 +43,10 @@ ADDONS = [
 ]
 A = {a["key"]: a for a in ADDONS}
 
+# cache busting: changes whenever site.css or site.js change
+import hashlib
+ASSET_V = hashlib.md5((ROOT / "assets" / "site.css").read_bytes() + (ROOT / "assets" / "site.js").read_bytes()).hexdigest()[:8]
+
 
 def cf_url(a): return f"https://www.curseforge.com/wow/addons/{a['key']}"
 def badge(a): return f"https://img.shields.io/curseforge/dt/{a['cf']}?label=downloads&color=9c7a32&labelColor=1f1a14&style=flat-square"
@@ -136,14 +140,14 @@ def page(title, desc, active, base, body, extra_head="", scripts="", icon="procf
 <meta property="og:image" content="https://bencepo.github.io/assets/icons/{icon}-256.png">
 <meta name="theme-color" content="#0b0a09">
 <link rel="icon" type="image/png" href="{base}assets/icons/{icon}-64.png">
-<link rel="stylesheet" href="{base}assets/site.css">
+<link rel="stylesheet" href="{base}assets/site.css?v={ASSET_V}">
 {extra_head}
 </head>
 <body>
 <!--@header-->{header(active, base)}<!--/@header-->
 {body}
 <!--@footer-->{footer(base)}<!--/@footer-->
-<script src="{base}assets/site.js"></script>
+<script src="{base}assets/site.js?v={ASSET_V}"></script>
 {scripts}
 </body>
 </html>
@@ -749,6 +753,7 @@ def build():
     for key in ("leveltrail", "vendorfloor"):
         p = ROOT / key / "index.html"
         s = p.read_text(encoding="utf-8")
+        s = re.sub(r'assets/site\.(css|js)(\?v=\w+)?"', lambda m: f'assets/site.{m.group(1)}?v={ASSET_V}"', s)
         s = re.sub(r"<!--@header-->.*?<!--/@header-->", lambda m: f"<!--@header-->{header(key, '../')}<!--/@header-->", s, flags=re.S)
         s = re.sub(r"<!--@footer-->.*?<!--/@footer-->", lambda m: f"<!--@footer-->{footer('../')}<!--/@footer-->", s, flags=re.S)
         s = re.sub(r"<!--@changelog-->.*?<!--/@changelog-->", lambda m: f"<!--@changelog-->{changelog(key)}<!--/@changelog-->", s, flags=re.S)
