@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0
+
+- Faster scans: looks the game already showed as collected are remembered, so later scans only check new items.
+- The list shows up as soon as the auction house has answered and fills while your collection is checked. You can start buying right away.
+- Shorter pause between two purchases.
+- Colour filter: looks whose item names suggest a colour (Crimson, Ebon, Azure …), across all items that share the look.
+- The search also finds a look through the names of the other items that share it.
+- Slot and colour lists open reliably (own list instead of the game menu).
+
 ## 1.0.0
 
 - TransmogSweep tab in the auction house window: every transmog appearance you have not collected yet, cheapest first.
