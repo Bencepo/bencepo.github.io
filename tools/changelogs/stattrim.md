@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5
+
+- New icon in the addon list and on the minimap button, part of the new Bencepo logo family.
+
 ## 1.0.4
 
 - "Report a bug" button in the list window (`/stt list`): shows the link to the bug reports, ready to copy with Ctrl+C.

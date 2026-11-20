@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- New icon in the addon list and in the addon menu at the minimap, part of the new Bencepo logo family.
+
 ## 1.0.0
 
 - Two use buttons for the top and bottom trinket, with cooldowns. Keybindings for both.

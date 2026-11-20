@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- New icon in the addon list and on the minimap button, part of the new Bencepo logo family.
+
 ## 1.0.0
 
 - Minimap button with a tooltip: every tracked profession cooldown of all your characters, with the time left.

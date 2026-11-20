@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- New icon in the addon list and on the minimap button, part of the new Bencepo logo family.
+
 ## 1.1.0
 
 - Faster scans: looks the game already showed as collected are remembered, so later scans only check new items.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0
+
+- New icon in the addon list and on the minimap button, part of the new Bencepo logo family.
+- SwingCast is now 1.0: stable after the 0.x releases, nothing else changes.
+
 ## 0.5.4
 
 - Fix: Lua error at login ("attempt to call a nil value", line 585) with other addons' frames loaded, for example the damage meter. The swing strip then stayed without its position. The search for swing bars under other names from 0.5.3 is removed again.

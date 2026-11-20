@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+- New icon in the addon list and on the minimap button, part of the new Bencepo logo family.
+
 ## 1.0.3
 
 - "Internal auction error" no longer stops a purchase. WoW Forever's auction house sends it with purchases that go through: VendorFloor now waits two seconds for the confirmation, takes the red line off the screen, and counts the purchase as failed only if no confirmation comes.

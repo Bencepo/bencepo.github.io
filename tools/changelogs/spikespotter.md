@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- New icon in the addon list and in the addon menu at the minimap, part of the new Bencepo logo family.
+
 ## 1.0.0
 
 - Detects frame-time spikes and names the addons that used those frames (client addon profiler).
