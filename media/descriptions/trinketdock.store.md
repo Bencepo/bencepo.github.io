@@ -10,7 +10,7 @@
 - **Flyout to swap.** Hover a button: left-click a trinket for the top slot, right-click for the bottom slot.
 - **Queue in combat.** Trinkets cannot be swapped in combat, so the swap waits and happens when combat ends.
 - **Light.** Bags are read only when the flyout opens. Made as a slim replacement for ItemRack's trinket menu.
-- **Your layout.** Side by side or stacked, flyout up or down, any scale, lock.
+- **Your layout.** Side by side or stacked, flyout up or down, any scale, lock. Frame and background in colours of your choice, opacity from 0 to 100 %.
 
 ## How to use
 
