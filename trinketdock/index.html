@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TrinketDock · A light trinket menu · WoW Forever addon</title>
+<meta name="description" content="Two buttons for your trinkets and a flyout to swap them. In combat the swap is queued and done the moment combat ends. Nothing runs in the background.">
+<meta property="og:title" content="TrinketDock · A light trinket menu · WoW Forever addon">
+<meta property="og:description" content="Two buttons for your trinkets and a flyout to swap them. In combat the swap is queued and done the moment combat ends. Nothing runs in the background.">
+<meta property="og:image" content="https://bencepo.github.io/assets/icons/trinketdock-256.png">
+<meta name="theme-color" content="#0b0a09">
+<link rel="icon" type="image/png" href="../assets/icons/trinketdock-64.png">
+<link rel="stylesheet" href="../assets/site.css?v=d9d7bed5">
+<style>
+.tddemo{background:linear-gradient(180deg,#0d1a24,#05090d);border-color:#24506a}
+.tdstage{position:relative;height:260px;display:flex;align-items:flex-end;justify-content:center}
+.tddock{display:flex;gap:6px}
+.tdfly{position:absolute;bottom:62px;display:flex;flex-direction:column-reverse;gap:6px}
+.tdb{width:52px;height:52px;border-radius:8px;border:2px solid #3c4a5a;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:#fff;position:relative;cursor:pointer;user-select:none;text-shadow:0 1px 2px #000}
+.tdb:hover{border-color:#4fc3f7;box-shadow:0 0 12px rgba(79,195,247,.5)}
+.tdb .q{position:absolute;right:-6px;bottom:-6px;width:22px;height:22px;border:2px solid #ffd100;border-radius:4px;font-size:11px;display:flex;align-items:center;justify-content:center}
+.tdb .cd{position:absolute;inset:0;background:rgba(0,0,0,.6);border-radius:6px;font-size:13px;display:flex;align-items:center;justify-content:center}
+.tdfly .tdb{width:44px;height:44px;font-size:16px}
+.tdfly .tdb.mark{box-shadow:0 0 0 2px #ffd100 inset}
+</style>
+</head>
+<body>
+<!--@header--><header class="top"><div class="wrap">
+  <a class="brand" href="../"><img src="../assets/icons/procflare-64.png" alt=""><span class="bt">Bencepo<b>·</b>Addons</span></a>
+  <nav class="nav"><a href="../leveltrail/"><img src="../assets/icons/leveltrail-64.png" alt=""><span>LevelTrail</span></a><a href="../vendorfloor/"><img src="../assets/icons/vendorfloor-64.png" alt=""><span>VendorFloor</span></a><a href="../procflare/"><img src="../assets/icons/procflare-64.png" alt=""><span>ProcFlare</span></a><a href="../swingcast/"><img src="../assets/icons/swingcast-64.png" alt=""><span>SwingCast</span></a><a href="../stattrim/"><img src="../assets/icons/stattrim-64.png" alt=""><span>StatTrim</span></a><a href="../transmogsweep/"><img src="../assets/icons/transmogsweep-64.png" alt=""><span>TransmogSweep</span></a><a href="../trinketdock/" class=on><img src="../assets/icons/trinketdock-64.png" alt=""><span>TrinketDock</span></a><a href="../spikespotter/"><img src="../assets/icons/spikespotter-64.png" alt=""><span>SpikeSpotter</span></a></nav>
+  <div class="spacer"></div>
+  <a class="btn sm" href="../#import">Import export</a>
+</div></header><!--/@header-->
+<main>
+<div class="wrap">
+  <section class="hero addonhero">
+    <img class="heroicon" src="../assets/icons/trinketdock-256.png" alt="TrinketDock">
+    <div>
+      <div class="eyebrow">A light trinket menu · v1.0.0</div>
+      <h1 class="goldtext">TrinketDock</h1>
+      <p class="lead">Two buttons for your trinkets and a flyout to swap them. In combat the swap is queued and done the moment combat ends. Nothing runs in the background.</p>
+      <div class="ctas"><a class="btn primary" href="https://www.curseforge.com/wow/addons/trinketdock" target="_blank" rel="noopener">Download on CurseForge</a><a class="btn" href="https://addons.wago.io/addons/trinketdock" target="_blank" rel="noopener">Wago</a><a class="btn ghost" href="#demo">Try the live demo</a></div>
+    </div>
+  </section>
+
+  <section class="section" id="demo">
+    <div class="eyebrow">Live demo</div>
+    <h2 class="goldtext">See it in action</h2>
+    <p class="lead">A recreation in your browser, close to what you see in game.</p>
+    
+<div class="grid2">
+  <div class="panel tddemo" style="padding:18px">
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <b class="display" style="color:#7fd3fa">TrinketDock</b>
+      <button class="sm" id="tdCombat">Enter combat</button>
+    </div>
+    <div class="tdstage" id="tdStage">
+      <div class="tdfly" id="tdFly"></div>
+      <div class="tddock" id="tdDock"></div>
+    </div>
+    <div class="small" id="tdInfo" style="margin-top:12px">Hover a button. Left-click a trinket for the top slot, right-click for the bottom slot.</div>
+  </div>
+  <div class="panel" style="padding:18px">
+    <h2>How it plays</h2>
+    <ul class="ticks" style="list-style:none;padding:0;margin:0;color:var(--muted)">
+      <li style="margin:7px 0">Click a dock button to use the trinket, or bind a key.</li>
+      <li style="margin:7px 0">Hover it: the trinkets in your bags fly out.</li>
+      <li style="margin:7px 0">Out of combat a click swaps right away.</li>
+      <li style="margin:7px 0">In combat the click queues the swap, shown by a small icon on the button. It happens the moment combat ends.</li>
+      <li style="margin:7px 0">Nothing else runs: no bag scans when you loot, no work when combat starts or ends.</li>
+    </ul>
+  </div>
+</div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="eyebrow">Features</div>
+    <h2 class="goldtext">What it does</h2>
+    <div class="features"><div class="feat reveal"><div class="fi">◧</div><b>Two use buttons</b><span>Your top and bottom trinket with their cooldowns. Click to use, or bind a key (Options &gt; Keybindings &gt; TrinketDock).</span></div><div class="feat reveal"><div class="fi">⇡</div><b>Flyout to swap</b><span>Hover a button and every trinket in your bags shows up. Left-click equips it to the top slot, right-click to the bottom slot.</span></div><div class="feat reveal"><div class="fi">⧗</div><b>Queue in combat</b><span>Trinkets cannot be swapped in combat, so the flyout queues the swap. It happens the moment combat ends; a small icon on the button shows what is queued.</span></div><div class="feat reveal"><div class="fi">◈</div><b>Light</b><span>Bags are read only when the flyout opens. No work when you loot, none when combat starts or ends. Made as a slim replacement for ItemRack&#x27;s trinket menu.</span></div><div class="feat reveal"><div class="fi">⚙</div><b>Your layout</b><span>Side by side or stacked, flyout up or down, any scale. Shift-drag to move, or lock it.</span></div></div>
+  </section>
+
+  
+
+  <section class="section">
+    <div class="split">
+      <div class="panel reveal"><h2>Settings</h2><ul class="ticks" style="list-style:none;padding:0;margin:0;color:var(--muted)"><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>Its own <b>settings window</b>: <code>/tdock</code> or the addon menu at the minimap. Drag it anywhere, changes apply live.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span><b>Show the buttons</b>, <b>Lock position</b>, <b>Vertical</b>, <b>Tooltips</b>, <b>Scale</b>, flyout <b>upwards or downwards</b>, <b>Reset position</b>.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span><b>Keybindings</b> for both trinkets under Options &gt; Keybindings &gt; TrinketDock.</li></ul></div>
+      <div class="panel reveal" id="changelog"><h2>Changelog</h2><!--@changelog--><div class="changelog"><div class="cl"><b>1.0.0</b><ul><li>Two use buttons for the top and bottom trinket, with cooldowns. Keybindings for both.</li><li>Flyout with the trinkets in your bags: left-click equips to the top slot, right-click to the bottom slot.</li><li>In combat the flyout queues the swap: it happens as soon as combat ends, shown as a small icon on the button.</li><li>No background work: bags are read only when the flyout opens.</li><li>Side by side or stacked, flyout up or down, scale, lock, Shift-drag to move.</li><li>Settings window of its own with a &quot;Report a bug&quot; button.</li></ul></div></div><!--/@changelog--></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="eyebrow">Goes well with</div>
+    <h2 class="goldtext">More from Bencepo</h2>
+    <div class="addons"><div class="acard reveal" style="--glow:rgba(255,138,61,.30)">
+  <div class="head"><img src="../assets/icons/spikespotter-128.png" alt=""><div><h3>SpikeSpotter</h3><div class="small">Find the addon behind the stutter</div></div></div>
+  
+  <div class="meta"><span class="tag">v1.0.0</span></div>
+  <div class="links"><a class="btn gold sm" href="../spikespotter/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/spikespotter" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/spikespotter" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(240,190,90,.32)">
+  <div class="head"><img src="../assets/icons/procflare-128.png" alt=""><div><h3>ProcFlare</h3><div class="small">Never miss a proc</div></div></div>
+  
+  <div class="meta"><span class="tag">v0.3.1</span></div>
+  <div class="links"><a class="btn gold sm" href="../procflare/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/procflare" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(90,120,230,.32)">
+  <div class="head"><img src="../assets/icons/swingcast-128.png" alt=""><div><h3>SwingCast</h3><div class="small">Cast bar plus swing timer</div></div></div>
+  
+  <div class="meta"><span class="tag">v0.5.4</span></div>
+  <div class="links"><a class="btn gold sm" href="../swingcast/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/swingcast" target="_blank" rel="noopener">Wago</a></div>
+</div></div>
+  </section>
+
+  <section class="section" id="community">
+  <div class="eyebrow">Community</div>
+  <h2 class="goldtext">Feedback, bugs and ideas</h2>
+  <p class="lead">Every addon is tested in game before it ships, but Forever changes often. Tell me what breaks and what you miss.</p>
+  <div class="grid3">
+    <div class="panel reveal"><h2>Report a bug</h2><p class="small">Open an issue on GitHub (the form asks for everything needed) or leave a comment on CurseForge: what you did, what happened, and the error text from BugSack if there is one.</p>
+      <div class="row" style="margin-bottom:8px"><a class="btn sm gold" href="https://github.com/Bencepo/LevelTrail/issues/new/choose" target="_blank" rel="noopener">LevelTrail</a><a class="btn sm gold" href="https://github.com/Bencepo/VendorFloor/issues/new/choose" target="_blank" rel="noopener">VendorFloor</a><a class="btn sm gold" href="https://github.com/Bencepo/ProcFlare/issues/new/choose" target="_blank" rel="noopener">ProcFlare</a><a class="btn sm gold" href="https://github.com/Bencepo/SwingCast/issues/new/choose" target="_blank" rel="noopener">SwingCast</a><a class="btn sm gold" href="https://github.com/Bencepo/StatTrim/issues/new/choose" target="_blank" rel="noopener">StatTrim</a><a class="btn sm gold" href="https://github.com/Bencepo/TransmogSweep/issues/new/choose" target="_blank" rel="noopener">TransmogSweep</a><a class="btn sm gold" href="https://github.com/Bencepo/TrinketDock/issues/new/choose" target="_blank" rel="noopener">TrinketDock</a><a class="btn sm gold" href="https://github.com/Bencepo/SpikeSpotter/issues/new/choose" target="_blank" rel="noopener">SpikeSpotter</a></div>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/wow/addons/leveltrail#comments" target="_blank" rel="noopener">LevelTrail</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/vendorfloor#comments" target="_blank" rel="noopener">VendorFloor</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare#comments" target="_blank" rel="noopener">ProcFlare</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast#comments" target="_blank" rel="noopener">SwingCast</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/stattrim#comments" target="_blank" rel="noopener">StatTrim</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/transmogsweep#comments" target="_blank" rel="noopener">TransmogSweep</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/trinketdock#comments" target="_blank" rel="noopener">TrinketDock</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/spikespotter#comments" target="_blank" rel="noopener">SpikeSpotter</a></div></div>
+    <div class="panel reveal"><h2>Share your run</h2><p class="small">LevelTrail turns your export into a share image for Discord or Reddit, VendorFloor does the same for your flips. Names can be hidden.</p>
+      <div class="row"><a class="btn sm gold" href="../leveltrail/#demo">LevelTrail demo</a><a class="btn sm gold" href="../vendorfloor/#demo">VendorFloor demo</a></div></div>
+    <div class="panel reveal"><h2>Suggest a feature</h2><p class="small">Ideas that make leveling faster or the UI calmer have the best chance. Comments on CurseForge reach me directly.</p>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/members/bencepo/projects" target="_blank" rel="noopener">All projects on CurseForge</a></div></div>
+  </div>
+  <div class="panel support reveal" style="margin-top:18px;display:flex;gap:22px;align-items:center;flex-wrap:wrap">
+    <div style="flex:1;min-width:260px"><h2 style="margin-bottom:6px">Support the addons</h2><p class="small" style="margin:0">All addons and pages are free and stay free, without ads or cookies. A privacy-friendly counter only tallies page views. If they save you time in game, a tip keeps new features and fixes coming.</p></div>
+    <a class="btn primary" href="https://ko-fi.com/bencepo" target="_blank" rel="noopener">Support on Ko-fi</a>
+  </div>
+</section>
+</div>
+</main>
+<!--@footer--><footer class="site"><div class="wrap">
+  <div class="cols">
+    <div><h4>Bencepo · Addons</h4><p style="margin:0 0 10px">Small, fast addons for World of Warcraft: Forever. Built by a player who tests every change in game. The pages run in your browser: your exports never leave it.</p>
+      <a href="../#community">Feedback, bugs and ideas</a><a href="https://ko-fi.com/bencepo" target="_blank" rel="noopener">Support on Ko-fi</a></div>
+    <div><h4>Addons</h4><a href="../leveltrail/">LevelTrail</a><a href="../vendorfloor/">VendorFloor</a><a href="../procflare/">ProcFlare</a><a href="../swingcast/">SwingCast</a><a href="../stattrim/">StatTrim</a><a href="../transmogsweep/">TransmogSweep</a><a href="../trinketdock/">TrinketDock</a><a href="../spikespotter/">SpikeSpotter</a></div>
+    <div><h4>Download</h4><a href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">LevelTrail on CurseForge</a><a href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">VendorFloor on CurseForge</a><a href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">ProcFlare on CurseForge</a><a href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">SwingCast on CurseForge</a><a href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">StatTrim on CurseForge</a><a href="https://www.curseforge.com/wow/addons/transmogsweep" target="_blank" rel="noopener">TransmogSweep on CurseForge</a><a href="https://www.curseforge.com/wow/addons/trinketdock" target="_blank" rel="noopener">TrinketDock on CurseForge</a><a href="https://www.curseforge.com/wow/addons/spikespotter" target="_blank" rel="noopener">SpikeSpotter on CurseForge</a></div>
+  </div>
+  <div class="legal">By Bencepo. Not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment, Inc. Headings use Cinzel (SIL Open Font License).</div>
+</div></footer><!--/@footer-->
+<script src="../assets/site.js?v=d9d7bed5"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const T = {
+    sw: { n: "Nifty Stopwatch", c: "#3b6ea5", l: "S" },
+    hoj: { n: "Hand of Justice", c: "#7a4a2a", l: "H" },
+    bb: { n: "Blackhand's Breadth", c: "#8a2a2a", l: "B" },
+    carrot: { n: "Carrot on a Stick", c: "#c06a1a", l: "C" },
+    gd: { n: "Glyph of Deflection", c: "#4a7a9a", l: "G" },
+  };
+  let eq = { 13: "sw", 14: "hoj" }, bag = ["bb", "carrot", "gd"], queue = {}, combat = false, open = null, used = {};
+  const box = (k, extra, cls) => `<div class="tdb${cls || ""}" style="background:${T[k].c}" ${extra || ""}>${T[k].l}`;
+  function renderDock(){
+    $("tdDock").innerHTML = [13, 14].map(s => box(eq[s], `data-slot="${s}" title="${T[eq[s]].n}"`) +
+      (used[s] ? `<span class="cd">${used[s]}s</span>` : "") +
+      (queue[s] ? `<span class="q" style="background:${T[queue[s]].c}">${T[queue[s]].l}</span>` : "") + "</div>").join("");
+  }
+  function renderFly(){
+    if (!open) { $("tdFly").innerHTML = ""; return; }
+    $("tdFly").style.left = open === 13 ? "calc(50% - 52px)" : "calc(50% + 6px)";
+    $("tdFly").innerHTML = bag.map(k => box(k, `data-bag="${k}" title="${T[k].n}"`, (queue[13] === k || queue[14] === k) ? " mark" : "") + "</div>").join("");
+  }
+  function swap(k, s){ const i = bag.indexOf(k); if (i < 0) return; bag[i] = eq[s]; eq[s] = k; }
+  $("tdDock").addEventListener("mouseover", e => { const b = e.target.closest("[data-slot]"); if (b) { open = +b.dataset.slot; renderFly(); } });
+  $("tdDock").addEventListener("click", e => { const b = e.target.closest("[data-slot]"); if (!b) return; const s = +b.dataset.slot;
+    if (used[s]) { $("tdInfo").textContent = "Still on cooldown."; return; }
+    $("tdInfo").textContent = "Used " + T[eq[s]].n + "."; used[s] = 10; renderDock(); });
+  $("tdStage").addEventListener("mouseleave", () => { open = null; renderFly(); });
+  function pick(e, s){ const b = e.target.closest("[data-bag]"); if (!b) return; e.preventDefault(); const k = b.dataset.bag;
+    if (combat) {
+      if (queue[s] === k) { delete queue[s]; $("tdInfo").textContent = "Queue cleared."; }
+      else { queue[s] = k; const o = s === 13 ? 14 : 13; if (queue[o] === k) delete queue[o];
+        $("tdInfo").textContent = T[k].n + " queued for the " + (s === 13 ? "top" : "bottom") + " slot: swapped when combat ends."; }
+    } else { swap(k, s); $("tdInfo").textContent = T[k].n + " equipped in the " + (s === 13 ? "top" : "bottom") + " slot."; open = null; }
+    renderDock(); renderFly(); }
+  $("tdFly").addEventListener("click", e => pick(e, 13));
+  $("tdFly").addEventListener("contextmenu", e => pick(e, 14));
+  $("tdCombat").onclick = () => {
+    combat = !combat; $("tdCombat").textContent = combat ? "Leave combat" : "Enter combat"; $("tdCombat").classList.toggle("gold", combat);
+    if (!combat) { const done = []; for (const s of [13, 14]) if (queue[s]) { done.push(T[queue[s]].n); swap(queue[s], s); } queue = {};
+      $("tdInfo").textContent = done.length ? "Combat ended: swapped in " + done.join(" and ") + "." : "Out of combat."; }
+    else $("tdInfo").textContent = "In combat: the flyout still opens, clicks queue the swap.";
+    renderDock(); renderFly(); };
+  setInterval(() => { let ch = false; for (const s of [13, 14]) if (used[s]) { used[s]--; ch = true; } if (ch) renderDock(); }, 1000);
+  renderDock();
+})();
+</script>
+</body>
+</html>

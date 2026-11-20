@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds the static site.
 
-- index.html, procflare/, swingcast/, stattrim/, transmogsweep/ are generated completely.
+- index.html, procflare/, swingcast/, stattrim/, transmogsweep/, trinketdock/, spikespotter/ are generated completely.
 - leveltrail/ and vendorfloor/ are hand-written tool pages; only the parts between
   <!--@header-->...<!--/@header-->, <!--@footer-->...<!--/@footer--> and
   <!--@changelog-->...<!--/@changelog--> are replaced.
@@ -40,6 +40,14 @@ ADDONS = [
          tag="Collect transmogs from the auction house",
          blurb="Every transmog appearance on the auction house you have not collected yet, cheapest first, as a tab in the auction house window. Buy them top to bottom with one button.",
          wago="https://addons.wago.io/addons/transmogsweep"),
+    dict(key="trinketdock", name="TrinketDock", cf=1818466, glow="rgba(79,195,247,.30)", tool=False,
+         tag="A light trinket menu",
+         blurb="Two buttons for your trinkets and a flyout to swap them. In combat the swap is queued and done the moment combat ends. Nothing runs in the background.",
+         wago="https://addons.wago.io/addons/trinketdock"),
+    dict(key="spikespotter", name="SpikeSpotter", cf=1818471, glow="rgba(255,138,61,.30)", tool=False,
+         tag="Find the addon behind the stutter",
+         blurb="Short FPS drops when you kill, loot or pull? SpikeSpotter asks the game's own addon profiler which addons used those frames and ranks them, with a copyable report.",
+         wago="https://addons.wago.io/addons/spikespotter"),
 ]
 A = {a["key"]: a for a in ADDONS}
 
@@ -674,6 +682,155 @@ TS_JS = '''
 })();
 '''
 
+TD_DEMO = '''
+<div class="grid2">
+  <div class="panel tddemo" style="padding:18px">
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <b class="display" style="color:#7fd3fa">TrinketDock</b>
+      <button class="sm" id="tdCombat">Enter combat</button>
+    </div>
+    <div class="tdstage" id="tdStage">
+      <div class="tdfly" id="tdFly"></div>
+      <div class="tddock" id="tdDock"></div>
+    </div>
+    <div class="small" id="tdInfo" style="margin-top:12px">Hover a button. Left-click a trinket for the top slot, right-click for the bottom slot.</div>
+  </div>
+  <div class="panel" style="padding:18px">
+    <h2>How it plays</h2>
+    <ul class="ticks" style="list-style:none;padding:0;margin:0;color:var(--muted)">
+      <li style="margin:7px 0">Click a dock button to use the trinket, or bind a key.</li>
+      <li style="margin:7px 0">Hover it: the trinkets in your bags fly out.</li>
+      <li style="margin:7px 0">Out of combat a click swaps right away.</li>
+      <li style="margin:7px 0">In combat the click queues the swap, shown by a small icon on the button. It happens the moment combat ends.</li>
+      <li style="margin:7px 0">Nothing else runs: no bag scans when you loot, no work when combat starts or ends.</li>
+    </ul>
+  </div>
+</div>'''
+TD_CSS = '''
+.tddemo{background:linear-gradient(180deg,#0d1a24,#05090d);border-color:#24506a}
+.tdstage{position:relative;height:260px;display:flex;align-items:flex-end;justify-content:center}
+.tddock{display:flex;gap:6px}
+.tdfly{position:absolute;bottom:62px;display:flex;flex-direction:column-reverse;gap:6px}
+.tdb{width:52px;height:52px;border-radius:8px;border:2px solid #3c4a5a;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:#fff;position:relative;cursor:pointer;user-select:none;text-shadow:0 1px 2px #000}
+.tdb:hover{border-color:#4fc3f7;box-shadow:0 0 12px rgba(79,195,247,.5)}
+.tdb .q{position:absolute;right:-6px;bottom:-6px;width:22px;height:22px;border:2px solid #ffd100;border-radius:4px;font-size:11px;display:flex;align-items:center;justify-content:center}
+.tdb .cd{position:absolute;inset:0;background:rgba(0,0,0,.6);border-radius:6px;font-size:13px;display:flex;align-items:center;justify-content:center}
+.tdfly .tdb{width:44px;height:44px;font-size:16px}
+.tdfly .tdb.mark{box-shadow:0 0 0 2px #ffd100 inset}
+'''
+TD_JS = '''
+(function(){
+  const $ = id => document.getElementById(id);
+  const T = {
+    sw: { n: "Nifty Stopwatch", c: "#3b6ea5", l: "S" },
+    hoj: { n: "Hand of Justice", c: "#7a4a2a", l: "H" },
+    bb: { n: "Blackhand's Breadth", c: "#8a2a2a", l: "B" },
+    carrot: { n: "Carrot on a Stick", c: "#c06a1a", l: "C" },
+    gd: { n: "Glyph of Deflection", c: "#4a7a9a", l: "G" },
+  };
+  let eq = { 13: "sw", 14: "hoj" }, bag = ["bb", "carrot", "gd"], queue = {}, combat = false, open = null, used = {};
+  const box = (k, extra, cls) => `<div class="tdb${cls || ""}" style="background:${T[k].c}" ${extra || ""}>${T[k].l}`;
+  function renderDock(){
+    $("tdDock").innerHTML = [13, 14].map(s => box(eq[s], `data-slot="${s}" title="${T[eq[s]].n}"`) +
+      (used[s] ? `<span class="cd">${used[s]}s</span>` : "") +
+      (queue[s] ? `<span class="q" style="background:${T[queue[s]].c}">${T[queue[s]].l}</span>` : "") + "</div>").join("");
+  }
+  function renderFly(){
+    if (!open) { $("tdFly").innerHTML = ""; return; }
+    $("tdFly").style.left = open === 13 ? "calc(50% - 52px)" : "calc(50% + 6px)";
+    $("tdFly").innerHTML = bag.map(k => box(k, `data-bag="${k}" title="${T[k].n}"`, (queue[13] === k || queue[14] === k) ? " mark" : "") + "</div>").join("");
+  }
+  function swap(k, s){ const i = bag.indexOf(k); if (i < 0) return; bag[i] = eq[s]; eq[s] = k; }
+  $("tdDock").addEventListener("mouseover", e => { const b = e.target.closest("[data-slot]"); if (b) { open = +b.dataset.slot; renderFly(); } });
+  $("tdDock").addEventListener("click", e => { const b = e.target.closest("[data-slot]"); if (!b) return; const s = +b.dataset.slot;
+    if (used[s]) { $("tdInfo").textContent = "Still on cooldown."; return; }
+    $("tdInfo").textContent = "Used " + T[eq[s]].n + "."; used[s] = 10; renderDock(); });
+  $("tdStage").addEventListener("mouseleave", () => { open = null; renderFly(); });
+  function pick(e, s){ const b = e.target.closest("[data-bag]"); if (!b) return; e.preventDefault(); const k = b.dataset.bag;
+    if (combat) {
+      if (queue[s] === k) { delete queue[s]; $("tdInfo").textContent = "Queue cleared."; }
+      else { queue[s] = k; const o = s === 13 ? 14 : 13; if (queue[o] === k) delete queue[o];
+        $("tdInfo").textContent = T[k].n + " queued for the " + (s === 13 ? "top" : "bottom") + " slot: swapped when combat ends."; }
+    } else { swap(k, s); $("tdInfo").textContent = T[k].n + " equipped in the " + (s === 13 ? "top" : "bottom") + " slot."; open = null; }
+    renderDock(); renderFly(); }
+  $("tdFly").addEventListener("click", e => pick(e, 13));
+  $("tdFly").addEventListener("contextmenu", e => pick(e, 14));
+  $("tdCombat").onclick = () => {
+    combat = !combat; $("tdCombat").textContent = combat ? "Leave combat" : "Enter combat"; $("tdCombat").classList.toggle("gold", combat);
+    if (!combat) { const done = []; for (const s of [13, 14]) if (queue[s]) { done.push(T[queue[s]].n); swap(queue[s], s); } queue = {};
+      $("tdInfo").textContent = done.length ? "Combat ended: swapped in " + done.join(" and ") + "." : "Out of combat."; }
+    else $("tdInfo").textContent = "In combat: the flyout still opens, clicks queue the swap.";
+    renderDock(); renderFly(); };
+  setInterval(() => { let ch = false; for (const s of [13, 14]) if (used[s]) { used[s]--; ch = true; } if (ch) renderDock(); }, 1000);
+  renderDock();
+})();
+'''
+
+SS_DEMO = '''
+<div class="grid2">
+  <div class="panel ssdemo" style="padding:16px">
+    <div class="row" style="gap:8px;margin-bottom:10px">
+      <button class="sm ssbtn" data-a="kill">Kill a mob</button><button class="sm ssbtn" data-a="loot">Loot</button><button class="sm ssbtn" data-a="pull">Pull</button>
+      <button class="sm" id="ssReset" style="margin-left:auto">Reset</button>
+    </div>
+    <canvas id="ssGraph" width="560" height="90" style="width:100%;height:90px;background:rgba(0,0,0,.45);border:1px solid #4a2c18;border-radius:6px"></canvas>
+    <div class="small" id="ssStatus" style="margin:10px 0 6px">0 spikes recorded.</div>
+    <div class="sstable" id="ssTable"></div>
+  </div>
+  <div class="panel" style="padding:18px">
+    <h2>Recorded in game</h2>
+    <img src="../media/spikespotter/window.jpg" alt="SpikeSpotter window in WoW Forever" loading="lazy" style="width:100%;border-radius:10px;border:1px solid var(--line)">
+  </div>
+</div>'''
+SS_CSS = '''
+.ssdemo{background:linear-gradient(180deg,#1f1209,#090503);border-color:#5a3418}
+.ssdemo .ssbtn{background:#ff8a3d;border-color:#ffb27d;color:#1a0d05}
+.sstable{font-size:13px}
+.ssrow{display:grid;grid-template-columns:1fr 70px 60px 70px;gap:6px;padding:3px 6px;border-bottom:1px solid rgba(255,138,61,.12)}
+.ssrow.h{color:#8d97a5}.ssrow span:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+'''
+SS_JS = '''
+(function(){
+  const $ = id => document.getElementById(id);
+  const cv = $("ssGraph"), g = cv.getContext("2d");
+  const frames = Array(140).fill(16);
+  const A = {
+    kill: [["QuestTracker", 18, 26], ["GuideAddon", 8, 14], ["CombatText", 1, 3]],
+    loot: [["FishingHelper", 30, 38], ["AuctionHelper", 20, 25], ["BagAddon", 3, 6]],
+    pull: [["GearSwapper", 24, 30], ["UIFrames", 2, 4]],
+  };
+  let stats = {}, spikes = 0, engine = 0;
+  const r = (a, b) => a + Math.random() * (b - a);
+  function draw(){
+    g.clearRect(0, 0, cv.width, cv.height);
+    const y = ms => cv.height - Math.min(ms, 120) / 120 * (cv.height - 6);
+    g.strokeStyle = "rgba(141,151,165,.5)"; g.lineWidth = 1; g.setLineDash([6, 6]); g.beginPath(); g.moveTo(0, y(40)); g.lineTo(cv.width, y(40)); g.stroke(); g.setLineDash([]);
+    g.lineWidth = 2; g.beginPath();
+    frames.forEach((ms, i) => { const x = i / (frames.length - 1) * cv.width; i ? g.lineTo(x, y(ms)) : g.moveTo(x, y(ms)); });
+    g.strokeStyle = "#5d6d80"; g.stroke();
+    frames.forEach((ms, i) => { if (ms > 40) { const x = i / (frames.length - 1) * cv.width; g.fillStyle = "#ff8a3d"; g.beginPath(); g.arc(x, y(ms), 4, 0, 7); g.fill(); } });
+  }
+  function table(){
+    const list = Object.entries(stats).sort((a, b) => b[1].ms - a[1].ms);
+    $("ssStatus").textContent = spikes + " spikes recorded, " + engine + " of them without a notable addon share (the game itself).";
+    $("ssTable").innerHTML = '<div class="ssrow h"><span>Addon</span><span>total ms</span><span>spikes</span><span>worst ms</span></div>' +
+      (list.length ? list.map(([n, s], i) => `<div class="ssrow"><span>${i + 1}. ${n}</span><span>${s.ms.toFixed(0)}</span><span>${s.n}</span><span>${s.max.toFixed(0)}</span></div>`).join("")
+        : '<div class="ssrow"><span style="color:#8d97a5">Nothing yet. Kill, loot, pull.</span></div>');
+  }
+  function spike(kind){
+    let sum = 0;
+    if (Math.random() < 0.12) engine++;
+    else for (const [n, a, b] of A[kind]) { const t = r(a, b); sum += t; const s = stats[n] || (stats[n] = { ms: 0, n: 0, max: 0 }); s.ms += t; s.n++; s.max = Math.max(s.max, t); }
+    spikes++; frames.push(16 + sum + r(25, 35)); frames.shift(); table();
+  }
+  document.querySelectorAll(".ssbtn").forEach(b => b.onclick = () => spike(b.dataset.a));
+  $("ssReset").onclick = () => { stats = {}; spikes = 0; engine = 0; table(); };
+  setInterval(() => { frames.push(r(13, 19)); frames.shift(); draw(); }, 60);
+  table(); draw();
+})();
+'''
+SS_NOTE = '''<section class="section"><div class="note"><b style="color:var(--gold2)">Where it found real culprits.</b> On the author's own setup: a fishing helper and an auction helper at about 60 ms on every loot, an equipment manager at 27 ms on every combat start and end, a quest data collector at 20 ms on every quest kill. After disabling them the loot stutter was gone.</div></section>'''
+
 
 def lst(items):
     return '<ul class="ticks" style="list-style:none;padding:0;margin:0;color:var(--muted)">' + "".join(f'<li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>{md_inline(x)}</li>' for x in items) + "</ul>"
@@ -748,6 +905,34 @@ def build():
     ]), '''<section class="section"><div class="note"><b style="color:var(--gold2)">Learning a look.</b> Bought items arrive in the mail. Wear one or sell it to a vendor and the appearance is yours on every character. Until then it stays hidden in the list.</div></section>''',
         ["vendorfloor", "stattrim", "leveltrail"])
     (ROOT / "transmogsweep").mkdir(exist_ok=True); (ROOT / "transmogsweep" / "index.html").write_text(ts, encoding="utf-8")
+
+    td = showcase("trinketdock", TD_DEMO, TD_CSS, TD_JS, [
+        ("◧", "Two use buttons", "Your top and bottom trinket with their cooldowns. Click to use, or bind a key (Options > Keybindings > TrinketDock)."),
+        ("⇡", "Flyout to swap", "Hover a button and every trinket in your bags shows up. Left-click equips it to the top slot, right-click to the bottom slot."),
+        ("⧗", "Queue in combat", "Trinkets cannot be swapped in combat, so the flyout queues the swap. It happens the moment combat ends; a small icon on the button shows what is queued."),
+        ("◈", "Light", "Bags are read only when the flyout opens. No work when you loot, none when combat starts or ends. Made as a slim replacement for ItemRack's trinket menu."),
+        ("⚙", "Your layout", "Side by side or stacked, flyout up or down, any scale. Shift-drag to move, or lock it."),
+    ], lst([
+        "Its own **settings window**: `/tdock` or the addon menu at the minimap. Drag it anywhere, changes apply live.",
+        "**Show the buttons**, **Lock position**, **Vertical**, **Tooltips**, **Scale**, flyout **upwards or downwards**, **Reset position**.",
+        "**Keybindings** for both trinkets under Options > Keybindings > TrinketDock.",
+    ]), "", ["spikespotter", "procflare", "swingcast"])
+    (ROOT / "trinketdock").mkdir(exist_ok=True); (ROOT / "trinketdock" / "index.html").write_text(td, encoding="utf-8")
+
+    ss = showcase("spikespotter", SS_DEMO, SS_CSS, SS_JS, [
+        ("⚡", "Catches the stutter", "Watches the frame time. A frame that takes much longer than usual counts as a spike; loading screens are left out."),
+        ("☰", "Ranking of the culprits", "Every addon that took part in a spike, with total time, how often and its worst frame, read from the game's own addon profiler."),
+        ("◎", "Game or addon?", "Spikes where no addon took a notable share are counted apart: then the game itself is the cause, and disabling addons will not help."),
+        ("✎", "Context", "Each spike is logged with the game events that fired just before (loot window, quest log update, combat start), so you see when an addon gets expensive."),
+        ("⧉", "Copy report", "Ranking and the last 100 spikes as text, ready for a bug report to the addon at fault or a forum post."),
+        ("⏻", "Off when you are done", "One switch stops all measuring; then SpikeSpotter costs nothing."),
+    ], lst([
+        "Its own **window**: `/spike` or the addon menu at the minimap. The ranking refreshes live while you play.",
+        "**Watch for spikes**, **Chat message per spike**, **Spike threshold** (20 to 150 ms).",
+        "**Reset** before a test, **Copy report** after it.",
+        "How to use it: Reset, play a few minutes the way the stutter happens, look at the ranking, disable the top addon and test again.",
+    ]), SS_NOTE, ["trinketdock", "vendorfloor", "procflare"])
+    (ROOT / "spikespotter").mkdir(exist_ok=True); (ROOT / "spikespotter" / "index.html").write_text(ss, encoding="utf-8")
 
     # tool pages: replace marked blocks
     for key in ("leveltrail", "vendorfloor"):

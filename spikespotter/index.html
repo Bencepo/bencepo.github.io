@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SpikeSpotter · Find the addon behind the stutter · WoW Forever addon</title>
+<meta name="description" content="Short FPS drops when you kill, loot or pull? SpikeSpotter asks the game&#x27;s own addon profiler which addons used those frames and ranks them, with a copyable report.">
+<meta property="og:title" content="SpikeSpotter · Find the addon behind the stutter · WoW Forever addon">
+<meta property="og:description" content="Short FPS drops when you kill, loot or pull? SpikeSpotter asks the game&#x27;s own addon profiler which addons used those frames and ranks them, with a copyable report.">
+<meta property="og:image" content="https://bencepo.github.io/assets/icons/spikespotter-256.png">
+<meta name="theme-color" content="#0b0a09">
+<link rel="icon" type="image/png" href="../assets/icons/spikespotter-64.png">
+<link rel="stylesheet" href="../assets/site.css?v=d9d7bed5">
+<style>
+.ssdemo{background:linear-gradient(180deg,#1f1209,#090503);border-color:#5a3418}
+.ssdemo .ssbtn{background:#ff8a3d;border-color:#ffb27d;color:#1a0d05}
+.sstable{font-size:13px}
+.ssrow{display:grid;grid-template-columns:1fr 70px 60px 70px;gap:6px;padding:3px 6px;border-bottom:1px solid rgba(255,138,61,.12)}
+.ssrow.h{color:#8d97a5}.ssrow span:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<!--@header--><header class="top"><div class="wrap">
+  <a class="brand" href="../"><img src="../assets/icons/procflare-64.png" alt=""><span class="bt">Bencepo<b>·</b>Addons</span></a>
+  <nav class="nav"><a href="../leveltrail/"><img src="../assets/icons/leveltrail-64.png" alt=""><span>LevelTrail</span></a><a href="../vendorfloor/"><img src="../assets/icons/vendorfloor-64.png" alt=""><span>VendorFloor</span></a><a href="../procflare/"><img src="../assets/icons/procflare-64.png" alt=""><span>ProcFlare</span></a><a href="../swingcast/"><img src="../assets/icons/swingcast-64.png" alt=""><span>SwingCast</span></a><a href="../stattrim/"><img src="../assets/icons/stattrim-64.png" alt=""><span>StatTrim</span></a><a href="../transmogsweep/"><img src="../assets/icons/transmogsweep-64.png" alt=""><span>TransmogSweep</span></a><a href="../trinketdock/"><img src="../assets/icons/trinketdock-64.png" alt=""><span>TrinketDock</span></a><a href="../spikespotter/" class=on><img src="../assets/icons/spikespotter-64.png" alt=""><span>SpikeSpotter</span></a></nav>
+  <div class="spacer"></div>
+  <a class="btn sm" href="../#import">Import export</a>
+</div></header><!--/@header-->
+<main>
+<div class="wrap">
+  <section class="hero addonhero">
+    <img class="heroicon" src="../assets/icons/spikespotter-256.png" alt="SpikeSpotter">
+    <div>
+      <div class="eyebrow">Find the addon behind the stutter · v1.0.0</div>
+      <h1 class="goldtext">SpikeSpotter</h1>
+      <p class="lead">Short FPS drops when you kill, loot or pull? SpikeSpotter asks the game&#x27;s own addon profiler which addons used those frames and ranks them, with a copyable report.</p>
+      <div class="ctas"><a class="btn primary" href="https://www.curseforge.com/wow/addons/spikespotter" target="_blank" rel="noopener">Download on CurseForge</a><a class="btn" href="https://addons.wago.io/addons/spikespotter" target="_blank" rel="noopener">Wago</a><a class="btn ghost" href="#demo">Try the live demo</a></div>
+    </div>
+  </section>
+
+  <section class="section" id="demo">
+    <div class="eyebrow">Live demo</div>
+    <h2 class="goldtext">See it in action</h2>
+    <p class="lead">A recreation in your browser, close to what you see in game.</p>
+    
+<div class="grid2">
+  <div class="panel ssdemo" style="padding:16px">
+    <div class="row" style="gap:8px;margin-bottom:10px">
+      <button class="sm ssbtn" data-a="kill">Kill a mob</button><button class="sm ssbtn" data-a="loot">Loot</button><button class="sm ssbtn" data-a="pull">Pull</button>
+      <button class="sm" id="ssReset" style="margin-left:auto">Reset</button>
+    </div>
+    <canvas id="ssGraph" width="560" height="90" style="width:100%;height:90px;background:rgba(0,0,0,.45);border:1px solid #4a2c18;border-radius:6px"></canvas>
+    <div class="small" id="ssStatus" style="margin:10px 0 6px">0 spikes recorded.</div>
+    <div class="sstable" id="ssTable"></div>
+  </div>
+  <div class="panel" style="padding:18px">
+    <h2>Recorded in game</h2>
+    <img src="../media/spikespotter/window.jpg" alt="SpikeSpotter window in WoW Forever" loading="lazy" style="width:100%;border-radius:10px;border:1px solid var(--line)">
+  </div>
+</div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="eyebrow">Features</div>
+    <h2 class="goldtext">What it does</h2>
+    <div class="features"><div class="feat reveal"><div class="fi">⚡</div><b>Catches the stutter</b><span>Watches the frame time. A frame that takes much longer than usual counts as a spike; loading screens are left out.</span></div><div class="feat reveal"><div class="fi">☰</div><b>Ranking of the culprits</b><span>Every addon that took part in a spike, with total time, how often and its worst frame, read from the game&#x27;s own addon profiler.</span></div><div class="feat reveal"><div class="fi">◎</div><b>Game or addon?</b><span>Spikes where no addon took a notable share are counted apart: then the game itself is the cause, and disabling addons will not help.</span></div><div class="feat reveal"><div class="fi">✎</div><b>Context</b><span>Each spike is logged with the game events that fired just before (loot window, quest log update, combat start), so you see when an addon gets expensive.</span></div><div class="feat reveal"><div class="fi">⧉</div><b>Copy report</b><span>Ranking and the last 100 spikes as text, ready for a bug report to the addon at fault or a forum post.</span></div><div class="feat reveal"><div class="fi">⏻</div><b>Off when you are done</b><span>One switch stops all measuring; then SpikeSpotter costs nothing.</span></div></div>
+  </section>
+
+  <section class="section"><div class="note"><b style="color:var(--gold2)">Where it found real culprits.</b> On the author's own setup: a fishing helper and an auction helper at about 60 ms on every loot, an equipment manager at 27 ms on every combat start and end, a quest data collector at 20 ms on every quest kill. After disabling them the loot stutter was gone.</div></section>
+
+  <section class="section">
+    <div class="split">
+      <div class="panel reveal"><h2>Settings</h2><ul class="ticks" style="list-style:none;padding:0;margin:0;color:var(--muted)"><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>Its own <b>window</b>: <code>/spike</code> or the addon menu at the minimap. The ranking refreshes live while you play.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span><b>Watch for spikes</b>, <b>Chat message per spike</b>, <b>Spike threshold</b> (20 to 150 ms).</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span><b>Reset</b> before a test, <b>Copy report</b> after it.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>How to use it: Reset, play a few minutes the way the stutter happens, look at the ranking, disable the top addon and test again.</li></ul></div>
+      <div class="panel reveal" id="changelog"><h2>Changelog</h2><!--@changelog--><div class="changelog"><div class="cl"><b>1.0.0</b><ul><li>Detects frame-time spikes and names the addons that used those frames (client addon profiler).</li><li>Ranking by total time, count and worst frame; spikes without a notable addon share are counted as the game&#x27;s own.</li><li>Every spike logged with the game events that fired just before it.</li><li>Copy report: ranking and the last 100 spikes as text.</li><li>Optional chat message per spike, adjustable threshold, one switch to turn all measuring off.</li><li>Window of its own with a &quot;Report a bug&quot; button.</li></ul></div></div><!--/@changelog--></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="eyebrow">Goes well with</div>
+    <h2 class="goldtext">More from Bencepo</h2>
+    <div class="addons"><div class="acard reveal" style="--glow:rgba(79,195,247,.30)">
+  <div class="head"><img src="../assets/icons/trinketdock-128.png" alt=""><div><h3>TrinketDock</h3><div class="small">A light trinket menu</div></div></div>
+  
+  <div class="meta"><span class="tag">v1.0.0</span></div>
+  <div class="links"><a class="btn gold sm" href="../trinketdock/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/trinketdock" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/trinketdock" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(224,112,60,.32)">
+  <div class="head"><img src="../assets/icons/vendorfloor-128.png" alt=""><div><h3>VendorFloor</h3><div class="small">Auction house sniper</div></div></div>
+  
+  <div class="meta"><span class="tag">v1.0.3</span></div>
+  <div class="links"><a class="btn gold sm" href="../vendorfloor/">Open the page</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/vendorfloor" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(240,190,90,.32)">
+  <div class="head"><img src="../assets/icons/procflare-128.png" alt=""><div><h3>ProcFlare</h3><div class="small">Never miss a proc</div></div></div>
+  
+  <div class="meta"><span class="tag">v0.3.1</span></div>
+  <div class="links"><a class="btn gold sm" href="../procflare/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/procflare" target="_blank" rel="noopener">Wago</a></div>
+</div></div>
+  </section>
+
+  <section class="section" id="community">
+  <div class="eyebrow">Community</div>
+  <h2 class="goldtext">Feedback, bugs and ideas</h2>
+  <p class="lead">Every addon is tested in game before it ships, but Forever changes often. Tell me what breaks and what you miss.</p>
+  <div class="grid3">
+    <div class="panel reveal"><h2>Report a bug</h2><p class="small">Open an issue on GitHub (the form asks for everything needed) or leave a comment on CurseForge: what you did, what happened, and the error text from BugSack if there is one.</p>
+      <div class="row" style="margin-bottom:8px"><a class="btn sm gold" href="https://github.com/Bencepo/LevelTrail/issues/new/choose" target="_blank" rel="noopener">LevelTrail</a><a class="btn sm gold" href="https://github.com/Bencepo/VendorFloor/issues/new/choose" target="_blank" rel="noopener">VendorFloor</a><a class="btn sm gold" href="https://github.com/Bencepo/ProcFlare/issues/new/choose" target="_blank" rel="noopener">ProcFlare</a><a class="btn sm gold" href="https://github.com/Bencepo/SwingCast/issues/new/choose" target="_blank" rel="noopener">SwingCast</a><a class="btn sm gold" href="https://github.com/Bencepo/StatTrim/issues/new/choose" target="_blank" rel="noopener">StatTrim</a><a class="btn sm gold" href="https://github.com/Bencepo/TransmogSweep/issues/new/choose" target="_blank" rel="noopener">TransmogSweep</a><a class="btn sm gold" href="https://github.com/Bencepo/TrinketDock/issues/new/choose" target="_blank" rel="noopener">TrinketDock</a><a class="btn sm gold" href="https://github.com/Bencepo/SpikeSpotter/issues/new/choose" target="_blank" rel="noopener">SpikeSpotter</a></div>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/wow/addons/leveltrail#comments" target="_blank" rel="noopener">LevelTrail</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/vendorfloor#comments" target="_blank" rel="noopener">VendorFloor</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare#comments" target="_blank" rel="noopener">ProcFlare</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast#comments" target="_blank" rel="noopener">SwingCast</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/stattrim#comments" target="_blank" rel="noopener">StatTrim</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/transmogsweep#comments" target="_blank" rel="noopener">TransmogSweep</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/trinketdock#comments" target="_blank" rel="noopener">TrinketDock</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/spikespotter#comments" target="_blank" rel="noopener">SpikeSpotter</a></div></div>
+    <div class="panel reveal"><h2>Share your run</h2><p class="small">LevelTrail turns your export into a share image for Discord or Reddit, VendorFloor does the same for your flips. Names can be hidden.</p>
+      <div class="row"><a class="btn sm gold" href="../leveltrail/#demo">LevelTrail demo</a><a class="btn sm gold" href="../vendorfloor/#demo">VendorFloor demo</a></div></div>
+    <div class="panel reveal"><h2>Suggest a feature</h2><p class="small">Ideas that make leveling faster or the UI calmer have the best chance. Comments on CurseForge reach me directly.</p>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/members/bencepo/projects" target="_blank" rel="noopener">All projects on CurseForge</a></div></div>
+  </div>
+  <div class="panel support reveal" style="margin-top:18px;display:flex;gap:22px;align-items:center;flex-wrap:wrap">
+    <div style="flex:1;min-width:260px"><h2 style="margin-bottom:6px">Support the addons</h2><p class="small" style="margin:0">All addons and pages are free and stay free, without ads or cookies. A privacy-friendly counter only tallies page views. If they save you time in game, a tip keeps new features and fixes coming.</p></div>
+    <a class="btn primary" href="https://ko-fi.com/bencepo" target="_blank" rel="noopener">Support on Ko-fi</a>
+  </div>
+</section>
+</div>
+</main>
+<!--@footer--><footer class="site"><div class="wrap">
+  <div class="cols">
+    <div><h4>Bencepo · Addons</h4><p style="margin:0 0 10px">Small, fast addons for World of Warcraft: Forever. Built by a player who tests every change in game. The pages run in your browser: your exports never leave it.</p>
+      <a href="../#community">Feedback, bugs and ideas</a><a href="https://ko-fi.com/bencepo" target="_blank" rel="noopener">Support on Ko-fi</a></div>
+    <div><h4>Addons</h4><a href="../leveltrail/">LevelTrail</a><a href="../vendorfloor/">VendorFloor</a><a href="../procflare/">ProcFlare</a><a href="../swingcast/">SwingCast</a><a href="../stattrim/">StatTrim</a><a href="../transmogsweep/">TransmogSweep</a><a href="../trinketdock/">TrinketDock</a><a href="../spikespotter/">SpikeSpotter</a></div>
+    <div><h4>Download</h4><a href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">LevelTrail on CurseForge</a><a href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">VendorFloor on CurseForge</a><a href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">ProcFlare on CurseForge</a><a href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">SwingCast on CurseForge</a><a href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">StatTrim on CurseForge</a><a href="https://www.curseforge.com/wow/addons/transmogsweep" target="_blank" rel="noopener">TransmogSweep on CurseForge</a><a href="https://www.curseforge.com/wow/addons/trinketdock" target="_blank" rel="noopener">TrinketDock on CurseForge</a><a href="https://www.curseforge.com/wow/addons/spikespotter" target="_blank" rel="noopener">SpikeSpotter on CurseForge</a></div>
+  </div>
+  <div class="legal">By Bencepo. Not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment, Inc. Headings use Cinzel (SIL Open Font License).</div>
+</div></footer><!--/@footer-->
+<script src="../assets/site.js?v=d9d7bed5"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const cv = $("ssGraph"), g = cv.getContext("2d");
+  const frames = Array(140).fill(16);
+  const A = {
+    kill: [["QuestTracker", 18, 26], ["GuideAddon", 8, 14], ["CombatText", 1, 3]],
+    loot: [["FishingHelper", 30, 38], ["AuctionHelper", 20, 25], ["BagAddon", 3, 6]],
+    pull: [["GearSwapper", 24, 30], ["UIFrames", 2, 4]],
+  };
+  let stats = {}, spikes = 0, engine = 0;
+  const r = (a, b) => a + Math.random() * (b - a);
+  function draw(){
+    g.clearRect(0, 0, cv.width, cv.height);
+    const y = ms => cv.height - Math.min(ms, 120) / 120 * (cv.height - 6);
+    g.strokeStyle = "rgba(141,151,165,.5)"; g.lineWidth = 1; g.setLineDash([6, 6]); g.beginPath(); g.moveTo(0, y(40)); g.lineTo(cv.width, y(40)); g.stroke(); g.setLineDash([]);
+    g.lineWidth = 2; g.beginPath();
+    frames.forEach((ms, i) => { const x = i / (frames.length - 1) * cv.width; i ? g.lineTo(x, y(ms)) : g.moveTo(x, y(ms)); });
+    g.strokeStyle = "#5d6d80"; g.stroke();
+    frames.forEach((ms, i) => { if (ms > 40) { const x = i / (frames.length - 1) * cv.width; g.fillStyle = "#ff8a3d"; g.beginPath(); g.arc(x, y(ms), 4, 0, 7); g.fill(); } });
+  }
+  function table(){
+    const list = Object.entries(stats).sort((a, b) => b[1].ms - a[1].ms);
+    $("ssStatus").textContent = spikes + " spikes recorded, " + engine + " of them without a notable addon share (the game itself).";
+    $("ssTable").innerHTML = '<div class="ssrow h"><span>Addon</span><span>total ms</span><span>spikes</span><span>worst ms</span></div>' +
+      (list.length ? list.map(([n, s], i) => `<div class="ssrow"><span>${i + 1}. ${n}</span><span>${s.ms.toFixed(0)}</span><span>${s.n}</span><span>${s.max.toFixed(0)}</span></div>`).join("")
+        : '<div class="ssrow"><span style="color:#8d97a5">Nothing yet. Kill, loot, pull.</span></div>');
+  }
+  function spike(kind){
+    let sum = 0;
+    if (Math.random() < 0.12) engine++;
+    else for (const [n, a, b] of A[kind]) { const t = r(a, b); sum += t; const s = stats[n] || (stats[n] = { ms: 0, n: 0, max: 0 }); s.ms += t; s.n++; s.max = Math.max(s.max, t); }
+    spikes++; frames.push(16 + sum + r(25, 35)); frames.shift(); table();
+  }
+  document.querySelectorAll(".ssbtn").forEach(b => b.onclick = () => spike(b.dataset.a));
+  $("ssReset").onclick = () => { stats = {}; spikes = 0; engine = 0; table(); };
+  setInterval(() => { frames.push(r(13, 19)); frames.shift(); draw(); }, 60);
+  table(); draw();
+})();
+</script>
+</body>
+</html>
