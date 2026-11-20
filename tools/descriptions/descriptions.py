@@ -210,7 +210,7 @@ def body(a, readme):
            f"**Website and live demo:** https://bencepo.github.io/{k}/", ""]
     if a.get("image"):
         out += [a["image"], ""]
-    out += ["## What it does", ""] + [f"- **{t}.** {d}" for t, d in a["what"]] + [""]
+    out += ["## What it does", ""] + [f"- **{t}{'' if t[-1] in '?!' else '.'}** {d}" for t, d in a["what"]] + [""]
     out += ["## How to use", ""] + [f"- {u}" for u in a["use"]] + [""]
     out += ["## Good to know", ""] + [f"- {g}" for g in a["good"]] + [""]
     issues = f"https://github.com/Bencepo/{a['repo']}/issues/new/choose"

@@ -8,7 +8,7 @@
 
 - **Catches the stutter.** A frame that takes much longer than usual counts as a spike; loading screens are left out.
 - **Ranking of the culprits.** Every addon in a spike, with total time, count and its worst frame.
-- **Game or addon?.** Spikes without a notable addon share count as the game's own: then disabling addons will not help.
+- **Game or addon?** Spikes without a notable addon share count as the game's own: then disabling addons will not help.
 - **Context.** The game events just before each spike, so you see when an addon gets expensive.
 - **Copy report.** Ranking and the last 100 spikes as text for a bug report or forum post.
 - **Off when you are done.** One switch stops all measuring; then it costs nothing.
