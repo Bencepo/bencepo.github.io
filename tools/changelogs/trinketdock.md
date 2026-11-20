@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+- Frame and background for the dock, each on or off, with a colour of your choice (window: Look). The background also has its own opacity.
+- Opacity of the whole dock from 0 to 100 %. At 0 % the buttons are invisible but still clickable, and keybindings keep working.
+
 ## 1.0.1
 
 - New icon in the addon list and in the addon menu at the minimap, part of the new Bencepo logo family.
