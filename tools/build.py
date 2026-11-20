@@ -108,7 +108,7 @@ def header(active, base):
         f'<a href="{base}{a["key"]}/"{" class=on" if a["key"] == active else ""}><img src="{base}assets/icons/{a["key"]}-64.png" alt=""><span>{a["name"]}</span></a>'
         for a in ADDONS)
     return f'''<header class="top"><div class="wrap">
-  <a class="brand" href="{base}"><img src="{base}assets/icons/procflare-64.png" alt=""><span class="bt">Bencepo<b>·</b>Addons</span></a>
+  <a class="brand" href="{base}"><img src="{base}assets/icons/bencepo-64.png" alt=""><span class="bt">Bencepo<b>·</b>Addons</span></a>
   <nav class="nav">{links}</nav>
   <div class="spacer"></div>
   <a class="btn sm" href="{base}#import">Import export</a>
@@ -139,7 +139,7 @@ def footer(base):
 </div></footer>'''
 
 
-def page(title, desc, active, base, body, extra_head="", scripts="", icon="procflare"):
+def page(title, desc, active, base, body, extra_head="", scripts="", icon="bencepo"):
     return f'''<!doctype html>
 <html lang="en">
 <head>
