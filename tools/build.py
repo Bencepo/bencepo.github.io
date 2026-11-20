@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds the static site.
 
-- index.html, procflare/, swingcast/, stattrim/, transmogsweep/, trinketdock/, spikespotter/ are generated completely.
+- index.html, procflare/, swingcast/, stattrim/, transmogsweep/, trinketdock/, spikespotter/, profcd/ are generated completely.
 - leveltrail/ and vendorfloor/ are hand-written tool pages; only the parts between
   <!--@header-->...<!--/@header-->, <!--@footer-->...<!--/@footer--> and
   <!--@changelog-->...<!--/@changelog--> are replaced.
@@ -48,6 +48,10 @@ ADDONS = [
          tag="Find the addon behind the stutter",
          blurb="Short FPS drops when you kill, loot or pull? SpikeSpotter asks the game's own addon profiler which addons used those frames and ranks them, with a copyable report.",
          wago="https://addons.wago.io/addons/spikespotter"),
+    dict(key="profcd", name="ProfCD", cf=1818860, glow="rgba(140,204,242,.30)", tool=False,
+         tag="Profession cooldowns at a glance",
+         blurb="Hover the minimap button for the transmute, Mooncloth and Salt Shaker timers of all your characters. Click it to see which crafts you have the mats for.",
+         wago="https://addons.wago.io/addons/profcd"),
 ]
 A = {a["key"]: a for a in ADDONS}
 
@@ -682,6 +686,86 @@ TS_JS = '''
 })();
 '''
 
+PC_DEMO = '''
+<div class="grid2">
+  <div class="panel pcdemo" style="padding:18px">
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <b class="display" style="color:#8cccf2">ProfCD</b>
+      <span class="small">Hover the button, then click it</span>
+    </div>
+    <div class="pcstage">
+      <div class="pcmap"><div class="pcbtn" id="pcBtn" title="ProfCD">&#9719;</div></div>
+      <div class="pctip" id="pcTip"></div>
+    </div>
+    <div class="pcwin" id="pcWin"></div>
+    <div class="small" id="pcInfo" style="margin-top:12px">Click a craft that is ready and has its mats to use it.</div>
+  </div>
+  <div class="panel" style="padding:18px">
+    <h2>How it plays</h2>
+    <ul class="ticks" style="list-style:none;padding:0;margin:0;color:var(--muted)">
+      <li style="margin:7px 0">Hover the minimap button: every cooldown of every character, with the time left.</li>
+      <li style="margin:7px 0">Click it: the window lists each craft with its mats, in bags, in the bank or missing.</li>
+      <li style="margin:7px 0">Every transmute has its own cooldown in Forever, so each gets its own row.</li>
+      <li style="margin:7px 0">Alts show as of their last login.</li>
+      <li style="margin:7px 0">No minimap button? ProfCD makes a macro: one click opens the window, the next closes it.</li>
+    </ul>
+  </div>
+</div>'''
+PC_CSS = '''
+.pcdemo{background:linear-gradient(180deg,#0d1a24,#05090d);border-color:#24506a}
+.pcstage{position:relative;height:72px}
+.pcmap{position:absolute;right:6px;top:0;width:64px;height:64px;border-radius:50%;background:radial-gradient(#2c3e2a,#14200f);border:3px solid #6b5a3a}
+.pcbtn{position:absolute;left:-14px;bottom:-6px;width:32px;height:32px;border-radius:50%;background:#0f1318;border:2px solid #8cccf2;color:#8cccf2;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;user-select:none}
+.pcbtn:hover{box-shadow:0 0 12px rgba(140,204,242,.6)}
+.pctip{display:none;position:absolute;right:84px;top:0;z-index:3;background:rgba(8,10,14,.96);border:1px solid #4a5a6a;border-radius:4px;padding:8px 10px;font-size:12px;min-width:220px}
+.pctip.on{display:block}
+.pctip .l{display:flex;justify-content:space-between;gap:14px;color:#e6e9ee}
+.pcwin{display:none;margin-top:10px;background:rgba(15,19,24,.97);border:1px solid #28313c;border-top:2px solid #8cccf2;border-radius:4px;padding:10px 12px;font-size:13px}
+.pcwin.on{display:block}
+.pcwin .r{display:grid;grid-template-columns:1fr 70px 1.2fr;gap:8px;padding:3px 0;cursor:default}
+.pcwin .r.go{cursor:pointer}.pcwin .r.go:hover{background:rgba(140,204,242,.08)}
+.pcwin .c{color:#ffd100;margin-top:6px}.pcwin .t{text-align:right;font-variant-numeric:tabular-nums}
+.pcg{color:#60ff60}.pcy{color:#ffd24d}.pcr{color:#ff6060}.pcm{color:#8d97a5}
+'''
+PC_JS = '''
+(function(){
+  const $ = id => document.getElementById(id);
+  const now = () => Math.floor(Date.now() / 1000);
+  const chars = [
+    { n: "Mortrak", c: "#ff7d0a", me: true, cds: [
+      { l: "Transmute: Arcanite", at: 0, cd: 172800, mats: [["Thorium Bar", 1, 4, 6], ["Arcane Crystal", 1, 0, 2]] },
+      { l: "Transmute: Truesilver", at: now() + 1460, cd: 3600, mats: [["Mithril Bar", 1, 0, 0]] },
+      { l: "Transmute: Gold", at: 0, cd: 3600, mats: [["Iron Bar", 1, 7, 7]] } ] },
+    { n: "Stitchwork", c: "#9482c9", seen: "18.11. 21:40", cds: [
+      { l: "Mooncloth", at: now() + 201600, cd: 345600, mats: [["Felcloth", 2, 2, 2]] } ] },
+  ];
+  const fmt = at => { const r = at - now(); if (r <= 0) return '<span class="pcg">Ready</span>';
+    const d = Math.floor(r / 86400), h = Math.floor(r % 86400 / 3600), m = Math.floor(r % 3600 / 60);
+    return d ? d + "d " + h + "h" : h ? h + "h " + String(m).padStart(2, "0") + "m" : Math.max(m, 1) + "m"; };
+  function mats(x){ const miss = [], n = []; let bank = false;
+    for (const [name, need, bags, total] of x.mats) { n.push(Math.floor(total / need));
+      if (bags < need) { if (total >= need) bank = true; else miss.push((need - total) + "x " + name); } }
+    if (miss.length) return ['<span class="pcr">Missing: ' + miss.join(", ") + "</span>", false];
+    const k = Math.min(...n);
+    return ['<span class="' + (bank ? 'pcy">Mats in bank' : 'pcg">Mats in bags') + "</span>" + (k > 1 ? ' <span class="pcm">(' + k + "x)</span>" : ""), !bank]; }
+  function tip(){ $("pcTip").innerHTML = '<div style="color:#8cccf2;margin-bottom:4px">ProfCD</div>' + chars.map(c =>
+      '<div style="color:' + c.c + ';margin-top:6px">' + c.n + "</div>" + c.cds.map(x => '<div class="l"><span>' + x.l + "</span><span>" + fmt(x.at) + "</span></div>").join("")).join("") +
+      '<div class="pcm" style="margin-top:6px">Click: mats and details</div>'; }
+  function win(){ $("pcWin").innerHTML = chars.map((c, ci) =>
+      '<div class="c"><span style="color:' + c.c + '">' + c.n + '</span> <span class="pcm">' + (c.me ? "this character" : "as of " + c.seen) + "</span></div>" +
+      c.cds.map((x, xi) => { const [st, ok] = mats(x); const go = c.me && ok && x.at <= now();
+        return '<div class="r' + (go ? " go" : "") + '" data-c="' + ci + '" data-x="' + xi + '"><span>' + x.l + '</span><span class="t">' + fmt(x.at) + "</span><span>" + st + "</span></div>"; }).join("")).join(""); }
+  $("pcBtn").onmouseenter = () => { tip(); $("pcTip").classList.add("on"); };
+  $("pcBtn").onmouseleave = () => $("pcTip").classList.remove("on");
+  $("pcBtn").onclick = () => { $("pcWin").classList.toggle("on"); win(); };
+  $("pcWin").onclick = e => { const r = e.target.closest(".r.go"); if (!r) return;
+    const x = chars[+r.dataset.c].cds[+r.dataset.x];
+    for (const m of x.mats) { m[2] -= m[1]; m[3] -= m[1]; }
+    x.at = now() + x.cd; $("pcInfo").textContent = x.l.replace("Transmute: ", "Transmuted ") + ". The cooldown starts."; win(); };
+  setInterval(() => { if ($("pcWin").classList.contains("on")) win(); if ($("pcTip").classList.contains("on")) tip(); }, 1000);
+})();
+'''
+
 TD_DEMO = '''
 <div class="grid2">
   <div class="panel tddemo" style="padding:18px">
@@ -933,6 +1017,20 @@ def build():
         "How to use it: Reset, play a few minutes the way the stutter happens, look at the ranking, disable the top addon and test again.",
     ]), SS_NOTE, ["trinketdock", "vendorfloor", "procflare"])
     (ROOT / "spikespotter").mkdir(exist_ok=True); (ROOT / "spikespotter" / "index.html").write_text(ss, encoding="utf-8")
+
+    pc = showcase("profcd", PC_DEMO, PC_CSS, PC_JS, [
+        ("◷", "Timers on hover", "Hover the minimap button: every tracked cooldown of every character, with the time left or \"Ready\"."),
+        ("⚗", "Mats check", "Click it: each craft shows \"Mats in bags\", \"Mats in bank\" or what is missing, and how many crafts the mats are enough for."),
+        ("⧗", "Forever cooldowns", "Every transmute on its own cooldown (Arcanite, Truesilver, Gold, the elemental ones), plus Mooncloth and the Salt Shaker. Durations come from the game."),
+        ("☰", "Recipes from the game", "Reagents are read from the profession window, so recipe changes in Forever show up on their own."),
+        ("◎", "Alts included", "Other characters show as of their last login. /pcd forget removes one."),
+        ("⌘", "Macro instead of a button", "Turn the minimap button off and ProfCD creates a macro: one click opens the window, the next closes it."),
+    ], lst([
+        "Its own **window**: the minimap button, `/pcd` or the addon menu at the minimap. Drag it anywhere, it stays open while you play.",
+        "**Minimap button**, **Show other characters**, **Chat notice when ready**.",
+        "`/pcd minimap` toggles the button, `/pcd forget <name>` removes a character.",
+    ]), "", ["trinketdock", "spikespotter", "vendorfloor"])
+    (ROOT / "profcd").mkdir(exist_ok=True); (ROOT / "profcd" / "index.html").write_text(pc, encoding="utf-8")
 
     # tool pages: replace marked blocks
     for key in ("leveltrail", "vendorfloor"):

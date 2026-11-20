@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ProfCD · Profession cooldowns at a glance · WoW Forever addon</title>
+<meta name="description" content="Hover the minimap button for the transmute, Mooncloth and Salt Shaker timers of all your characters. Click it to see which crafts you have the mats for.">
+<meta property="og:title" content="ProfCD · Profession cooldowns at a glance · WoW Forever addon">
+<meta property="og:description" content="Hover the minimap button for the transmute, Mooncloth and Salt Shaker timers of all your characters. Click it to see which crafts you have the mats for.">
+<meta property="og:image" content="https://bencepo.github.io/assets/icons/profcd-256.png">
+<meta name="theme-color" content="#0b0a09">
+<link rel="icon" type="image/png" href="../assets/icons/profcd-64.png">
+<link rel="stylesheet" href="../assets/site.css?v=d9d7bed5">
+<style>
+.pcdemo{background:linear-gradient(180deg,#0d1a24,#05090d);border-color:#24506a}
+.pcstage{position:relative;height:72px}
+.pcmap{position:absolute;right:6px;top:0;width:64px;height:64px;border-radius:50%;background:radial-gradient(#2c3e2a,#14200f);border:3px solid #6b5a3a}
+.pcbtn{position:absolute;left:-14px;bottom:-6px;width:32px;height:32px;border-radius:50%;background:#0f1318;border:2px solid #8cccf2;color:#8cccf2;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;user-select:none}
+.pcbtn:hover{box-shadow:0 0 12px rgba(140,204,242,.6)}
+.pctip{display:none;position:absolute;right:84px;top:0;z-index:3;background:rgba(8,10,14,.96);border:1px solid #4a5a6a;border-radius:4px;padding:8px 10px;font-size:12px;min-width:220px}
+.pctip.on{display:block}
+.pctip .l{display:flex;justify-content:space-between;gap:14px;color:#e6e9ee}
+.pcwin{display:none;margin-top:10px;background:rgba(15,19,24,.97);border:1px solid #28313c;border-top:2px solid #8cccf2;border-radius:4px;padding:10px 12px;font-size:13px}
+.pcwin.on{display:block}
+.pcwin .r{display:grid;grid-template-columns:1fr 70px 1.2fr;gap:8px;padding:3px 0;cursor:default}
+.pcwin .r.go{cursor:pointer}.pcwin .r.go:hover{background:rgba(140,204,242,.08)}
+.pcwin .c{color:#ffd100;margin-top:6px}.pcwin .t{text-align:right;font-variant-numeric:tabular-nums}
+.pcg{color:#60ff60}.pcy{color:#ffd24d}.pcr{color:#ff6060}.pcm{color:#8d97a5}
+</style>
+</head>
+<body>
+<!--@header--><header class="top"><div class="wrap">
+  <a class="brand" href="../"><img src="../assets/icons/procflare-64.png" alt=""><span class="bt">Bencepo<b>·</b>Addons</span></a>
+  <nav class="nav"><a href="../leveltrail/"><img src="../assets/icons/leveltrail-64.png" alt=""><span>LevelTrail</span></a><a href="../vendorfloor/"><img src="../assets/icons/vendorfloor-64.png" alt=""><span>VendorFloor</span></a><a href="../procflare/"><img src="../assets/icons/procflare-64.png" alt=""><span>ProcFlare</span></a><a href="../swingcast/"><img src="../assets/icons/swingcast-64.png" alt=""><span>SwingCast</span></a><a href="../stattrim/"><img src="../assets/icons/stattrim-64.png" alt=""><span>StatTrim</span></a><a href="../transmogsweep/"><img src="../assets/icons/transmogsweep-64.png" alt=""><span>TransmogSweep</span></a><a href="../trinketdock/"><img src="../assets/icons/trinketdock-64.png" alt=""><span>TrinketDock</span></a><a href="../spikespotter/"><img src="../assets/icons/spikespotter-64.png" alt=""><span>SpikeSpotter</span></a><a href="../profcd/" class=on><img src="../assets/icons/profcd-64.png" alt=""><span>ProfCD</span></a></nav>
+  <div class="spacer"></div>
+  <a class="btn sm" href="../#import">Import export</a>
+</div></header><!--/@header-->
+<main>
+<div class="wrap">
+  <section class="hero addonhero">
+    <img class="heroicon" src="../assets/icons/profcd-256.png" alt="ProfCD">
+    <div>
+      <div class="eyebrow">Profession cooldowns at a glance · v1.0.0</div>
+      <h1 class="goldtext">ProfCD</h1>
+      <p class="lead">Hover the minimap button for the transmute, Mooncloth and Salt Shaker timers of all your characters. Click it to see which crafts you have the mats for.</p>
+      <div class="ctas"><a class="btn primary" href="https://www.curseforge.com/wow/addons/profcd" target="_blank" rel="noopener">Download on CurseForge</a><a class="btn" href="https://addons.wago.io/addons/profcd" target="_blank" rel="noopener">Wago</a><a class="btn ghost" href="#demo">Try the live demo</a></div>
+    </div>
+  </section>
+
+  <section class="section" id="demo">
+    <div class="eyebrow">Live demo</div>
+    <h2 class="goldtext">See it in action</h2>
+    <p class="lead">A recreation in your browser, close to what you see in game.</p>
+    
+<div class="grid2">
+  <div class="panel pcdemo" style="padding:18px">
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <b class="display" style="color:#8cccf2">ProfCD</b>
+      <span class="small">Hover the button, then click it</span>
+    </div>
+    <div class="pcstage">
+      <div class="pcmap"><div class="pcbtn" id="pcBtn" title="ProfCD">&#9719;</div></div>
+      <div class="pctip" id="pcTip"></div>
+    </div>
+    <div class="pcwin" id="pcWin"></div>
+    <div class="small" id="pcInfo" style="margin-top:12px">Click a craft that is ready and has its mats to use it.</div>
+  </div>
+  <div class="panel" style="padding:18px">
+    <h2>How it plays</h2>
+    <ul class="ticks" style="list-style:none;padding:0;margin:0;color:var(--muted)">
+      <li style="margin:7px 0">Hover the minimap button: every cooldown of every character, with the time left.</li>
+      <li style="margin:7px 0">Click it: the window lists each craft with its mats, in bags, in the bank or missing.</li>
+      <li style="margin:7px 0">Every transmute has its own cooldown in Forever, so each gets its own row.</li>
+      <li style="margin:7px 0">Alts show as of their last login.</li>
+      <li style="margin:7px 0">No minimap button? ProfCD makes a macro: one click opens the window, the next closes it.</li>
+    </ul>
+  </div>
+</div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="eyebrow">Features</div>
+    <h2 class="goldtext">What it does</h2>
+    <div class="features"><div class="feat reveal"><div class="fi">◷</div><b>Timers on hover</b><span>Hover the minimap button: every tracked cooldown of every character, with the time left or &quot;Ready&quot;.</span></div><div class="feat reveal"><div class="fi">⚗</div><b>Mats check</b><span>Click it: each craft shows &quot;Mats in bags&quot;, &quot;Mats in bank&quot; or what is missing, and how many crafts the mats are enough for.</span></div><div class="feat reveal"><div class="fi">⧗</div><b>Forever cooldowns</b><span>Every transmute on its own cooldown (Arcanite, Truesilver, Gold, the elemental ones), plus Mooncloth and the Salt Shaker. Durations come from the game.</span></div><div class="feat reveal"><div class="fi">☰</div><b>Recipes from the game</b><span>Reagents are read from the profession window, so recipe changes in Forever show up on their own.</span></div><div class="feat reveal"><div class="fi">◎</div><b>Alts included</b><span>Other characters show as of their last login. /pcd forget removes one.</span></div><div class="feat reveal"><div class="fi">⌘</div><b>Macro instead of a button</b><span>Turn the minimap button off and ProfCD creates a macro: one click opens the window, the next closes it.</span></div></div>
+  </section>
+
+  
+
+  <section class="section">
+    <div class="split">
+      <div class="panel reveal"><h2>Settings</h2><ul class="ticks" style="list-style:none;padding:0;margin:0;color:var(--muted)"><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span>Its own <b>window</b>: the minimap button, <code>/pcd</code> or the addon menu at the minimap. Drag it anywhere, it stays open while you play.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span><b>Minimap button</b>, <b>Show other characters</b>, <b>Chat notice when ready</b>.</li><li style="padding-left:22px;position:relative;margin:7px 0"><span style="position:absolute;left:2px;color:var(--gold);font-size:11px;top:4px">◆</span><code>/pcd minimap</code> toggles the button, <code>/pcd forget &lt;name&gt;</code> removes a character.</li></ul></div>
+      <div class="panel reveal" id="changelog"><h2>Changelog</h2><!--@changelog--><div class="changelog"><div class="cl"><b>1.0.0</b><ul><li>Minimap button with a tooltip: every tracked profession cooldown of all your characters, with the time left.</li><li>Window with the mats status of each craft: in bags, in bank, or what is missing.</li><li>Tracks every transmute on its own cooldown (Arcanite, Truesilver, Gold, elemental transmutes), Mooncloth and the Salt Shaker.</li><li>Reagents are read from the profession window, so recipe changes in Forever are picked up.</li><li>Macro &quot;ProfCD&quot; is created when the minimap button is turned off.</li><li>Chat notice when a cooldown is ready. <code>/pcd forget &lt;name&gt;</code> removes a character.</li><li>Settings in the window, with a &quot;Report a bug&quot; button.</li></ul></div></div><!--/@changelog--></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="eyebrow">Goes well with</div>
+    <h2 class="goldtext">More from Bencepo</h2>
+    <div class="addons"><div class="acard reveal" style="--glow:rgba(79,195,247,.30)">
+  <div class="head"><img src="../assets/icons/trinketdock-128.png" alt=""><div><h3>TrinketDock</h3><div class="small">A light trinket menu</div></div></div>
+  
+  <div class="meta"><span class="tag">v1.0.0</span></div>
+  <div class="links"><a class="btn gold sm" href="../trinketdock/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/trinketdock" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/trinketdock" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(255,138,61,.30)">
+  <div class="head"><img src="../assets/icons/spikespotter-128.png" alt=""><div><h3>SpikeSpotter</h3><div class="small">Find the addon behind the stutter</div></div></div>
+  
+  <div class="meta"><span class="tag">v1.0.0</span></div>
+  <div class="links"><a class="btn gold sm" href="../spikespotter/">Details & demo</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/spikespotter" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/spikespotter" target="_blank" rel="noopener">Wago</a></div>
+</div><div class="acard reveal" style="--glow:rgba(224,112,60,.32)">
+  <div class="head"><img src="../assets/icons/vendorfloor-128.png" alt=""><div><h3>VendorFloor</h3><div class="small">Auction house sniper</div></div></div>
+  
+  <div class="meta"><span class="tag">v1.0.3</span></div>
+  <div class="links"><a class="btn gold sm" href="../vendorfloor/">Open the page</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">CurseForge</a><a class="btn sm ghost" href="https://addons.wago.io/addons/vendorfloor" target="_blank" rel="noopener">Wago</a></div>
+</div></div>
+  </section>
+
+  <section class="section" id="community">
+  <div class="eyebrow">Community</div>
+  <h2 class="goldtext">Feedback, bugs and ideas</h2>
+  <p class="lead">Every addon is tested in game before it ships, but Forever changes often. Tell me what breaks and what you miss.</p>
+  <div class="grid3">
+    <div class="panel reveal"><h2>Report a bug</h2><p class="small">Open an issue on GitHub (the form asks for everything needed) or leave a comment on CurseForge: what you did, what happened, and the error text from BugSack if there is one.</p>
+      <div class="row" style="margin-bottom:8px"><a class="btn sm gold" href="https://github.com/Bencepo/LevelTrail/issues/new/choose" target="_blank" rel="noopener">LevelTrail</a><a class="btn sm gold" href="https://github.com/Bencepo/VendorFloor/issues/new/choose" target="_blank" rel="noopener">VendorFloor</a><a class="btn sm gold" href="https://github.com/Bencepo/ProcFlare/issues/new/choose" target="_blank" rel="noopener">ProcFlare</a><a class="btn sm gold" href="https://github.com/Bencepo/SwingCast/issues/new/choose" target="_blank" rel="noopener">SwingCast</a><a class="btn sm gold" href="https://github.com/Bencepo/StatTrim/issues/new/choose" target="_blank" rel="noopener">StatTrim</a><a class="btn sm gold" href="https://github.com/Bencepo/TransmogSweep/issues/new/choose" target="_blank" rel="noopener">TransmogSweep</a><a class="btn sm gold" href="https://github.com/Bencepo/TrinketDock/issues/new/choose" target="_blank" rel="noopener">TrinketDock</a><a class="btn sm gold" href="https://github.com/Bencepo/SpikeSpotter/issues/new/choose" target="_blank" rel="noopener">SpikeSpotter</a><a class="btn sm gold" href="https://github.com/Bencepo/ProfCD/issues/new/choose" target="_blank" rel="noopener">ProfCD</a></div>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/wow/addons/leveltrail#comments" target="_blank" rel="noopener">LevelTrail</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/vendorfloor#comments" target="_blank" rel="noopener">VendorFloor</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/procflare#comments" target="_blank" rel="noopener">ProcFlare</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/swingcast#comments" target="_blank" rel="noopener">SwingCast</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/stattrim#comments" target="_blank" rel="noopener">StatTrim</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/transmogsweep#comments" target="_blank" rel="noopener">TransmogSweep</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/trinketdock#comments" target="_blank" rel="noopener">TrinketDock</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/spikespotter#comments" target="_blank" rel="noopener">SpikeSpotter</a><a class="btn sm" href="https://www.curseforge.com/wow/addons/profcd#comments" target="_blank" rel="noopener">ProfCD</a></div></div>
+    <div class="panel reveal"><h2>Share your run</h2><p class="small">LevelTrail turns your export into a share image for Discord or Reddit, VendorFloor does the same for your flips. Names can be hidden.</p>
+      <div class="row"><a class="btn sm gold" href="../leveltrail/#demo">LevelTrail demo</a><a class="btn sm gold" href="../vendorfloor/#demo">VendorFloor demo</a></div></div>
+    <div class="panel reveal"><h2>Suggest a feature</h2><p class="small">Ideas that make leveling faster or the UI calmer have the best chance. Comments on CurseForge reach me directly.</p>
+      <div class="row"><a class="btn sm" href="https://www.curseforge.com/members/bencepo/projects" target="_blank" rel="noopener">All projects on CurseForge</a></div></div>
+  </div>
+  <div class="panel support reveal" style="margin-top:18px;display:flex;gap:22px;align-items:center;flex-wrap:wrap">
+    <div style="flex:1;min-width:260px"><h2 style="margin-bottom:6px">Support the addons</h2><p class="small" style="margin:0">All addons and pages are free and stay free, without ads or cookies. A privacy-friendly counter only tallies page views. If they save you time in game, a tip keeps new features and fixes coming.</p></div>
+    <a class="btn primary" href="https://ko-fi.com/bencepo" target="_blank" rel="noopener">Support on Ko-fi</a>
+  </div>
+</section>
+</div>
+</main>
+<!--@footer--><footer class="site"><div class="wrap">
+  <div class="cols">
+    <div><h4>Bencepo · Addons</h4><p style="margin:0 0 10px">Small, fast addons for World of Warcraft: Forever. Built by a player who tests every change in game. The pages run in your browser: your exports never leave it.</p>
+      <a href="../#community">Feedback, bugs and ideas</a><a href="https://ko-fi.com/bencepo" target="_blank" rel="noopener">Support on Ko-fi</a></div>
+    <div><h4>Addons</h4><a href="../leveltrail/">LevelTrail</a><a href="../vendorfloor/">VendorFloor</a><a href="../procflare/">ProcFlare</a><a href="../swingcast/">SwingCast</a><a href="../stattrim/">StatTrim</a><a href="../transmogsweep/">TransmogSweep</a><a href="../trinketdock/">TrinketDock</a><a href="../spikespotter/">SpikeSpotter</a><a href="../profcd/">ProfCD</a></div>
+    <div><h4>Download</h4><a href="https://www.curseforge.com/wow/addons/leveltrail" target="_blank" rel="noopener">LevelTrail on CurseForge</a><a href="https://www.curseforge.com/wow/addons/vendorfloor" target="_blank" rel="noopener">VendorFloor on CurseForge</a><a href="https://www.curseforge.com/wow/addons/procflare" target="_blank" rel="noopener">ProcFlare on CurseForge</a><a href="https://www.curseforge.com/wow/addons/swingcast" target="_blank" rel="noopener">SwingCast on CurseForge</a><a href="https://www.curseforge.com/wow/addons/stattrim" target="_blank" rel="noopener">StatTrim on CurseForge</a><a href="https://www.curseforge.com/wow/addons/transmogsweep" target="_blank" rel="noopener">TransmogSweep on CurseForge</a><a href="https://www.curseforge.com/wow/addons/trinketdock" target="_blank" rel="noopener">TrinketDock on CurseForge</a><a href="https://www.curseforge.com/wow/addons/spikespotter" target="_blank" rel="noopener">SpikeSpotter on CurseForge</a><a href="https://www.curseforge.com/wow/addons/profcd" target="_blank" rel="noopener">ProfCD on CurseForge</a></div>
+  </div>
+  <div class="legal">By Bencepo. Not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment, Inc. Headings use Cinzel (SIL Open Font License).</div>
+</div></footer><!--/@footer-->
+<script src="../assets/site.js?v=d9d7bed5"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const now = () => Math.floor(Date.now() / 1000);
+  const chars = [
+    { n: "Mortrak", c: "#ff7d0a", me: true, cds: [
+      { l: "Transmute: Arcanite", at: 0, cd: 172800, mats: [["Thorium Bar", 1, 4, 6], ["Arcane Crystal", 1, 0, 2]] },
+      { l: "Transmute: Truesilver", at: now() + 1460, cd: 3600, mats: [["Mithril Bar", 1, 0, 0]] },
+      { l: "Transmute: Gold", at: 0, cd: 3600, mats: [["Iron Bar", 1, 7, 7]] } ] },
+    { n: "Stitchwork", c: "#9482c9", seen: "18.11. 21:40", cds: [
+      { l: "Mooncloth", at: now() + 201600, cd: 345600, mats: [["Felcloth", 2, 2, 2]] } ] },
+  ];
+  const fmt = at => { const r = at - now(); if (r <= 0) return '<span class="pcg">Ready</span>';
+    const d = Math.floor(r / 86400), h = Math.floor(r % 86400 / 3600), m = Math.floor(r % 3600 / 60);
+    return d ? d + "d " + h + "h" : h ? h + "h " + String(m).padStart(2, "0") + "m" : Math.max(m, 1) + "m"; };
+  function mats(x){ const miss = [], n = []; let bank = false;
+    for (const [name, need, bags, total] of x.mats) { n.push(Math.floor(total / need));
+      if (bags < need) { if (total >= need) bank = true; else miss.push((need - total) + "x " + name); } }
+    if (miss.length) return ['<span class="pcr">Missing: ' + miss.join(", ") + "</span>", false];
+    const k = Math.min(...n);
+    return ['<span class="' + (bank ? 'pcy">Mats in bank' : 'pcg">Mats in bags') + "</span>" + (k > 1 ? ' <span class="pcm">(' + k + "x)</span>" : ""), !bank]; }
+  function tip(){ $("pcTip").innerHTML = '<div style="color:#8cccf2;margin-bottom:4px">ProfCD</div>' + chars.map(c =>
+      '<div style="color:' + c.c + ';margin-top:6px">' + c.n + "</div>" + c.cds.map(x => '<div class="l"><span>' + x.l + "</span><span>" + fmt(x.at) + "</span></div>").join("")).join("") +
+      '<div class="pcm" style="margin-top:6px">Click: mats and details</div>'; }
+  function win(){ $("pcWin").innerHTML = chars.map((c, ci) =>
+      '<div class="c"><span style="color:' + c.c + '">' + c.n + '</span> <span class="pcm">' + (c.me ? "this character" : "as of " + c.seen) + "</span></div>" +
+      c.cds.map((x, xi) => { const [st, ok] = mats(x); const go = c.me && ok && x.at <= now();
+        return '<div class="r' + (go ? " go" : "") + '" data-c="' + ci + '" data-x="' + xi + '"><span>' + x.l + '</span><span class="t">' + fmt(x.at) + "</span><span>" + st + "</span></div>"; }).join("")).join(""); }
+  $("pcBtn").onmouseenter = () => { tip(); $("pcTip").classList.add("on"); };
+  $("pcBtn").onmouseleave = () => $("pcTip").classList.remove("on");
+  $("pcBtn").onclick = () => { $("pcWin").classList.toggle("on"); win(); };
+  $("pcWin").onclick = e => { const r = e.target.closest(".r.go"); if (!r) return;
+    const x = chars[+r.dataset.c].cds[+r.dataset.x];
+    for (const m of x.mats) { m[2] -= m[1]; m[3] -= m[1]; }
+    x.at = now() + x.cd; $("pcInfo").textContent = x.l.replace("Transmute: ", "Transmuted ") + ". The cooldown starts."; win(); };
+  setInterval(() => { if ($("pcWin").classList.contains("on")) win(); if ($("pcTip").classList.contains("on")) tip(); }, 1000);
+})();
+</script>
+</body>
+</html>
