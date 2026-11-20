@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+- The settings window now uses the same look as the other Bencepo addons. The font is picked from a list.
+
 ## 1.0.0
 
 - New icon in the addon list and on the minimap button, part of the new Bencepo logo family.
