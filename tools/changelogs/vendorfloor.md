@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.3
+
+- "Internal auction error" no longer stops a purchase. WoW Forever's auction house sends it with purchases that go through: VendorFloor now waits two seconds for the confirmation, takes the red line off the screen, and counts the purchase as failed only if no confirmation comes.
+- A purchase the auction house really refuses (e.g. the auction was sold a moment before) is not the end: VendorFloor tries the next auction of the same item at once.
+- Hot deals: a find checked in the last 15 seconds is bought on the first click, without searching again. The auction keeps its price, so you never pay more; if it was sold meanwhile, the next auction of the item is tried.
+- Faster buying: VendorFloor goes on the moment the auction house confirms a purchase instead of waiting. A single auction bought needs no new search, and the next find is ready at once when it was checked in the last 15 seconds: one click per purchase.
+- Finds that turn out gone are skipped on the way.
+- An empty answer from the auction house is asked once more before a find counts as gone.
+- Alt+click on a find: a bug report to copy, with the find, the purchase state and the purchase log.
+- Quick rounds learn from finds and purchases: items found often, above all those whose finds were gone again within two minutes (someone else was faster), and items that earned you the most are checked first (fading over 30 days), gear included, in the exact variants you bought before. Purchases from before this version count too: they come from the ledger kept for the website.
+- Continuous mode goes on one second after a purchase instead of five, and the pause between rounds can be set down to one second.
+- Menu > Purchase log: what happened during the last purchases, ready to copy into a bug report (Report a bug in the settings).
+- Checks no longer hang ("Checking 3 of 4"): a scan whose next page never comes ends after 8 seconds, a find made ready to buy is let go after 20 seconds without a click, and a watchdog frees the check queue after 30 seconds without progress.
+- A find whose auctions the auction house keeps refusing as gone is dropped after three tries instead of being tried auction by auction.
+
 ## 1.0.2
 
 - "Your auctions" counts again: sales and expired auctions are now read from the mailbox (the invoice of each sale, the "Auction expired" mail), since the game hides the chat lines about them from addons. Statistics update when you open the mailbox, and sales made while you were offline count too. Each mail is counted once.
