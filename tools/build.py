@@ -339,6 +339,20 @@ def home():
 
 
 # ---------------------------------------------------------------- showcase pages
+
+INGAME_W = {"trinketdock": 570, "profcd": 620, "procflare": 920, "swingcast": 895, "leveltrail": 470, "spikespotter": 560}
+
+
+def ingame(key, caption):
+    """Section with a real in-game screenshot (media/<key>/ingame.jpg)."""
+    a = A[key]
+    return f'''<section class="section" id="ingame">
+    <div class="eyebrow">In game</div>
+    <h2 class="goldtext">How it looks in WoW Forever</h2>
+    <p class="lead">{esc(caption)}</p>
+    <div class="panel reveal" style="padding:10px;max-width:{INGAME_W.get(key, 800) + 22}px"><img src="../media/{key}/ingame.jpg" alt="{a["name"]} in WoW Forever" loading="lazy" style="width:100%;display:block;border-radius:8px"></div>
+  </section>'''
+
 def showcase(key, demo_html, demo_css, demo_js, features, settings, extra_sections, goes):
     a, base = A[key], "../"
     body = f'''<main>
@@ -938,7 +952,7 @@ def build():
         "**Volume** 25 to 100 % and the **sound channel**: on Sound Effects by default, so the game's effects slider applies.",
         "Clearcasting (or Shadow Trance) alert and screen flash, other procs, reactive abilities, only your own procs.",
         "Longest buff that still counts as a proc (30 s by default), size and position.",
-    ]), '''<section class="section"><div class="note"><b style="color:var(--gold2)">Limits.</b> Procs that only deal damage (Fiery Weapon, Lifestealing) or grant an extra attack (Hand of Justice, Windfury) cannot be shown: Forever keeps the combat log from addons. In restricted content (some boss encounters, battlegrounds) only Clearcasting is shown.</div></section>''',
+    ]), ingame("procflare", "A real screenshot: the Clearcasting alert above the character, proc icons with their countdowns, and the settings window.") + '''<section class="section"><div class="note"><b style="color:var(--gold2)">Limits.</b> Procs that only deal damage (Fiery Weapon, Lifestealing) or grant an extra attack (Hand of Justice, Windfury) cannot be shown: Forever keeps the combat log from addons. In restricted content (some boss encounters, battlegrounds) only Clearcasting is shown.</div></section>''',
         ["swingcast", "stattrim", "leveltrail"])
     (ROOT / "procflare").mkdir(exist_ok=True); (ROOT / "procflare" / "index.html").write_text(pf, encoding="utf-8")
 
@@ -955,7 +969,7 @@ def build():
         "**Move the swing strip** in the game's Edit Mode or with \"Move strip\" in the window, or keep it under the cast bar.",
         "Show or hide icon, cast time, latency zone, swing strip and its seconds; hide the built-in swing bars.",
         "Advanced: `/swc help` lists every setting as a command.",
-    ]), '''<section class="section"><div class="note"><b style="color:var(--gold2)">How it works.</b> The strip mirrors Forever's built-in swing timer, the only accurate source: Forever keeps the combat log from addons and hands attack speed to addons as secret values. If the strip ever fails, it switches itself off and the built-in bar comes back.</div></section>''',
+    ]), ingame("swingcast", "A real screenshot: the settings window and the swing strip under the cast bar, shown as a preview while the window is open.") + '''<section class="section"><div class="note"><b style="color:var(--gold2)">How it works.</b> The strip mirrors Forever's built-in swing timer, the only accurate source: Forever keeps the combat log from addons and hands attack speed to addons as secret values. If the strip ever fails, it switches itself off and the built-in bar comes back.</div></section>''',
         ["procflare", "stattrim", "leveltrail"])
     (ROOT / "swingcast").mkdir(exist_ok=True); (ROOT / "swingcast" / "index.html").write_text(sc, encoding="utf-8")
 
@@ -1000,7 +1014,7 @@ def build():
         "Its own **settings window**: `/tdock` or the addon menu at the minimap. Drag it anywhere, changes apply live.",
         "**Show the buttons**, **Lock position**, **Vertical**, **Tooltips**, **Scale**, flyout **upwards or downwards**, **Reset position**.",
         "**Keybindings** for both trinkets under Options > Keybindings > TrinketDock.",
-    ]), "", ["spikespotter", "procflare", "swingcast"])
+    ]), ingame("trinketdock", "A real screenshot: the settings window with frame, background and opacity, and the dock with its flyout on the right."), ["spikespotter", "procflare", "swingcast"])
     (ROOT / "trinketdock").mkdir(exist_ok=True); (ROOT / "trinketdock" / "index.html").write_text(td, encoding="utf-8")
 
     ss = showcase("spikespotter", SS_DEMO, SS_CSS, SS_JS, [
@@ -1029,7 +1043,7 @@ def build():
         "Its own **window**: the minimap button, `/pcd` or the addon menu at the minimap. Drag it anywhere, it stays open while you play.",
         "**Minimap button**, **Show other characters**, **Chat notice when ready**.",
         "`/pcd minimap` toggles the button, `/pcd forget <name>` removes a character.",
-    ]), "", ["trinketdock", "spikespotter", "vendorfloor"])
+    ]), ingame("profcd", "A real screenshot: each transmute with its cooldown and whether the mats are in your bags."), ["trinketdock", "spikespotter", "vendorfloor"])
     (ROOT / "profcd").mkdir(exist_ok=True); (ROOT / "profcd" / "index.html").write_text(pc, encoding="utf-8")
 
     # tool pages: replace marked blocks
