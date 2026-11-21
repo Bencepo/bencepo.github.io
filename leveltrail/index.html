@@ -299,6 +299,14 @@ function addChar(all, c) {
   Object.keys(all).forEach(id => { if (sameChar(all[id], c)) { Object.assign(runs, runsOf(all[id])); delete all[id]; } });
   Object.keys(runs).forEach(k => { runs[k] = (({ runs: _, ...r }) => r)(runs[k]); });
   if (c.runs) Object.assign(runs, c.runs); else runs[runKey(c)] = c;
+  // the addon (1.5.3+) merges its records itself: a run the newest one already contains is dropped
+  const top = Object.values(runs).sort(newer).pop();
+  Object.keys(runs).forEach(k => {
+    const r = runs[k];
+    if (r === top || newer(r, top) > 0 || (+r.online || 0) > (+top.online || 0)) return;
+    const have = new Set(arr(top.splits).map(x => x.level));
+    if (arr(r.splits).every(x => have.has(x.level))) delete runs[k];
+  });
   // a run without a known realm belongs to the run with the same realm once that is known
   const ids = Object.keys(runs);
   const entry = ids.length > 1 ? view({ runs }) : runs[ids[0]];
