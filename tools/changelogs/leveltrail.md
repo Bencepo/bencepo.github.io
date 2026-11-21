@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.3
+
+- Fixed: when the game reports an empty realm name, LevelTrail no longer starts a second record for your character. It keeps writing to the existing one, and a record saved under the empty realm is merged into it at login, so the export has your whole history again.
+- `/trail old` exports an older record of this character, if one is left.
+- Web viewer: imports of the same character are merged again, even when the realm name differs between exports, and no history is lost.
+
 ## 1.5.2
 
 - New icon in the addon list and on the minimap button, part of the new Bencepo logo family.
