@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+- A character no longer shows up twice when the server reports a different realm name. Characters are now kept by their character ID; existing doubles are merged at login.
+
 ## 1.0.1
 
 - New icon in the addon list and on the minimap button, part of the new Bencepo logo family.
