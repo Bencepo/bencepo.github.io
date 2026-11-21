@@ -234,7 +234,29 @@ function parseExport(text) {
   return d;
 }
 let chars = load();
-function charId(c) { return `${c.name || "Unknown"}-${c.realm || ""}`; }
+// Same character = same name and realm. Realm text can differ between exports ("?" before the
+// realm is known, spaces, case), so compare a normalized realm and treat an unknown realm as a match.
+const normRealm = r => String(r ?? "").replace(/[\s'-]/g, "").toLowerCase().replace(/^\?$/, "");
+function charId(c) { return `${c.name || "Unknown"}-${normRealm(c.realm)}`; }
+function sameChar(a, b) {
+  if (!a || !b || String(a.name || "").toLowerCase() !== String(b.name || "").toLowerCase()) return false;
+  const ra = normRealm(a.realm), rb = normRealm(b.realm);
+  return !ra || !rb || ra === rb;
+}
+// newer export wins: timestamp, then online time, then level
+const newer = (a, b) => ((+a.ts || 0) - (+b.ts || 0)) || ((+a.online || 0) - (+b.online || 0)) || ((+a.level || 0) - (+b.level || 0));
+function addChar(all, c) {
+  let keep = c;
+  Object.keys(all).forEach(id => { if (sameChar(all[id], c)) { if (newer(all[id], keep) > 0) keep = all[id]; delete all[id]; } });
+  if (keep !== c && !normRealm(keep.realm) && normRealm(c.realm)) keep.realm = c.realm;
+  const id = charId(keep); all[id] = keep; return id;
+}
+function dedupe(all) {
+  const out = {}; let changed = false;
+  Object.keys(all).forEach(id => { const nid = addChar(out, all[id]); if (nid !== id) changed = true; });
+  return { all: out, changed: changed || Object.keys(out).length !== Object.keys(all).length };
+}
+{ const d = dedupe(chars); if (d.changed) { chars = d.all; save(chars); } }
 function slim(d) {
   // keep what the viewer needs; drop quests, recipes, spells, bags and bank
   const c = d.char, o = {};
@@ -882,8 +904,7 @@ function importText(text) {
   const msg = $("msg");
   try {
     const d = parseExport(text);
-    const c = slim(d), id = charId(c);
-    chars[id] = c;
+    const id = addChar(chars, slim(d));
     const kept = save(chars);
     current = id; demoMode = false;
     $("paste").value = ""; msg.textContent = ""; msg.className = "msg";
