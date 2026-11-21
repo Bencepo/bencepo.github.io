@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5
+
+- The disenchant basket works from a macro: `/click VendorFloorBasketButton` disenchants the next basket item, whatever the "cast on key down" setting says. The button now casts Disenchant on the bag slot directly instead of running a macro of its own.
+
 ## 1.0.4
 
 - New icon in the addon list and on the minimap button, part of the new Bencepo logo family.
