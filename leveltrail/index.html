@@ -243,13 +243,68 @@ function sameChar(a, b) {
   const ra = normRealm(a.realm), rb = normRealm(b.realm);
   return !ra || !rb || ra === rb;
 }
-// newer export wins: timestamp, then online time, then level
+// The addon keeps one record per name and realm text. When the realm text changed, the same
+// character has two addon records: each one is kept as a "run" (keyed by its raw realm text) and
+// the viewer shows them combined. A new export only replaces the run it came from.
 const newer = (a, b) => ((+a.ts || 0) - (+b.ts || 0)) || ((+a.online || 0) - (+b.online || 0)) || ((+a.level || 0) - (+b.level || 0));
+const runKey = c => String(c.realm ?? "");
+const plain = o => o && typeof o === "object" && !Array.isArray(o);
+function sumInto(t, f) {
+  if (!plain(f)) return t;
+  t = plain(t) ? { ...t } : {};
+  Object.keys(f).forEach(k => {
+    const a = t[k], b = f[k];
+    if (typeof b === "number" && (a == null || typeof a === "number")) t[k] = (a || 0) + b;
+    else if (plain(b)) t[k] = sumInto(a, b);
+    else if (a === undefined) t[k] = b;
+  });
+  return t;
+}
+function unionBy(newList, oldList, key, sum) {
+  const out = new Map();
+  arr(oldList).forEach(r => { if (r) out.set(key(r), r); });
+  arr(newList).forEach(r => { if (!r) return; const k = key(r), o = out.get(k); out.set(k, sum && o ? sumInto(o, r) : r); });
+  return [...out.values()];
+}
+const byStr = f => (a, b) => String(f(a) ?? "").localeCompare(String(f(b) ?? ""));
+// b is the newer run; a's history is added to it
+function foldRun(b, a) {
+  const c = { ...b };
+  const off = +a.online || 0;
+  c.online = (+b.online || 0) + off;
+  if (b.levelSince) c.levelSince = { ...b.levelSince, online: (+b.levelSince.online || 0) + off };
+  c.splits = unionBy(b.splits, a.splits, r => r.level).sort((x, y) => x.level - y.level);
+  c.deaths = unionBy(b.deaths, a.deaths, r => `${r.ts ?? r.date}|${r.level}`).sort((x, y) => (+x.ts || 0) - (+y.ts || 0));
+  c.deathCount = (+b.deathCount || arr(b.deaths).length) + (+a.deathCount || arr(a.deaths).length);
+  c.goldDays = unionBy(b.goldDays, a.goldDays, r => r.d).sort(byStr(r => r.d));
+  c.sessions = unionBy(b.sessions, a.sessions, r => `${r.date}|${r.levelStart}|${r.minutes}`).sort(byStr(r => r.date));
+  c.sessionMonths = unionBy(b.sessionMonths, a.sessionMonths, r => r.month, true).sort(byStr(r => r.month));
+  c.dungeons = unionBy(b.dungeons, a.dungeons, r => `${r.date}|${r.name}`).sort(byStr(r => r.date));
+  c.zones = unionBy(b.zones, a.zones, r => r.zone, true);
+  c.zoneLevels = unionBy(b.zoneLevels, a.zoneLevels, r => `${r.zone}|${r.level}`, true);
+  ["xpSources", "travel", "repairs", "deathsByLevel"].forEach(k => { if (a[k] || b[k]) c[k] = sumInto(a[k], b[k] || {}); });
+  if (a.firstLevel != null && (c.firstLevel == null || a.firstLevel < c.firstLevel)) c.firstLevel = a.firstLevel;
+  ["splits", "deaths", "goldDays", "sessions", "sessionMonths", "dungeons", "zones", "zoneLevels"].forEach(k => { if (!c[k].length && b[k] === undefined) delete c[k]; });
+  return clean(c);
+}
+function combine(runs) {
+  const list = Object.values(runs).filter(Boolean).sort(newer).reverse(); // newest first
+  if (list.length < 2) return { ...list[0] };
+  return list.slice(1).reduce((acc, r) => foldRun(acc, r), list[0]);
+}
+function runsOf(e) { return e && e.runs ? e.runs : { [runKey(e || {})]: e }; }
+function view(e) { if (!e) return e; if (!e.runs) return e; const v = combine(e.runs); v.runs = e.runs; return v; }
 function addChar(all, c) {
-  let keep = c;
-  Object.keys(all).forEach(id => { if (sameChar(all[id], c)) { if (newer(all[id], keep) > 0) keep = all[id]; delete all[id]; } });
-  if (keep !== c && !normRealm(keep.realm) && normRealm(c.realm)) keep.realm = c.realm;
-  const id = charId(keep); all[id] = keep; return id;
+  let runs = {};
+  Object.keys(all).forEach(id => { if (sameChar(all[id], c)) { Object.assign(runs, runsOf(all[id])); delete all[id]; } });
+  Object.keys(runs).forEach(k => { runs[k] = (({ runs: _, ...r }) => r)(runs[k]); });
+  if (c.runs) Object.assign(runs, c.runs); else runs[runKey(c)] = c;
+  // a run without a known realm belongs to the run with the same realm once that is known
+  const ids = Object.keys(runs);
+  const entry = ids.length > 1 ? view({ runs }) : runs[ids[0]];
+  const real = ids.map(k => runs[k]).filter(r => normRealm(r.realm)).sort(newer).pop();
+  if (real) entry.realm = real.realm;
+  const id = charId(entry); all[id] = entry; return id;
 }
 function dedupe(all) {
   const out = {}; let changed = false;
