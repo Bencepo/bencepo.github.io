@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.4
+
+- Fixed: recipes are no longer saved a second time under an empty profession name when the game does not report the name (profession window closed or still loading). Such entries are removed at login.
+
 ## 1.5.3
 
 - Fixed: when the game reports an empty realm name, LevelTrail no longer starts a second record for your character. It keeps writing to the existing one, and a record saved under the empty realm is merged into it at login, so the export has your whole history again.
