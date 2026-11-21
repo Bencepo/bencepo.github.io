@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0
+
+- Recipes: a second list next to Appearances with the recipes your character has not learned yet, for its own professions, cheapest first. Buy them top to bottom like appearances.
+- "Learnable now" (on by default) shows only recipes your skill, level and other requirements allow today. Off: recipes for later too, their required skill in red.
+- Profession filter, required skill column, right-click hides a recipe, Alt+click shows a diagnosis.
+- The chosen list (Appearances or Recipes) carries a tick. The status line moved to the bottom of the window.
+
 ## 1.1.1
 
 - New icon in the addon list and on the minimap button, part of the new Bencepo logo family.
