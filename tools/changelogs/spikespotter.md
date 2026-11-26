@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2
+
+- Addons loaded on demand (when their window opens, for example) are measured too: the list of addons is updated whenever one loads. Before, only the addons loaded at login counted.
+- The shared settings window (BencepoUI) is now one version for all Bencepo addons: "Report a bug" sits in a footer of its own, and the hint in the title row no longer runs into the title.
+
 ## 1.0.1
 
 - New icon in the addon list and in the addon menu at the minimap, part of the new Bencepo logo family.

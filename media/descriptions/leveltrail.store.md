@@ -18,7 +18,8 @@
 
 - `/trail` opens the export, already selected: Ctrl+C, then paste it at the website.
 - `/trail hud` turns the tracker window on or off, `/trail options` sets it up.
-- Minimap button: left-click export, right-click tracker, shift-click options.
+- Minimap button: left-click settings, right-click export, shift-click tracker on/off.
+- Place the tracker in the game's Edit Mode; lines, text size, alignment and opacity are set in the settings.
 
 ## Good to know
 

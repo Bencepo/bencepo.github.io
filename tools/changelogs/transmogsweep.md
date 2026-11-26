@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.1
+
+- No Lua error when the game hides an error line from addons ("secret" values) while TransmogSweep watches for the "Internal auction error" after a purchase.
+- English only: the German description in the addon list is removed.
+- The shared settings window (BencepoUI) is now one version for all Bencepo addons. The hint in its title row ("drag to move …") no longer runs into the title and version: it is shortened or left out when there is no room.
+- Code cleanup, no change in what is found or bought.
+
 ## 1.2.0
 
 - Recipes: a second list next to Appearances with the recipes your character has not learned yet, for its own professions, cheapest first. Buy them top to bottom like appearances.

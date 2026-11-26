@@ -16,7 +16,7 @@
 ## How to use
 
 - Hover or click the minimap button, or type `/pcd`.
-- `/pcd forget <name>` removes a character, `/pcd minimap` toggles the button.
+- The x on a character's line removes it (deleted or renamed characters). `/pcd minimap` toggles the button.
 
 ## Good to know
 

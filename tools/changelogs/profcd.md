@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3
+
+- Other characters can be forgotten with the x on their line in the window (after a question), e.g. a deleted or renamed character. No chat command needed.
+- The shared settings window (BencepoUI) is now one version for all Bencepo addons: "Report a bug" sits in a footer of its own, and the hint in the title row no longer runs into the title.
+
 ## 1.0.2
 
 - A character no longer shows up twice when the server reports a different realm name. Characters are now kept by their character ID; existing doubles are merged at login.

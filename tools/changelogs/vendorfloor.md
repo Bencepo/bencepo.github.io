@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.1.0
+
+- First steps: the first time the VendorFloor tab opens, three small callouts point one after the other at the Scan button, the result list and the buy button (Next, Next, Got it). The x skips them; Menu > How it works shows them again.
+
+## 1.0.9
+
+- New: a short sound each time the Check or Buy button becomes clickable, so you no longer wait for the chat summary. It stays quiet right after your own click or a tab change. On by default, switch: Settings > Alerts > "Sound when ready to click" (thanks kanegasi, #27).
+
+## 1.0.8
+
+- The shared settings window (BencepoUI 4): the hint in its title row ("drag to move …") no longer runs into the title and version; it is shortened or left out when there is no room.
+
+## 1.0.7
+
+- The minimap button opens the settings with a left-click, like the other Bencepo addons. Right-click shows the ledger for the website (the totals are in Menu > Statistics).
+- The settings window (BencepoUI) is now one version for all Bencepo addons: "Report a bug" sits in a footer of its own, and every settings window looks and works the same, whichever addon loads first.
+
+## 1.0.6
+
+- Disenchant values follow new material prices at once: a check or a crafting price lookup that finds dust, essences or shards at a new price now updates the disenchant tab right away instead of after the next full scan.
+- Crafting prices leave your own commodity auctions out (they could pull the usual price of a reagent towards your own listing).
+- The minimum profit filters the list at once, in both directions: raise it and finds below it hide, lower it and they come back (they were dropped until the next scan before). The input field saves the new value while you type, without Enter, and a click anywhere else ends the input; Escape undoes the change. The crafting tab and the percent slider in the settings follow at once too.
+- Not enough gold no longer stops scanning: a find you cannot afford (or that the spending limit or free bag slots stop) is let go at once with a note in the status line, and continuous mode goes on. The find stays in the list; stackable goods were dropped from it before. A find ready to buy that nobody clicks is let go after 20 seconds in continuous mode too.
+- Purchases confirmed only by the chat line now count for quick rounds too, like all other purchases.
+- English only: the German translation is removed, VendorFloor shows the same English texts on every client.
+- The minimap tooltip points to the settings instead of a chat command.
+- Code cleanup, no change in how VendorFloor scans or buys.
+
 ## 1.0.5
 
 - The disenchant basket works from a macro: `/click VendorFloorBasketButton` disenchants the next basket item, whatever the "cast on key down" setting says. The button now casts Disenchant on the bag slot directly instead of running a macro of its own.

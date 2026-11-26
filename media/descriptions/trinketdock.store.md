@@ -15,7 +15,7 @@
 ## How to use
 
 - `/tdock` or the addon menu at the minimap opens the settings.
-- Shift-drag a button to move the dock. Keybindings: Options > Keybindings > TrinketDock.
+- Move the dock in the game's Edit Mode or shift-drag a button. Keybindings: Options > Keybindings > TrinketDock.
 
 ## Good to know
 

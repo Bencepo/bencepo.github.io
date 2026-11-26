@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0
+
+- The dock can be placed in the game's Edit Mode: it shows there (blue, with its name) even when hidden or locked. With Edit Mode's "Snap" on it snaps flush to the other Edit Mode frames, the screen edges and the screen centre; without it, it stays where you drop it. Shift-drag still works as before.
+
+## 1.1.1
+
+- The shared settings window (BencepoUI) is now one version for all Bencepo addons: "Report a bug" sits in a footer of its own, and the hint in the title row no longer runs into the title.
+
 ## 1.1.0
 
 - Frame and background for the dock, each on or off, with a colour of your choice (window: Look). The background also has its own opacity.

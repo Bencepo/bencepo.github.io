@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.5.6
+
+- The shared settings window (BencepoUI 4): the hint in its title row ("drag to move …") no longer runs into the title and version; it is shortened or left out when there is no room.
+
+## 1.5.5
+
+- Text alignment for the tracker window: left, centre or right (settings).
+- Window opacity: the whole tracker, text included, can be made transparent; with the mouse over it, it is fully visible again.
+- Each tracker line can be moved up or down and has its own text size (settings, Lines). "Default lines" puts all lines back.
+- The tracker window can be placed in the game's Edit Mode: it shows there (blue, with its name) even when hidden or locked, snaps to the screen centre and, with Edit Mode's "Snap" on, to its grid. It is held at one edge, so switching lines on or off or changing their size grows and shrinks it from the other side: the edge it snapped to, otherwise the edge nearer the screen border (lower half of the screen: its bottom edge).
+- The minimap button opens the settings with a left-click, like the other Bencepo addons. Right-click opens the export for the web viewer, shift-click turns the tracker window on or off.
+- The settings window has a "Minimap button" switch and an "Export" button; hiding the minimap button no longer needs a chat command.
+- "Report a bug" uses the same link popup as the other Bencepo addons.
+- English only: the German description in the addon list is removed.
+- The shared settings window (BencepoUI) is now one version for all Bencepo addons.
+- Code cleanup, no change in what is recorded or exported.
+
 ## 1.5.4
 
 - Fixed: recipes are no longer saved a second time under an empty profession name when the game does not report the name (profession window closed or still loading). Such entries are removed at login.

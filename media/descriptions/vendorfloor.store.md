@@ -1,8 +1,10 @@
 # VendorFloor
 
-**Auction house sniper.** Finds auctions that are worth more than they cost: below vendor price, below disenchant value, or the reagents for a profitable craft. A tab of its own in the auction house window; every purchase is your own click.
+**Buy for less than a merchant pays, sell to the merchant, keep the difference.** VendorFloor is an auction house sniper for WoW Forever. It finds auctions that are worth more than they cost: below vendor price, below disenchant value, or the reagents for a profitable craft. A tab of its own in the auction house window; every purchase is your own click.
 
 **Website and live demo:** https://bencepo.github.io/vendorfloor/
+
+![VendorFloor in the auction house](https://bencepo.github.io/media/vendorfloor/finds.jpg)
 
 ## What it does
 
@@ -13,10 +15,13 @@
 - **Realistic values.** Materials count at the cheapest listings and at what your auctions really sold for.
 - **Ledger.** Spent, sold and real profit per session, day and item.
 - **Continuous mode.** Rescans on its own and announces new finds with an optional sound.
+- **Ready sound.** A short sound the moment the Check or Buy button can be clicked, so you are faster than the others.
+- **Share.** Today's and all-time profit as a short text for Discord or chat; the website makes a share image from the export.
 
 ## How to use
 
-- Open the auction house, click the VendorFloor tab, pick a list and press Scan.
+- Open the auction house and click the VendorFloor tab. The first time, three short callouts show the way: Scan, Check, Buy.
+- Pick a list and press Scan.
 - Click a find to check it against the live auctions, then Buy. At the mailbox: Collect purchases; at a merchant: Sell purchases.
 - Menu (top right): statistics, watchlist, ignore list, export and settings.
 

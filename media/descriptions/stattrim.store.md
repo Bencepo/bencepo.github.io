@@ -16,6 +16,7 @@
 ## How to use
 
 - Open the character window and click the gear icon above the stats.
+- Right-click the gear icon, or use the addon menu at the minimap, for the list window: every stat with a checkbox and "Default order".
 - `/stt reset` shows everything again, `/stt order` restores the original order.
 
 ## Good to know

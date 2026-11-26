@@ -18,7 +18,8 @@ A["leveltrail"] = dict(
     use=[
         "`/trail` opens the export, already selected: Ctrl+C, then paste it at the website.",
         "`/trail hud` turns the tracker window on or off, `/trail options` sets it up.",
-        "Minimap button: left-click export, right-click tracker, shift-click options.",
+        "Minimap button: left-click settings, right-click export, shift-click tracker on/off.",
+        "Place the tracker in the game's Edit Mode; lines, text size, alignment and opacity are set in the settings.",
     ],
     good=[
         "Online time counts from the install on. A level the addon did not see from the start is marked as partial.",
@@ -33,8 +34,9 @@ A["leveltrail"] = dict(
 )
 
 A["vendorfloor"] = dict(
-    name="VendorFloor", repo="VendorFloor", tag="Auction house sniper",
-    lead="Finds auctions that are worth more than they cost: below vendor price, below disenchant value, or the reagents for a profitable craft. A tab of its own in the auction house window; every purchase is your own click.",
+    name="VendorFloor", repo="VendorFloor", tag="Buy for less than a merchant pays, sell to the merchant, keep the difference",
+    lead="VendorFloor is an auction house sniper for WoW Forever. It finds auctions that are worth more than they cost: below vendor price, below disenchant value, or the reagents for a profitable craft. A tab of its own in the auction house window; every purchase is your own click.",
+    image="![VendorFloor in the auction house](https://bencepo.github.io/media/vendorfloor/finds.jpg)",
     what=[
         ("Vendor finds", "Auctions below what a merchant pays. Buy, collect from the mail and sell, each with one button."),
         ("Disenchant finds", "Green and blue gear below its disenchant value, from Forever's tables and your own results."),
@@ -43,9 +45,12 @@ A["vendorfloor"] = dict(
         ("Realistic values", "Materials count at the cheapest listings and at what your auctions really sold for."),
         ("Ledger", "Spent, sold and real profit per session, day and item."),
         ("Continuous mode", "Rescans on its own and announces new finds with an optional sound."),
+        ("Ready sound", "A short sound the moment the Check or Buy button can be clicked, so you are faster than the others."),
+        ("Share", "Today's and all-time profit as a short text for Discord or chat; the website makes a share image from the export."),
     ],
     use=[
-        "Open the auction house, click the VendorFloor tab, pick a list and press Scan.",
+        "Open the auction house and click the VendorFloor tab. The first time, three short callouts show the way: Scan, Check, Buy.",
+        "Pick a list and press Scan.",
         "Click a find to check it against the live auctions, then Buy. At the mailbox: Collect purchases; at a merchant: Sell purchases.",
         "Menu (top right): statistics, watchlist, ignore list, export and settings.",
     ],
@@ -57,7 +62,7 @@ A["vendorfloor"] = dict(
     dev="""## Development
 
 - Ledger page: `web/index.html`, published from `Bencepo/bencepo.github.io` (folder `vendorfloor/`).
-- Tests: `busted`. Release: new version heading at the top of `CHANGELOG.md`, push to `main`; the workflow checks the code and uploads to CurseForge and Wago.""",
+- Tests: `busted`. Release: new version heading at the top of `CHANGELOG.md`, push to `main`; the workflow checks the code and uploads to CurseForge and Wago. Changes wait under `## Unreleased` for the weekly release.""",
 )
 
 A["procflare"] = dict(
@@ -92,7 +97,7 @@ A["swingcast"] = dict(
         ("Your look", "Height, width, position, font, font size and colours."),
     ],
     use=[
-        "Switch on Forever's swing timer first: Options > Advanced Options > Swing Timer.",
+        "Switch on Forever's swing timer first: Options > Advanced Options > Swing Timer. \"Hide built-in swing bars\" in the window keeps only the strip visible.",
         "`/swc` or the minimap button opens the window; right-click the button for a preview.",
         "Move the strip in Edit Mode or with \"Move strip\" in the window.",
     ],
@@ -114,6 +119,7 @@ A["stattrim"] = dict(
     ],
     use=[
         "Open the character window and click the gear icon above the stats.",
+        "Right-click the gear icon, or use the addon menu at the minimap, for the list window: every stat with a checkbox and \"Default order\".",
         "`/stt reset` shows everything again, `/stt order` restores the original order.",
     ],
     good=[
@@ -123,7 +129,7 @@ A["stattrim"] = dict(
 
 A["transmogsweep"] = dict(
     name="TransmogSweep", repo="TransmogSweep", tag="Collect transmogs from the auction house",
-    lead="Every transmog appearance on the auction house you have not collected yet, cheapest first, as a tab in the auction house window. Buy them top to bottom with one button.",
+    lead="Every transmog appearance on the auction house you have not collected yet, cheapest first, as a tab in the auction house window. Also finds the recipes your character has not learned yet. Buy them top to bottom with one button.",
     image="![TransmogSweep in the auction house](https://bencepo.github.io/media/transmogsweep/demo.gif)",
     what=[
         ("Its own tab", "Next to the tabs of other auction addons, which stay where they are."),
@@ -131,15 +137,17 @@ A["transmogsweep"] = dict(
         ("What the game says", "Account-wide, exactly as the item tooltip shows \"You haven't collected this appearance\"."),
         ("Unique appearances", "One row per look, the cheapest item. Off: every source you lack."),
         ("Filters", "Usable by my class, slot, search, maximum price, hide items above your level."),
+        ("Recipes", "A second list: unlearned recipes for your character's professions, cheapest first. \"Learnable now\" keeps it to what your skill allows today."),
         ("Buy top to bottom", "\"Start buying\" checks the first item, the next click buys it, then the next row is checked by itself."),
     ],
     use=[
-        "Open the auction house, click the TransmogSweep tab, press Scan.",
+        "Open the auction house, click the TransmogSweep tab, pick Appearances or Recipes, press Scan.",
         "Ctrl+click previews an item, right-click hides a look, Alt+click shows a diagnosis for bug reports.",
     ],
     good=[
         "Nothing is ever bought without your click.",
         "Bought looks arrive in the mail and stay hidden until you learn them: wear the item or sell it to a vendor.",
+        "Recipes count per character and only for the professions it has.",
     ],
 )
 
@@ -155,7 +163,7 @@ A["trinketdock"] = dict(
     ],
     use=[
         "`/tdock` or the addon menu at the minimap opens the settings.",
-        "Shift-drag a button to move the dock. Keybindings: Options > Keybindings > TrinketDock.",
+        "Move the dock in the game's Edit Mode or shift-drag a button. Keybindings: Options > Keybindings > TrinketDock.",
     ],
     good=[
         "No work when you loot, none when combat starts or ends.",
@@ -195,7 +203,7 @@ A["profcd"] = dict(
     ],
     use=[
         "Hover or click the minimap button, or type `/pcd`.",
-        "`/pcd forget <name>` removes a character, `/pcd minimap` toggles the button.",
+        "The x on a character's line removes it (deleted or renamed characters). `/pcd minimap` toggles the button.",
     ],
     good=[
         "Log in once with each crafter so ProfCD knows its cooldowns.",

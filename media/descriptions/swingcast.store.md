@@ -14,7 +14,7 @@
 
 ## How to use
 
-- Switch on Forever's swing timer first: Options > Advanced Options > Swing Timer.
+- Switch on Forever's swing timer first: Options > Advanced Options > Swing Timer. "Hide built-in swing bars" in the window keeps only the strip visible.
 - `/swc` or the minimap button opens the window; right-click the button for a preview.
 - Move the strip in Edit Mode or with "Move strip" in the window.
 
