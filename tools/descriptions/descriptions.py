@@ -36,7 +36,7 @@ A["leveltrail"] = dict(
 A["vendorfloor"] = dict(
     name="VendorFloor", repo="VendorFloor", tag="Buy for less than a merchant pays, sell to the merchant, keep the difference",
     lead="VendorFloor is an auction house sniper for WoW Forever. It finds auctions that are worth more than they cost: below vendor price, below disenchant value, or the reagents for a profitable craft. A tab of its own in the auction house window; every purchase is your own click.",
-    image="![VendorFloor in the auction house](https://bencepo.github.io/media/vendorfloor/finds.jpg)",
+    image="![VendorFloor in the auction house](https://bencepo.github.io/media/vendorfloor/demo.gif)",
     what=[
         ("Vendor finds", "Auctions below what a merchant pays. Buy, collect from the mail and sell, each with one button."),
         ("Disenchant finds", "Green and blue gear below its disenchant value, from Forever's tables and your own results."),

@@ -4,7 +4,7 @@
 
 **Website and live demo:** https://bencepo.github.io/vendorfloor/
 
-![VendorFloor in the auction house](https://bencepo.github.io/media/vendorfloor/finds.jpg)
+![VendorFloor in the auction house](https://bencepo.github.io/media/vendorfloor/demo.gif)
 
 ## What it does
 
