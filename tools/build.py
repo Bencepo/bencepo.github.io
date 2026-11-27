@@ -186,6 +186,12 @@ VIDEOS = {
     "swingcast": "https://youtube.com/shorts/zE11MGQ7QIY",
 }
 
+# "More from Bencepo" on the two tool pages: hand-picked, like the showcase pages
+TOOL_GOES = {
+    "vendorfloor": ["transmogsweep", "profcd", "leveltrail"],  # same auction-house / gold audience
+    "leveltrail": ["vendorfloor", "procflare", "swingcast"],
+}
+
 
 def card(a, base, compact=False):
     video = "" if compact or a["key"] not in VIDEOS else f'<a class="btn sm ghost" href="{VIDEOS[a["key"]]}" target="_blank" rel="noopener">▶ Video</a>'
@@ -1057,7 +1063,7 @@ def build():
         s = re.sub(r"<!--@footer-->.*?<!--/@footer-->", lambda m: f"<!--@footer-->{footer('../')}<!--/@footer-->", s, flags=re.S)
         s = re.sub(r"<!--@changelog-->.*?<!--/@changelog-->", lambda m: f"<!--@changelog-->{changelog(key)}<!--/@changelog-->", s, flags=re.S)
         s = re.sub(r"<!--@version-->.*?<!--/@version-->", lambda m: f"<!--@version-->v{latest(key)}<!--/@version-->", s, flags=re.S)
-        s = re.sub(r"<!--@goes-->.*?<!--/@goes-->", lambda m: f"<!--@goes-->{goes_with([k for k in ('procflare','swingcast','stattrim','transmogsweep','leveltrail','vendorfloor') if k != key][:3], '../')}<!--/@goes-->", s, flags=re.S)
+        s = re.sub(r"<!--@goes-->.*?<!--/@goes-->", lambda m: f"<!--@goes-->{goes_with(TOOL_GOES[key], '../')}<!--/@goes-->", s, flags=re.S)
         s = re.sub(r"<!--@community-->.*?<!--/@community-->", lambda m: f"<!--@community-->{community('../')}<!--/@community-->", s, flags=re.S)
         p.write_text(s, encoding="utf-8")
     print("built")
