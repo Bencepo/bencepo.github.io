@@ -1,5 +1,34 @@
 # Changelog
 
+## 1.2.2
+
+- Fixed: full scans dropped a large part of the auction house. For roughly a quarter of all auctions the client never marks the data as complete, although price, amount and item are there; VendorFloor waited for it, gave up after 20 seconds and left those auctions out. They are now read with the data that is there, so full scans see every auction again, find more and price items better.
+- Fixed: "Loading item data" in full scans took one to two minutes. It now ends a few seconds after reading (about 12 seconds for 320,000 auctions in testing). Every waiting auction is tried again, not only the first one of each item.
+
+## 1.2.1
+
+- New: Settings > Market Flips > "Enable Market Flips" (on by default). Turned off, VendorFloor is the plain vendor and disenchant sniper again: no flip checks while scanning, no price history, no Market Flips tab and no market value in tooltips. The history already kept stays for when it is turned on again. Thanks to maltundra for the suggestion.
+- Faster checks with Market Flips on: vendor, disenchant and watchlist finds are always checked before flips, so flips no longer use up a round's checks first.
+- Faster continuous mode: a find checked within the last 90 seconds whose cheapest price and listed amount have not changed is not searched again; a search without an answer gives up after 1.2 instead of 2 seconds; quick rounds pause after two rounds without a find (the whole item list is read instead) and are tried again every 12th round.
+- Faster full scan while item data loads: waiting auctions are kept by item and read as soon as the client reports the item; the last few auctions whose item never loads no longer hold up the scan for 20 seconds.
+- Lower CPU while scanning: the market value of an item is computed once per new price reading instead of for every browse result and window refresh.
+- Settings window: "More from Bencepo" button in the footer links to all Bencepo addons (BencepoUI 6).
+
+## 1.2.0
+
+- New tab "Market Flips": auctions far below their usual price, to buy and post again on the auction house. The usual price (market value) is the median of up to 14 days of VendorFloor's own price history (one value per day, other players' auctions only); the profit shown is net, after the 5% auction house cut. An item needs at least 3 days and 3 price readings before it can be a flip; until then the empty tab says how many days of history there are. Full scans, scans and checks all add to the history, kept for 21 days. The prices VendorFloor already saw before this version start the history, so flips can show from the first day.
+- Settings > Market Flips: minimum discount below the market value (default 30%), minimum net profit per unit (default 50 silver), the market value in item tooltips (with "Values in item tooltips") and "Reset flip history".
+- Flip purchases are collected from the mail like the others but never offered to a merchant by "Sell". As always, nothing is bought on its own: every purchase is your click or key.
+- The ready sound (Check or Buy clickable) is louder and clearer: the ready-check tone on the Master channel, so it is heard even with game sounds turned down.
+- Fixed: switching tabs while a find of the other tab was ready to buy kept the Scan button grey and continuous mode waiting. That purchase is now let go when the tab changes, and scanning goes on.
+- New "Share" button next to the buy button: today's and all-time profit as a short text to copy, for Discord or chat, with the link to the addon. The tooltip points to Menu > Export for the website for a share image.
+- Fixed (Market Flips & scanning): item checks no longer pass ItemKey tables into price history (existing bad keys are scrubbed on load); commodity quotes now enforce `minDiscountPct`, `minPercent` and `minSlot`; scanning on one tab no longer wipes finds from another tab; browse timeout retries work properly; `MarketHistory` rejects invalid/sub-copper prices and aligns its 14-day window.
+- Fixed (Mail, Selling, Lists, Tooltips, Export, Sales): mail collection strictly skips C.O.D. and non-purchase mails, counts only general bag slots (avoiding loops with a reagent bag) and confirms receipt before decrementing DE tracking; bulk vendor sales no longer drop delayed batches from the ledger; Shift-click into the Ignore List works even before opening the Watchlist; item tooltips guard forbidden tooltips and skip work when disabled; JSON export no longer overflows 32-bit integers on large gold totals; auction sales deduplication handles identical batch mails reliably.
+- Lower CPU, memory and idle overhead: full scans compute quantiles in a single sort with zero-alloc flip filtering and batched saves; scrolling and scan progress avoid full UI rebuilds; `GLOBAL_MOUSE_DOWN`, disenchant tracking and AH events are only active when needed; stale `prices`, `lows` and `hot` entries are pruned on login; shared settings window updated to BencepoUI 5.
+- Faster scans, checks, crafting price lookups and full scans: queries now send immediately when the auction house throttle is ready and flush on `AUCTION_HOUSE_THROTTLED_MESSAGE_SYSTEM_READY` instead of polling every 0.1 s; check rounds pipeline straight from one result to the next without per-page/per-check UI rebuilds; crafting price lookups advance directly on search-result events; full-scan reading and item-data loading now run per frame within a 10 ms frame budget instead of a fixed 400 auctions per 0.1 s tick.
+- Faster mail collection: taking purchases from the mailbox is now event-driven (`MAIL_INBOX_UPDATE` / `MAIL_SUCCESS`) at up to ~20 items/sec instead of a fixed 0.4 s wait between items, skips full inbox rescans while collecting, tracks inbox position in O(N) with early-exit on attachment count, retries a stalled take once and stops immediately on `ERR_INV_FULL`.
+- Alert sound and taskbar flash now only trigger for new vendor or disenchant finds, not for Market Flips or watchlist-only finds.
+
 ## 1.1.0
 
 - First steps: the first time the VendorFloor tab opens, three small callouts point one after the other at the Scan button, the result list and the buy button (Next, Next, Got it). The x skips them; Menu > How it works shows them again.

@@ -35,11 +35,12 @@ A["leveltrail"] = dict(
 
 A["vendorfloor"] = dict(
     name="VendorFloor", repo="VendorFloor", tag="Buy for less than a merchant pays, sell to the merchant, keep the difference",
-    lead="VendorFloor is an auction house sniper for WoW Forever. It finds auctions that are worth more than they cost: below vendor price, below disenchant value, or the reagents for a profitable craft. A tab of its own in the auction house window; every purchase is your own click.",
+    lead="VendorFloor is an auction house sniper for WoW Forever. It finds auctions that are worth more than they cost: below vendor price, below disenchant value, far below their usual price, or the reagents for a profitable craft. A tab of its own in the auction house window; every purchase is your own click.",
     image="![VendorFloor in the auction house](https://bencepo.github.io/media/vendorfloor/demo.gif)",
     what=[
         ("Vendor finds", "Auctions below what a merchant pays. Buy, collect from the mail and sell, each with one button."),
         ("Disenchant finds", "Green and blue gear below its disenchant value, from Forever's tables and your own results."),
+        ("Market Flips", "Auctions far below their usual price (median of up to 14 days of price history, 3 days minimum), with the net profit after the 5% auction house cut. Can be switched off in the settings."),
         ("Disenchant basket", "Enchanters disenchant the bought items one click or one key at a time."),
         ("Crafting profits", "Which of your recipes make a profit right now, reagents from the cheapest source."),
         ("Realistic values", "Materials count at the cheapest listings and at what your auctions really sold for."),
@@ -56,6 +57,7 @@ A["vendorfloor"] = dict(
     ],
     good=[
         "The full scan reads every auction at once. The auction house allows it every 15 minutes, and only after your click.",
+        "Market Flips are bought to post again on the auction house, so \"Sell\" never offers them to a merchant.",
         "All auction addons share one search channel: stop the scan before searching elsewhere.",
         "Export the ledger and paste it on the website for profit per day and per item.",
     ],
@@ -92,17 +94,17 @@ A["swingcast"] = dict(
     what=[
         ("Spell icon and cast time", "On the standard cast bar, inside it or left of it."),
         ("Latency zone", "At the end of the bar: once the bar reaches it, press the next spell."),
-        ("Swing timer", "A thin strip under the cast bar with the seconds to the next swing."),
+        ("Swing timer", "A thin strip under the cast bar with the seconds to the next swing. It follows your attack speed: forms, haste buffs and slows count, also mid-swing. The off-hand strip shows only with a weapon in the off hand."),
         ("Queued swing", "Orange while Maul, Heroic Strike or Raptor Strike is queued, blue for Cleave."),
         ("Your look", "Height, width, position, font, font size and colours."),
     ],
     use=[
-        "Switch on Forever's swing timer first: Options > Advanced Options > Swing Timer. \"Hide built-in swing bars\" in the window keeps only the strip visible.",
+        "Works without Forever's own swing timer option. If you have it switched on, \"Hide built-in swing bars\" in the window keeps only the strip visible.",
         "`/swc` or the minimap button opens the window; right-click the button for a preview.",
         "Move the strip in Edit Mode or with \"Move strip\" in the window.",
     ],
     good=[
-        "SwingCast mirrors Forever's built-in swing timer. It is the only accurate source, because Forever keeps the combat log from addons.",
+        "SwingCast times each swing from the game's own swing event (main hand, off hand, ranged), so Cat Form, Bear Form, haste buffs and slows are counted in. A speed change mid-swing rescales the rest of the swing.",
         "If the strip ever fails, it switches itself off and the built-in bar comes back.",
     ],
 )
@@ -153,11 +155,12 @@ A["transmogsweep"] = dict(
 
 A["trinketdock"] = dict(
     name="TrinketDock", repo="TrinketDock", tag="A light trinket menu",
-    lead="Two buttons for your trinkets and a flyout to swap them. In combat the swap is queued and done the moment combat ends. Nothing runs in the background.",
+    lead="Two buttons for your trinkets and a flyout to swap them. In combat or while casting the swap is queued and done the moment you are free. Nothing runs in the background.",
     what=[
-        ("Two use buttons", "Top and bottom trinket with cooldowns. Click or bind a key."),
+        ("Two use buttons", "Top and bottom trinket with cooldowns. Click or bind a key. An empty slot is hidden; with no trinket equipped the dock hides until Edit Mode."),
         ("Flyout to swap", "Hover a button: left-click a trinket for the top slot, right-click for the bottom slot."),
-        ("Queue in combat", "Trinkets cannot be swapped in combat, so the swap waits and happens when combat ends."),
+        ("Queue in combat and while casting", "Trinkets cannot be swapped in combat, and a swap would cancel a cast such as your mount. The swap waits and happens the moment combat or the cast ends."),
+        ("Short tooltips", "Only the trinket under the mouse, without the comparison tooltips of your equipped trinkets."),
         ("Light", "Bags are read only when the flyout opens. Made as a slim replacement for ItemRack's trinket menu."),
         ("Your layout", "Side by side or stacked, flyout up or down, any scale, lock. Frame and background in colours of your choice, opacity from 0 to 100 %."),
     ],

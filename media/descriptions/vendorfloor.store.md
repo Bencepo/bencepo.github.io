@@ -1,6 +1,6 @@
 # VendorFloor
 
-**Buy for less than a merchant pays, sell to the merchant, keep the difference.** VendorFloor is an auction house sniper for WoW Forever. It finds auctions that are worth more than they cost: below vendor price, below disenchant value, or the reagents for a profitable craft. A tab of its own in the auction house window; every purchase is your own click.
+**Buy for less than a merchant pays, sell to the merchant, keep the difference.** VendorFloor is an auction house sniper for WoW Forever. It finds auctions that are worth more than they cost: below vendor price, below disenchant value, far below their usual price, or the reagents for a profitable craft. A tab of its own in the auction house window; every purchase is your own click.
 
 **Website and live demo:** https://bencepo.github.io/vendorfloor/
 
@@ -10,6 +10,7 @@
 
 - **Vendor finds.** Auctions below what a merchant pays. Buy, collect from the mail and sell, each with one button.
 - **Disenchant finds.** Green and blue gear below its disenchant value, from Forever's tables and your own results.
+- **Market Flips.** Auctions far below their usual price (median of up to 14 days of price history, 3 days minimum), with the net profit after the 5% auction house cut. Can be switched off in the settings.
 - **Disenchant basket.** Enchanters disenchant the bought items one click or one key at a time.
 - **Crafting profits.** Which of your recipes make a profit right now, reagents from the cheapest source.
 - **Realistic values.** Materials count at the cheapest listings and at what your auctions really sold for.
@@ -28,6 +29,7 @@
 ## Good to know
 
 - The full scan reads every auction at once. The auction house allows it every 15 minutes, and only after your click.
+- Market Flips are bought to post again on the auction house, so "Sell" never offers them to a merchant.
 - All auction addons share one search channel: stop the scan before searching elsewhere.
 - Export the ledger and paste it on the website for profit per day and per item.
 

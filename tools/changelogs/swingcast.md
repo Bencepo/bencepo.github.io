@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.4
+
+- Fix: the swing strip did not show in combat. It no longer depends on Forever's built-in swing timer: it now runs on the game's own swing event, so the "Swing Timer" game option is no longer needed.
+- The swing time follows your attack speed: Cat Form, Bear Form, haste buffs and slows are counted in, and a change mid-swing rescales the rest of the running swing.
+- The off-hand strip only shows with a weapon in the off hand.
+- Settings window: "More from Bencepo" button in the footer links to all Bencepo addons (BencepoUI 6).
+- Code cleanup, no change in behaviour.
+
+## 1.1.3
+
+- Zero idle frame work: the swing driver sleeps whenever no swing bar or preview is active, and queued-ability tinting updates on `CURRENT_SPELL_CAST_CHANGED` instead of polling `IsCurrentSpell` 20 times per second.
+- Fixed: `applySelection` no longer wipes the cast bar's Edit Mode selection box if anchors were not ready yet, and respects combat lockdown; queued-ability tinting now colours only the Main-Hand bar (not Off-Hand or Ranged); visible strips stack without empty gaps; toggling the latency zone updates an active cast immediately.
+- Shared settings window updated to BencepoUI 5.
+
 ## 1.1.2
 
 - The shared settings window (BencepoUI 4): the hint in its title row ("drag to move …") no longer runs into the title and version; it is shortened or left out when there is no room.

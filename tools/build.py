@@ -22,7 +22,7 @@ ADDONS = [
          wago="https://addons.wago.io/addons/leveltrail"),
     dict(key="vendorfloor", name="VendorFloor", cf=1797826, glow="rgba(224,112,60,.32)", tool=True,
          tag="Auction house sniper",
-         blurb="Finds auctions below vendor price, below disenchant value and profitable crafts. One click to buy, collect and sell. The page shows your real profit per day and item.",
+         blurb="Finds auctions below vendor price, below disenchant value or far below their usual price, plus profitable crafts. One click to buy, collect and sell. The page shows your real profit per day and item.",
          wago="https://addons.wago.io/addons/vendorfloor"),
     dict(key="procflare", name="ProcFlare", cf=1800929, glow="rgba(240,190,90,.32)", tool=False,
          tag="Never miss a proc",
@@ -42,7 +42,7 @@ ADDONS = [
          wago="https://addons.wago.io/addons/transmogsweep"),
     dict(key="trinketdock", name="TrinketDock", cf=1818466, glow="rgba(79,195,247,.30)", tool=False,
          tag="A light trinket menu",
-         blurb="Two buttons for your trinkets and a flyout to swap them. In combat the swap is queued and done the moment combat ends. Nothing runs in the background.",
+         blurb="Two buttons for your trinkets and a flyout to swap them. In combat or while casting the swap is queued and done the moment you are free. Nothing runs in the background.",
          wago="https://addons.wago.io/addons/trinketdock"),
     dict(key="spikespotter", name="SpikeSpotter", cf=1818471, glow="rgba(255,138,61,.30)", tool=False,
          tag="Find the addon behind the stutter",
@@ -966,16 +966,15 @@ def build():
         ("◧", "Spell icon", "Inside the cast bar at its left end, or left of it, so you see what you are casting at a glance."),
         ("⧗", "Remaining cast time", "Counted down right on the bar."),
         ("▮", "Latency zone", "Red end of the bar: once the bar reaches it, the next spell can be pressed."),
-        ("⚔", "Swing timer", "A thin strip right under the cast bar, with the seconds to the next swing."),
+        ("⚔", "Swing timer", "A thin strip right under the cast bar, with the seconds to the next swing. It follows your attack speed: forms, haste buffs and slows count, also mid-swing."),
         ("◆", "Queued swing", "Orange while Maul, Heroic Strike or Raptor Strike is queued, blue for Cleave."),
         ("⚙", "Your look", "Height, font, font size and every colour, with the game's colour picker."),
     ], lst([
-        "Switch on Forever's swing timer first: **Options > Advanced Options > Swing Timer**.",
         "Its own **settings window**: drag it anywhere, it stays open while you play and every change shows live. `/swc`, or the **minimap button**: left-click the window, right-click an 8 s preview.",
         "**Move the swing strip** in the game's Edit Mode or with \"Move strip\" in the window, or keep it under the cast bar.",
         "Show or hide icon, cast time, latency zone, swing strip and its seconds; hide the built-in swing bars.",
         "Advanced: `/swc help` lists every setting as a command.",
-    ]), ingame("swingcast", "A real screenshot: the settings window and the swing strip under the cast bar, shown as a preview while the window is open.") + '''<section class="section"><div class="note"><b style="color:var(--gold2)">How it works.</b> The strip mirrors Forever's built-in swing timer, the only accurate source: Forever keeps the combat log from addons and hands attack speed to addons as secret values. If the strip ever fails, it switches itself off and the built-in bar comes back.</div></section>''',
+    ]), ingame("swingcast", "A real screenshot: the settings window and the swing strip under the cast bar, shown as a preview while the window is open.") + '''<section class="section"><div class="note"><b style="color:var(--gold2)">How it works.</b> The strip times each swing from the game's own swing event (main hand, off hand, ranged), so Forever's swing timer option is not needed. The off-hand strip shows only with a weapon in the off hand. If the strip ever fails, it switches itself off and the built-in bar comes back.</div></section>''',
         ["procflare", "stattrim", "leveltrail"])
     (ROOT / "swingcast").mkdir(exist_ok=True); (ROOT / "swingcast" / "index.html").write_text(sc, encoding="utf-8")
 
@@ -1015,7 +1014,9 @@ def build():
     td = showcase("trinketdock", TD_DEMO, TD_CSS, TD_JS, [
         ("◧", "Two use buttons", "Your top and bottom trinket with their cooldowns. Click to use, or bind a key (Options > Keybindings > TrinketDock)."),
         ("⇡", "Flyout to swap", "Hover a button and every trinket in your bags shows up. Left-click equips it to the top slot, right-click to the bottom slot."),
-        ("⧗", "Queue in combat", "Trinkets cannot be swapped in combat, so the flyout queues the swap. It happens the moment combat ends; a small icon on the button shows what is queued."),
+        ("⧗", "Queue in combat and while casting", "Trinkets cannot be swapped in combat, and a swap would cancel a cast such as your mount. The flyout queues it; it happens the moment combat or the cast ends, and a small icon on the button shows what is queued."),
+        ("▢", "Only what you wear", "An empty trinket slot is hidden. With no trinket equipped the dock hides, and Edit Mode shows both slots to place it."),
+        ("☰", "Short tooltips", "Only the trinket under the mouse, without the comparison tooltips of your equipped trinkets."),
         ("◈", "Light", "Bags are read only when the flyout opens. No work when you loot, none when combat starts or ends. Made as a slim replacement for ItemRack's trinket menu."),
         ("⚙", "Your layout", "Side by side or stacked, flyout up or down, any scale. Shift-drag to move, or lock it."),
     ], lst([

@@ -1,14 +1,15 @@
 # TrinketDock
 
-**A light trinket menu.** Two buttons for your trinkets and a flyout to swap them. In combat the swap is queued and done the moment combat ends. Nothing runs in the background.
+**A light trinket menu.** Two buttons for your trinkets and a flyout to swap them. In combat or while casting the swap is queued and done the moment you are free. Nothing runs in the background.
 
 **Website and live demo:** https://bencepo.github.io/trinketdock/
 
 ## What it does
 
-- **Two use buttons.** Top and bottom trinket with cooldowns. Click or bind a key.
+- **Two use buttons.** Top and bottom trinket with cooldowns. Click or bind a key. An empty slot is hidden; with no trinket equipped the dock hides until Edit Mode.
 - **Flyout to swap.** Hover a button: left-click a trinket for the top slot, right-click for the bottom slot.
-- **Queue in combat.** Trinkets cannot be swapped in combat, so the swap waits and happens when combat ends.
+- **Queue in combat and while casting.** Trinkets cannot be swapped in combat, and a swap would cancel a cast such as your mount. The swap waits and happens the moment combat or the cast ends.
+- **Short tooltips.** Only the trinket under the mouse, without the comparison tooltips of your equipped trinkets.
 - **Light.** Bags are read only when the flyout opens. Made as a slim replacement for ItemRack's trinket menu.
 - **Your layout.** Side by side or stacked, flyout up or down, any scale, lock. Frame and background in colours of your choice, opacity from 0 to 100 %.
 
